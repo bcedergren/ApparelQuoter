@@ -1,0 +1,33 @@
+/* .pricingTable {
+	width: 100%;
+	border-collapse: collapse;
+} */
+
+/* .pricingTable th,
+.pricingTable td {
+	border: 1px solid #ddd;
+	padding: 8px;
+} */
+
+.pricingTable th {
+	text-align: left;
+	background-color: #4caf50;
+	color: white;
+}
+
+/* .quantityRangesSection th {
+	background-color: #f2f2f2;
+} */
+
+.wholesaleMarkupSection,
+.quantityRangesSection,
+.printingLocationNamesSection,
+.dtgPrintingPricesSection,
+.dyeSublimationPricesSection,
+.preCutVinylPricesSection,
+.minimumStitchCountSection,
+.orderQuantityDiscountsSection,
+.shippingFeesSection,
+.wholesaleWebsitesSection {
+	margin-top: 20px;
+}

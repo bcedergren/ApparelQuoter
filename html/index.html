@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0"
+		/>
+		<title>Apparel Pricing Guide</title>
+		<style>
+			.header,
+			.subtotal-section,
+			.footer {
+				background-color: #003366;
+				color: white;
+				padding: 10px;
+				text-align: center;
+			}
+
+			table {
+				width: 100%;
+				border-collapse: collapse;
+			}
+
+			th,
+			td {
+				border: 1px solid #ddd;
+				padding: 8px;
+			}
+
+			.step th {
+				background-color: #e7eff6;
+				color: #003366;
+			}
+
+			.subtotal td {
+				background-color: #f2f2f2;
+				font-weight: bold;
+				text-align: right;
+			}
+
+			.subtotal-section {
+				margin-top: 20px;
+			}
+
+			.footer {
+				position: fixed;
+				bottom: 0;
+				width: 100%;
+			}
+
+			/* Add additional CSS for input elements, buttons, and layout adjustments */
+		</style>
+	</head>
+	<body>
+		<div class="header">
+			<h1>APPAREL PRICING GUIDE</h1>
+		</div>
+		<div class="customer-type-header">
+			<label for="customer">Customer:</label>
+			<input
+				type="text"
+				id="customer"
+				name="customer"
+			/>
+
+			<label for="type">Type:</label>
+			<select
+				id="type"
+				name="type"
+			>
+				<option value="invoice">Invoice</option>
+				<!-- Other options here -->
+			</select>
+
+			<!-- Buttons -->
+			<button type="button">Clear Quote Values</button>
+			<button type="button">Save Quote Values</button>
+		</div>
+
+		<table>
+			<tr class="step">
+				<th>STEP 1</th>
+				<th colspan="2">BRAND & STYLE</th>
+				<th>COLOR</th>
+				<!-- Size headers -->
+				<th>XS</th>
+				<th>S</th>
+				<th>M</th>
+				<!-- ... other sizes ... -->
+			</tr>
+			<!-- Rows for Brand & Style -->
+			<tr>
+				<td>PC78H</td>
+				<td colspan="2">Jet Black</td>
+				<td>
+					<input
+						type="text"
+						name="xs"
+					/>
+				</td>
+				<td>
+					<input
+						type="text"
+						name="s"
+					/>
+				</td>
+				<td>
+					<input
+						type="text"
+						name="m"
+					/>
+				</td>
+				<!-- ... other sizes ... -->
+			</tr>
+			<!-- ... additional rows ... -->
+		</table>
+		<table>
+			<tr class="step">
+				<th>STEP 2</th>
+				<th colspan="2">BRAND & STYLE</th>
+				<th>COLOR</th>
+				<!-- ... -->
+				<th>XS-XL</th>
+				<!-- ... -->
+			</tr>
+			<!-- Rows for Pricing -->
+			<tr>
+				<td>PC78H</td>
+				<td colspan="2">Jet Black</td>
+				<td>
+					<input
+						type="text"
+						name="price_xs_xl"
+					/>
+				</td>
+				<!-- ... -->
+			</tr>
+			<!-- ... additional rows ... -->
+		</table>
+
+		<!-- Steps 3 to 7 -->
+		<!-- Repeat the structure of the tables above for each step -->
+
+		<div class="subtotal-section">
+			<table>
+				<tr class="subtotal">
+					<td>QTY 47</td>
+					<td>AVG COST $26.10</td>
+					<td>APPAREL $855.89</td>
+					<td>PRINTING $371.00</td>
+					<td>SHIPPING $0.00</td>
+					<td>TAX $0.00</td>
+					<td>TOTAL $1,226.89</td>
+				</tr>
+			</table>
+		</div>
+
+		<div class="footer">
+			<p>Footer content here</p>
+		</div>
+	</body>
+</html>
