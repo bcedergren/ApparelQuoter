@@ -17,7 +17,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 		const { companyName, email, password, ...companyDetails }: UserData =
 			req.body;
 
-		const db = await connectToDatabase();
+		const { client, db } = await connectToDatabase();
 		const existingUser = await db.collection('User').findOne({ Email: email });
 
 		if (existingUser) {
