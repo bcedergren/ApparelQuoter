@@ -1,5 +1,5 @@
 import type { NextPage } from 'next';
-import Layout from '@/components/Layout';
+import PublicLayout from '@/components/public/Layout';
 
 // Example type for a pricing plan, adjust according to your actual data structure
 interface PricingPlan {
@@ -47,7 +47,7 @@ const Pricing: NextPage = () => {
 	];
 
 	return (
-		<Layout>
+		<PublicLayout>
 			<div className='container mt-5'>
 				<h1>Pricing Plans</h1>
 				<div className='row'>
@@ -81,7 +81,7 @@ const Pricing: NextPage = () => {
 					))}
 				</div>
 			</div>
-		</Layout>
+		</PublicLayout>
 	);
 };
 

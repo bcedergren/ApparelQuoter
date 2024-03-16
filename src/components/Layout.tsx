@@ -1,6 +1,7 @@
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import { useSession } from 'next-auth/react';
+import Header from '@/components/Header';
 import SideNavigation from './SideNavigation';
 
 type LayoutProps = {
@@ -9,26 +10,35 @@ type LayoutProps = {
 
 const Layout = ({ children }: LayoutProps) => {
 	const { data: session } = useSession();
+	const [collapsed, setCollapsed] = useState(false); // State to manage sidebar collapse
 
 	return (
 		<Container fluid>
 			<Row>
 				{session && (
 					<Col
-						xs={3}
-						md={2}
-						lg={2}
-						className='d-none d-md-block'
+						xs={collapsed ? 1 : 3} // Adjust width when collapsed
+						md={collapsed ? 1 : 2}
+						lg={collapsed ? 1 : 2}
+						className='d-none d-md-block bg-light'
 					>
-						<SideNavigation />
+						<SideNavigation
+							collapsed={collapsed}
+							setCollapsed={setCollapsed}
+						/>
 					</Col>
 				)}
 				<Col
-					xs={12}
-					md={session ? 10 : 12}
-					lg={session ? 10 : 12}
+					xs={collapsed ? 11 : 9} // Adjust main content width based on collapsed state
+					md={collapsed ? 11 : 10}
+					lg={collapsed ? 11 : 10}
 				>
-					{children}
+					{session && (
+						<div>
+							<Header />
+						</div>
+					)}
+					<div>{children}</div>
 				</Col>
 			</Row>
 		</Container>

@@ -1,0 +1,23 @@
+/* Company.module.css */
+.header {
+	color: green;
+}
+
+.customTable {
+	margin-top: 20px;
+}
+
+.tableHeader {
+	background-color: green;
+	color: white;
+}
+
+.tableHeader th {
+	text-align: center;
+}
+
+.companyTable th {
+	text-align: left;
+	background-color: #4caf50;
+	color: white;
+}

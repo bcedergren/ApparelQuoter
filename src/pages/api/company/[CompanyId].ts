@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { ObjectId } from 'mongodb';
 import { connectToDatabase } from '@/utils/dbConnect';
 
 export default async function handler(
@@ -11,22 +12,22 @@ export default async function handler(
 		const { client, db } = await connectToDatabase();
 		try {
 			const companyId = query.CompanyId as string;
+			const objectId = new ObjectId(companyId);
+			const company = await db.collection('Company').findOne({ _id: objectId });
 
-			const prices = await db
-				.collection('Prices')
-				.findOne({ CompanyId: companyId });
-
-			res.status(200).json({ success: true, prices });
+			if (company) {
+				res.status(200).json({ success: true, company });
+			} else {
+				res.status(404).json({ success: false, message: 'Company not found' });
+			}
 		} catch (error) {
 			console.error(error);
-			res
-				.status(500)
-				.json({ success: false, message: 'Failed to fetch prices' });
+			res.status(500).json({
+				success: false,
+				message: 'Failed to fetch company information',
+			});
 		} finally {
 			await client.close();
 		}
-	} else {
-		res.setHeader('Allow', ['GET']);
-		res.status(405).end(`Method ${method} Not Allowed`);
 	}
 }

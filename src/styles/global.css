@@ -1,0 +1,46 @@
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(-20px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.currency-input {
+	position: relative;
+	display: inline-block;
+}
+
+.currency-symbol {
+	position: absolute;
+	left: 8px;
+	top: 50%;
+	transform: translateY(-50%);
+	pointer-events: none;
+	color: #000;
+}
+
+input[type='number'] {
+	margin-left: 5px;
+}
+
+.percentage-input {
+	position: relative;
+	display: inline-block;
+}
+
+.percentage-symbol {
+	position: absolute;
+	right: 8px;
+	top: 50%;
+	transform: translateY(-50%);
+	pointer-events: none;
+	color: #000;
+}
+
+.percentage-symbol > input[type='number'] {
+	padding-right: 20px;
+}

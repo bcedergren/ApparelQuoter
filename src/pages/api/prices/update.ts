@@ -3,29 +3,34 @@ import { ObjectId } from 'mongodb';
 import { connectToDatabase } from '@/utils/dbConnect';
 
 async function updatePricing(req: NextApiRequest, res: NextApiResponse) {
-	const { client, db } = await connectToDatabase();
+	const { db, client } = await connectToDatabase();
 
 	try {
-		const pricing = db.collection('Pricing');
+		const { _id } = req.body.prices;
+		const objectId = new ObjectId(_id);
+		const prices = db.collection('Prices');
 
-		const pricingId = req.query.pricingId as string;
 		const updateData = {
-			...req.body,
+			...req.body.prices,
 			UpdatedAt: new Date(),
 		};
 
-		const result = await pricing.updateOne(
-			{ _id: new ObjectId(pricingId) },
+		delete updateData._id;
+
+		const result = await prices.findOneAndUpdate(
+			{ _id: objectId },
 			{ $set: updateData }
 		);
 
-		if (result.matchedCount === 0) {
+		if (!result) {
+			console.error('Document not found with _id:', _id);
 			return res.status(404).json({ error: 'Document not found' });
 		}
 
-		res.status(200).json(result);
+		res.status(200).json(result.value);
 	} catch (error) {
-		res.status(500).json({ error: 'Unable to update pricing' });
+		console.error('Error updating pricing:', error);
+		res.status(500).json({ error: 'Unable to update pricing', details: error });
 	} finally {
 		await client.close();
 	}

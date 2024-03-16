@@ -1,0 +1,37 @@
+.hero {
+	background-image: url('/hero.png');
+	background-position: center;
+	background-repeat: no-repeat;
+	min-height: 60vh;
+	border-radius: 25px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: relative;
+}
+
+.heroTextContainer {
+	background-color: rgba(128, 128, 128, 0.7);
+	padding: 2rem;
+	border-radius: 15px;
+	min-height: 50vh;
+	max-width: 60vw;
+}
+
+.container {
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
+}
+
+.content {
+	flex: 1;
+}
+
+.footer {
+	background-color: #008080;
+	color: white;
+	text-align: center;
+	padding: 1rem 0;
+	height: 110px;
+}

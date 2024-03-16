@@ -1,34 +1,26 @@
 import { useEffect } from 'react';
 import Router from 'next/router';
-import { Button, Container } from 'react-bootstrap';
-import { useSession, signIn } from 'next-auth/react'; // Import signIn
-import { FaSignInAlt } from 'react-icons/fa';
-import Link from 'next/link';
+import { Container } from 'react-bootstrap';
+import { useSession } from 'next-auth/react';
+import PublicLayout from '@/components/public/Layout';
+import Hero from '@/components/public/Hero';
 
 const Home = () => {
-	const { data: session, status } = useSession();
+	const { data: session } = useSession();
 
 	useEffect(() => {
-		// Redirect to dashboard if authenticated
 		if (session) {
 			Router.push('/dashboard');
 		}
-	}, [session, status]);
-
-	const handleLogin = () => {
-		signIn(); // Trigger the sign-in flow
-	};
+	}, [session]);
 
 	return (
-		<Container className='text-center mt-5'>
-			{/* Login Button */}
-			<Button
-				onClick={handleLogin}
-				variant='primary'
-			>
-				<FaSignInAlt /> Login
-			</Button>
-		</Container>
+		<PublicLayout>
+			<Hero />
+			<Container className='my-5 py-5 bg-white'>
+				{/* Content sections for features, testimonials, etc. go here */}
+			</Container>
+		</PublicLayout>
 	);
 };
 

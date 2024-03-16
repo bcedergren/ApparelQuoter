@@ -1,4 +1,3 @@
-// pages/api/subscribe.ts
 import type { NextApiRequest, NextApiResponse } from 'next';
 import Stripe from 'stripe';
 
@@ -15,19 +14,28 @@ const handleSubscription = async (
 			const { email, selectedPlan } = req.body;
 
 			// Create a new customer in Stripe
-			const customer = await stripe.customers.create({
-				email: email,
-			});
+			const customer = await stripe.customers.create({ email });
 
-			// Create the subscription
-			const subscription = await stripe.subscriptions.create({
+			// Configure trial period for the trial plan
+			let subscriptionParams: Stripe.SubscriptionCreateParams = {
 				customer: customer.id,
 				items: [{ price: selectedPlan }],
 				expand: ['latest_invoice.payment_intent'],
-			});
+			};
+
+			if (selectedPlan === 'trial') {
+				const trialEnd = Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60; // 7 days from now
+				subscriptionParams.trial_end = trialEnd;
+			}
+
+			// Create the subscription with the specified parameters
+			const subscription = await stripe.subscriptions.create(
+				subscriptionParams
+			);
 
 			res.status(200).json({ subscriptionId: subscription.id });
 		} catch (error) {
+			console.error('Subscription creation failed:', error);
 			res
 				.status(400)
 				.json({ error: 'An error occurred, unable to create subscription' });
@@ -38,5 +46,4 @@ const handleSubscription = async (
 	}
 };
 
-// Export the named constant as the default export
 export default handleSubscription;

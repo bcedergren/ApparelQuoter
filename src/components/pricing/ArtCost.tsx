@@ -1,22 +1,15 @@
 import { ChangeEvent } from 'react';
 import { Table, Form, Spinner } from 'react-bootstrap';
+import CurrencyInput from 'react-currency-input-field';
 import styles from '@/styles/Pricing.module.css';
+import { ArtCost } from '@/types/Price';
 
 type ArtCostProps = {
 	artCostData: ArtCost;
 	setArtCostData: (artCostData: ArtCost) => void;
 };
 
-type ArtCost = {
-	firstColor: string;
-	additionalColor: string;
-	flatFee: string;
-	inkMarkup: string;
-	inkChargesPerPiece: string;
-	glitterOrPuff: string;
-	perScreenNew: string;
-	perScreenExisting: string;
-};
+type NestedKeys = 'colorMatch';
 
 const ArtCostComponent: React.FC<ArtCostProps> = ({
 	artCostData,
@@ -32,12 +25,21 @@ const ArtCostComponent: React.FC<ArtCostProps> = ({
 
 	const handleInputChange = (
 		event: ChangeEvent<HTMLInputElement>,
-		field: keyof ArtCost
+		field: keyof ArtCost | NestedKeys,
+		subField?: keyof ArtCost['colorMatch']
 	) => {
-		const updatedArtCost = {
-			...artCostData,
-			[field]: event.target.value,
-		};
+		const value = event.target.value;
+
+		// Create a new updated object based on the field type
+		const updatedArtCost: ArtCost = { ...artCostData };
+
+		if (subField && field === 'colorMatch') {
+			// Update nested object field
+			(updatedArtCost[field] as any)[subField] = value;
+		} else {
+			// Update top-level field
+			(updatedArtCost as any)[field] = value;
+		}
 
 		setArtCostData(updatedArtCost);
 	};
@@ -50,105 +52,138 @@ const ArtCostComponent: React.FC<ArtCostProps> = ({
 		>
 			<thead>
 				<tr>
-					<th colSpan={3}>Art Cost</th>
-					<th colSpan={1}>Customer Has Apparel</th>
-					<th colSpan={1}>Ink Charges/Piece</th>
-					<th colSpan={1}>New Screen Setup</th>
-					<th colSpan={1}>Existing Screen Setup</th>
+					<th colSpan={9}>Art Cost</th>
 				</tr>
 				<tr>
 					<th>First Color</th>
 					<th>Per Add&apos;l Color</th>
 					<th>Flat Fee</th>
-					<th>Ink Markup</th>
-					<th>Glitter or Puff</th>
-					<th>Per Screen</th>
-					<th>Per Screen</th>
+					<th>Ink Markup %</th>
+					<th>Ink Charges/Piece</th>
+					<th>Color Match</th>
+					<th>Ink Color Changes</th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr>
 					<td>
-						<Form.Control
-							type='text'
-							value={artCostData.firstColor}
-							onChange={(e) =>
-								handleInputChange(
-									e as ChangeEvent<HTMLInputElement>,
-									'firstColor'
-								)
-							}
-						/>
+						<div className='currency-input'>
+							<span className='currency-symbol'>$</span>
+							<Form.Control
+								type='number'
+								step='0.01'
+								min='0.00'
+								value={artCostData.firstColor}
+								onChange={(e) =>
+									handleInputChange(
+										e as ChangeEvent<HTMLInputElement>,
+										'firstColor'
+									)
+								}
+							/>
+						</div>
 					</td>
 					<td>
-						<Form.Control
-							type='text'
-							value={artCostData.additionalColor}
-							onChange={(e) =>
-								handleInputChange(
-									e as ChangeEvent<HTMLInputElement>,
-									'additionalColor'
-								)
-							}
-						/>
+						<div className='currency-input'>
+							<span className='currency-symbol'>$</span>
+							<Form.Control
+								type='number'
+								step='0.01'
+								min='0.00'
+								value={artCostData.additionalColor}
+								onChange={(e) =>
+									handleInputChange(
+										e as ChangeEvent<HTMLInputElement>,
+										'additionalColor'
+									)
+								}
+							/>
+						</div>
 					</td>
 					<td>
-						<Form.Control
-							type='text'
-							value={artCostData.flatFee}
-							onChange={(e) =>
-								handleInputChange(e as ChangeEvent<HTMLInputElement>, 'flatFee')
-							}
-						/>
+						<div className='currency-input'>
+							<span className='currency-symbol'>$</span>
+							<Form.Control
+								type='number'
+								step='0.01'
+								min='0.00'
+								value={artCostData.flatFee}
+								onChange={(e) =>
+									handleInputChange(
+										e as ChangeEvent<HTMLInputElement>,
+										'flatFee'
+									)
+								}
+							/>
+						</div>
 					</td>
 					<td>
-						<Form.Control
-							type='text'
-							value={artCostData.inkMarkup}
-							onChange={(e) =>
-								handleInputChange(
-									e as ChangeEvent<HTMLInputElement>,
-									'inkMarkup'
-								)
-							}
-						/>
+						<div className='percentage-input'>
+							<Form.Control
+								type='number'
+								step='0.01'
+								min='0.00'
+								value={artCostData.inkMarkup}
+								onChange={(e) =>
+									handleInputChange(
+										e as ChangeEvent<HTMLInputElement>,
+										'inkMarkup'
+									)
+								}
+							/>
+							<span className='percentage-symbol'>%</span>
+						</div>
 					</td>
 					<td>
-						<Form.Control
-							type='text'
-							value={artCostData.inkChargesPerPiece}
-							onChange={(e) =>
-								handleInputChange(
-									e as ChangeEvent<HTMLInputElement>,
-									'inkChargesPerPiece'
-								)
-							}
-						/>
-					</td>
-
-					<td>
-						<Form.Control
-							type='text'
-							value={artCostData.perScreenNew}
-							onChange={(e) =>
-								handleInputChange(
-									e as ChangeEvent<HTMLInputElement>,
-									'perScreenNew'
-								)
-							}
-						/>
+						<div className='currency-input'>
+							<span className='currency-symbol'>$</span>
+							<Form.Control
+								type='number'
+								step='0.01'
+								min='0.00'
+								value={artCostData.inkChargesPerPiece}
+								onChange={(e) =>
+									handleInputChange(
+										e as ChangeEvent<HTMLInputElement>,
+										'inkChargesPerPiece'
+									)
+								}
+							/>
+						</div>
 					</td>
 					<td>
-						<Form.Control
-							type='text'
-							value={artCostData.perScreenExisting}
-							onChange={(e) =>
-								handleInputChange(
-									e as ChangeEvent<HTMLInputElement>,
-									'perScreenExisting'
-								)
-							}
-						/>
+						<div className='currency-input'>
+							<span className='currency-symbol'>$</span>
+							<Form.Control
+								type='number'
+								step='0.01'
+								min='0.00'
+								value={artCostData.colorMatch ?? ''}
+								onChange={(e) =>
+									handleInputChange(
+										e as ChangeEvent<HTMLInputElement>,
+										'colorMatch'
+									)
+								}
+							/>
+						</div>
+					</td>
+					<td>
+						<div className='currency-input'>
+							<span className='currency-symbol'>$</span>
+							<Form.Control
+								type='number'
+								step='0.01'
+								min='0.00'
+								value={artCostData.inkColorChanges ?? ''}
+								onChange={(e) =>
+									handleInputChange(
+										e as ChangeEvent<HTMLInputElement>,
+										'inkColorChanges'
+									)
+								}
+							/>
+						</div>
 					</td>
 				</tr>
 			</tbody>

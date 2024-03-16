@@ -1,19 +1,22 @@
-import NextAuth from 'next-auth';
+import NextAuth, { User as NextAuthUser } from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { MongoClient } from 'mongodb';
 import { verifyPassword } from '@/lib/password';
-import { User } from '@/types/User';
 import { connectToDatabase } from '@/utils/dbConnect';
+import { User } from '@/types/User';
+import { CustomSession } from '@/types/CustomSession';
 
-type SessionUser = Omit<User, '_id' | 'password'> & {
+// Extend the NextAuth User type
+interface CustomUser extends NextAuthUser {
 	id: string;
-	role?: string;
-};
+	firstName: string;
+	lastName: string;
+	companyId: string;
+	role: string;
+}
 
 export default NextAuth({
 	providers: [
-		// Add authentication providers here (e.g., Google, Facebook)
 		GoogleProvider({
 			clientId: process.env.GOOGLE_CLIENT_ID as string,
 			clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
@@ -26,7 +29,7 @@ export default NextAuth({
 			},
 		}),
 		CredentialsProvider({
-			name: 'credentials',
+			name: 'Credentials',
 			credentials: {
 				email: {
 					label: 'Email',
@@ -35,46 +38,68 @@ export default NextAuth({
 				},
 				password: { label: 'Password', type: 'password' },
 			},
-			async authorize(credentials, req) {
-				console.log('Authorizing user with credentials:');
-
+			async authorize(credentials) {
 				if (!credentials || !credentials.email || !credentials.password) {
-					return null;
+					throw new Error('Credentials must be provided');
 				}
 
-				const { client, db } = await connectToDatabase();
+				const { db } = await connectToDatabase();
 
-				const userDocument = await db
+				const userDocument = (await db
 					.collection('User')
-					.findOne({ email: credentials.email });
+					.findOne({ email: credentials.email })) as User | null;
 
 				if (!userDocument) {
-					console.log('No user found with the email', credentials.email);
-					return null;
+					throw new Error('No user found with the email');
 				}
 
-				const passwordsMatch = await verifyPassword(
+				const isValid = await verifyPassword(
 					credentials.password,
 					userDocument.password
 				);
-
-				if (!passwordsMatch) {
-					console.log('Password is incorrect');
-					return null;
+				if (!isValid) {
+					throw new Error('Password is incorrect');
 				}
 
-				console.log('User authenticated successfully:');
-
-				const user: SessionUser = {
-					id: userDocument._id.toString(), // Convert _id to string
+				// Return user object for JWT
+				return {
+					id: userDocument._id.toString(), // Ensure _id is a string
 					email: userDocument.email,
-					name: userDocument.name,
-					//companyId: userDocument.companyId;
+					firstName: userDocument.firstName,
+					lastName: userDocument.lastName,
+					companyId: userDocument.companyId.toString(), // Ensure companyId is a string
+					role: userDocument.role,
 				};
-
-				client.close();
-				return user;
 			},
 		}),
 	],
+	callbacks: {
+		async jwt({ token, user }) {
+			const customUser = user as CustomUser; // Now using CustomUser for type assertion
+			if (customUser) {
+				token.id = customUser.id;
+				token.email = customUser.email;
+				token.firstName = customUser.firstName;
+				token.lastName = customUser.lastName;
+				token.companyId = customUser.companyId;
+				token.role = customUser.role;
+			}
+			return token;
+		},
+		async session({ session, token }) {
+			const customSession = session as CustomSession;
+			customSession.user.id = token.id as string;
+			customSession.user.firstName = token.firstName as string;
+			customSession.user.lastName = token.lastName as string;
+			customSession.user.companyId = token.companyId as string;
+			customSession.user.role = token.role as string;
+
+			return customSession; // Return the augmented session object
+		},
+	},
+	pages: {
+		signIn: '/login',
+		// Add other custom pages if needed
+	},
+	// Other NextAuth options...
 });

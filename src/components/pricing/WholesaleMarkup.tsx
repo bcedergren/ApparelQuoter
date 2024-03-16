@@ -20,7 +20,7 @@ type WholesaleMarkupProps = {
 	setWholesaleMarkupData: (data: WholesaleMarkupTier) => void;
 };
 
-const WholesaleMarkup: React.FC<WholesaleMarkupProps> = ({
+const WholesaleMarkupComponent: React.FC<WholesaleMarkupProps> = ({
 	wholesaleMarkupData,
 	setWholesaleMarkupData,
 }) => {
@@ -53,13 +53,17 @@ const WholesaleMarkup: React.FC<WholesaleMarkupProps> = ({
 							<Form.Label>Less than</Form.Label>
 						</td>
 						<td>
-							<Form.Control
-								type='text'
-								value={wholesaleMarkupData.lessThan || ''}
-								onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-									handleInputChange('lessThan', e)
-								}
-							/>
+							<div className='currency-input'>
+								<span className='currency-symbol'>$</span>
+								<Form.Control
+									type='number'
+									min='0.00'
+									value={wholesaleMarkupData.lessThan || ''}
+									onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+										handleInputChange('lessThan', e)
+									}
+								/>
+							</div>
 						</td>
 						<td></td>
 						<td></td>
@@ -67,25 +71,35 @@ const WholesaleMarkup: React.FC<WholesaleMarkupProps> = ({
 							<Form.Label>Markup is</Form.Label>
 						</td>
 						<td>
-							<Form.Control
-								type='text'
-								value={wholesaleMarkupData.markupLessThan}
-								onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-									handleInputChange('markupLessThan', e)
-								}
-							/>
+							<div className='percentage-input'>
+								<Form.Control
+									type='number'
+									step='0.01'
+									min='0.00'
+									value={wholesaleMarkupData.markupLessThan}
+									onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+										handleInputChange('markupLessThan', e)
+									}
+								/>
+								<span className='percentage-symbol'>%</span>
+							</div>
 						</td>
 						<td>
 							<Form.Label>and/or</Form.Label>
 						</td>
 						<td>
-							<Form.Control
-								type='text'
-								value={wholesaleMarkupData.andOrLessThan}
-								onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-									handleInputChange('andOrLessThan', e)
-								}
-							/>
+							<div className='currency-input'>
+								<span className='currency-symbol'>$</span>
+								<Form.Control
+									type='number'
+									step='0.01'
+									min='0.00'
+									value={wholesaleMarkupData.andOrLessThan}
+									onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+										handleInputChange('andOrLessThan', e)
+									}
+								/>
+							</div>
 						</td>
 					</tr>
 					<tr>
@@ -93,64 +107,85 @@ const WholesaleMarkup: React.FC<WholesaleMarkupProps> = ({
 							<Form.Label>Between</Form.Label>
 						</td>
 						<td>
-							<Form.Control
-								type='text'
-								value={wholesaleMarkupData.betweenStart || ''}
-								onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-									handleInputChange('betweenStart', e)
-								}
-							/>
+							<div className='currency-input'>
+								<span className='currency-symbol'>$</span>
+								<Form.Control
+									type='number'
+									min='0.00'
+									value={wholesaleMarkupData.betweenStart || ''}
+									onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+										handleInputChange('betweenStart', e)
+									}
+								/>
+							</div>
 						</td>
 						<td>
 							<Form.Label>and</Form.Label>
 						</td>
 						<td>
-							<Form.Control
-								type='text'
-								value={wholesaleMarkupData.betweenEnd || ''}
-								onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-									handleInputChange('betweenEnd', e)
-								}
-							/>
+							<div className='currency-input'>
+								<span className='currency-symbol'>$</span>
+								<Form.Control
+									type='number'
+									min='0.00'
+									value={wholesaleMarkupData.betweenEnd || ''}
+									onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+										handleInputChange('betweenEnd', e)
+									}
+								/>
+							</div>
 						</td>
 						<td>
 							<Form.Label>Markup is</Form.Label>
 						</td>
 						<td>
-							<Form.Control
-								type='text'
-								value={wholesaleMarkupData.markupBetween}
-								onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-									handleInputChange('markupBetween', e)
-								}
-							/>
+							<div className='percentage-input'>
+								<Form.Control
+									type='number'
+									step='0.01'
+									min='0.00'
+									value={wholesaleMarkupData.markupBetween}
+									onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+										handleInputChange('markupBetween', e)
+									}
+								/>
+								<span className='percentage-symbol'>%</span>
+							</div>
 						</td>
 						<td>
 							<Form.Label>and/or</Form.Label>
 						</td>
 						<td>
-							<Form.Control
-								type='text'
-								value={wholesaleMarkupData.andOrBetween}
-								onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-									handleInputChange('andOrBetween', e)
-								}
-							/>
+							<div className='currency-input'>
+								<span className='currency-symbol'>$</span>
+								<Form.Control
+									type='number'
+									step='0.01'
+									min='0.00'
+									value={wholesaleMarkupData.andOrBetween}
+									onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+										handleInputChange('andOrBetween', e)
+									}
+								/>
+							</div>
 						</td>
 					</tr>
-
 					<tr>
 						<td>
 							<Form.Label>Over</Form.Label>
 						</td>
 						<td>
-							<Form.Control
-								type='text'
-								value={wholesaleMarkupData.over || ''}
-								onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-									handleInputChange('over', e)
-								}
-							/>
+							<div className='currency-input'>
+								<span className='currency-symbol'>$</span>
+								<Form.Control
+									type='number'
+									min='0.00'
+									value={wholesaleMarkupData.over || ''}
+									onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+										handleInputChange('over', e)
+									}
+								/>
+							</div>
 						</td>
 						<td></td>
 						<td></td>
@@ -158,25 +193,35 @@ const WholesaleMarkup: React.FC<WholesaleMarkupProps> = ({
 							<Form.Label>Markup is</Form.Label>
 						</td>
 						<td>
-							<Form.Control
-								type='text'
-								value={wholesaleMarkupData.markupOver}
-								onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-									handleInputChange('markupOver', e)
-								}
-							/>
+							<div className='percentage-input'>
+								<Form.Control
+									type='number'
+									step='0.01'
+									min='0.00'
+									value={wholesaleMarkupData.markupOver}
+									onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+										handleInputChange('markupOver', e)
+									}
+								/>
+								<span className='percentage-symbol'>%</span>
+							</div>
 						</td>
 						<td>
 							<Form.Label>and/or</Form.Label>
 						</td>
 						<td>
-							<Form.Control
-								type='text'
-								value={wholesaleMarkupData.andOrOver}
-								onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-									handleInputChange('andOrOver', e)
-								}
-							/>
+							<div className='currency-input'>
+								<span className='currency-symbol'>$</span>
+								<Form.Control
+									type='number'
+									step='0.01'
+									min='0.00'
+									value={wholesaleMarkupData.andOrOver}
+									onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+										handleInputChange('andOrOver', e)
+									}
+								/>
+							</div>
 						</td>
 					</tr>
 				</tbody>
@@ -185,4 +230,4 @@ const WholesaleMarkup: React.FC<WholesaleMarkupProps> = ({
 	);
 };
 
-export default WholesaleMarkup;
+export default WholesaleMarkupComponent;

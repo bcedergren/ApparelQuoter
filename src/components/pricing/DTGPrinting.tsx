@@ -1,65 +1,42 @@
 import React, { ChangeEvent } from 'react';
 import { Table, Form, Spinner } from 'react-bootstrap';
+import { DTGPrinting } from '@/types/Price'; // Assuming DTGPrinting is properly defined in your types
 import styles from '@/styles/Pricing.module.css';
 
-type DTGPrintingProps = {
-	dtgPrintingData: DTGPrintingData;
-	setDTGPrintingData: (dtgPrintingData: DTGPrintingData) => void;
-};
+interface DTGPrintingProps {
+	dtgPrintingData: DTGPrinting;
+	setDTGPrintingData: (data: DTGPrinting) => void;
+}
 
-type DTGPrintingData = {
-	small: string[];
-	medium: string[];
-	large: string[];
-};
-
-const headers = [
-	'1 - 12',
-	'13 - 24',
-	'25 - 74',
-	'75 - 149',
-	'150 - 299',
-	'300 - 499',
-	'500+',
-];
-
-const DTGPricingComponent: React.FC<DTGPrintingProps> = ({
+const DTGPrintingComponent: React.FC<DTGPrintingProps> = ({
 	dtgPrintingData,
 	setDTGPrintingData,
 }) => {
-	if (!dtgPrintingData) {
-		return (
-			<div className='text-center'>
-				<Spinner animation='border' />
-			</div>
-		);
-	}
-
 	const handleInputChange = (
-		size: keyof DTGPrintingData,
+		size: keyof DTGPrinting,
 		index: number,
 		event: ChangeEvent<any>
 	) => {
-		const target = event.target as HTMLInputElement;
 		const updatedPrices = [...dtgPrintingData[size]];
-		updatedPrices[index] = target.value;
-
-		setDTGPrintingData({
-			...dtgPrintingData,
-			[size]: updatedPrices,
-		});
+		updatedPrices[index] = event.target.value;
+		setDTGPrintingData({ ...dtgPrintingData, [size]: updatedPrices });
 	};
 
-	const renderRow = (size: keyof DTGPrintingData) => (
+	const renderRow = (size: keyof DTGPrinting) => (
 		<tr key={size}>
 			<td>{size.charAt(0).toUpperCase() + size.slice(1)}</td>
-			{dtgPrintingData[size].map((price, index) => (
+			{dtgPrintingData[size].map((price: string, index: number) => (
 				<td key={index}>
-					<Form.Control
-						type='text'
-						value={price}
-						onChange={(e) => handleInputChange(size, index, e)}
-					/>
+					<div className='currency-input'>
+						<span className='currency-symbol'>$</span>
+						<Form.Control
+							type='number'
+							step='0.01'
+							min='0.00'
+							value={price}
+							onChange={(e) => handleInputChange(size, index, e)}
+						/>
+					</div>
 				</td>
 			))}
 		</tr>
@@ -69,7 +46,7 @@ const DTGPricingComponent: React.FC<DTGPrintingProps> = ({
 		<Table
 			bordered
 			hover
-			className={`${styles.pricingTable} ${styles.dtgPrintingPricesSection}`}
+			className={styles.pricingTable}
 		>
 			<thead>
 				<tr>
@@ -77,7 +54,15 @@ const DTGPricingComponent: React.FC<DTGPrintingProps> = ({
 				</tr>
 				<tr>
 					<th>Size</th>
-					{headers.map((header, index) => (
+					{[
+						'1 - 12',
+						'13 - 24',
+						'25 - 74',
+						'75 - 149',
+						'150 - 299',
+						'300 - 499',
+						'500+',
+					].map((header, index) => (
 						<th key={index}>{header}</th>
 					))}
 				</tr>
@@ -91,4 +76,4 @@ const DTGPricingComponent: React.FC<DTGPrintingProps> = ({
 	);
 };
 
-export default DTGPricingComponent;
+export default DTGPrintingComponent;

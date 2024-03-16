@@ -1,6 +1,6 @@
 export interface Company {
 	_id: string;
-	name: string;
+	companyName: string;
 	streetAddress: string;
 	city: string;
 	state: string;

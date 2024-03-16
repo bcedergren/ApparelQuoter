@@ -47,7 +47,8 @@ const Embroidery: React.FC<EmbroideryProps> = ({
 					<td>Minimum Stitch Count</td>
 					<td>
 						<Form.Control
-							type='text'
+							type='number'
+							min='0.00'
 							value={embroideryData.stitchCount}
 							onChange={(e) => handlePriceChange('stitchCount', e)}
 						/>
@@ -56,31 +57,50 @@ const Embroidery: React.FC<EmbroideryProps> = ({
 				<tr>
 					<td>Cost per 1,000 stitches after first 5,000</td>
 					<td>
-						<Form.Control
-							type='text'
-							value={embroideryData.costPerThousandStitches}
-							onChange={(e) => handlePriceChange('costPerThousandStitches', e)}
-						/>
+						<div className='currency-input'>
+							<span className='currency-symbol'>$</span>
+							<Form.Control
+								type='number'
+								step='0.01'
+								min='0.00'
+								value={embroideryData.costPerThousandStitches}
+								onChange={(e) =>
+									handlePriceChange('costPerThousandStitches', e)
+								}
+							/>
+						</div>
 					</td>
 				</tr>
 				<tr>
 					<td>Hooping Fee/Piece</td>
 					<td>
-						<Form.Control
-							type='text'
-							value={embroideryData.hoopingFee}
-							onChange={(e) => handlePriceChange('hoopingFee', e)}
-						/>
+						<div className='currency-input'>
+							<span className='currency-symbol'>$</span>
+							<Form.Control
+								type='number'
+								step='0.01'
+								min='0.00'
+								value={embroideryData.hoopingFee}
+								onChange={(e) => handlePriceChange('hoopingFee', e)}
+							/>
+						</div>
 					</td>
 				</tr>
 				<tr>
 					<td>Cost for first 5,000 stitches</td>
 					<td>
-						<Form.Control
-							type='text'
-							value={embroideryData.costPerFirst5000Stitches}
-							onChange={(e) => handlePriceChange('costPerFirst5000Stitches', e)}
-						/>
+						<div className='currency-input'>
+							<span className='currency-symbol'>$</span>
+							<Form.Control
+								type='number'
+								step='0.01'
+								min='0.00'
+								value={embroideryData.costPerFirst5000Stitches}
+								onChange={(e) =>
+									handlePriceChange('costPerFirst5000Stitches', e)
+								}
+							/>
+						</div>
 					</td>
 				</tr>
 			</tbody>

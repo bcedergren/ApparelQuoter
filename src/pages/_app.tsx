@@ -1,7 +1,8 @@
-import { SessionProvider } from 'next-auth/react'; // Import Provider from NextAuth
+import { SessionProvider } from 'next-auth/react';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
-import 'bootstrap/dist/css/bootstrap.min.css'; // Import Bootstrap CSS
+import 'bootstrap/dist/css/bootstrap.min.css';
+import '@/styles/global.css';
 
 function MyApp({ Component, pageProps }: AppProps) {
 	return (
@@ -9,12 +10,12 @@ function MyApp({ Component, pageProps }: AppProps) {
 			<Head>
 				<title>Apparel Quoter</title>
 				<meta
-					name='description'
+					name='ApparelQuoter'
 					content=''
 				/>
 			</Head>
 			<Component {...pageProps} />
-		</SessionProvider> // Uncomment this line
+		</SessionProvider>
 	);
 }
 

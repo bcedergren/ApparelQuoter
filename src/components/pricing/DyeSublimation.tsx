@@ -61,13 +61,18 @@ const DyeSublimation: React.FC<DyeSublimationProps> = ({
 						<td>{size.charAt(0).toUpperCase() + size.slice(1)}</td>
 						{prices.map((price, priceIndex) => (
 							<td key={priceIndex}>
-								<Form.Control
-									type='text'
-									value={price}
-									onChange={(e) =>
-										handleInputChange(size as keyof DyeSubData, priceIndex, e)
-									}
-								/>
+								<div className='currency-input'>
+									<span className='currency-symbol'>$</span>
+									<Form.Control
+										type='number'
+										step='0.01'
+										min='0.00'
+										value={price}
+										onChange={(e) =>
+											handleInputChange(size as keyof DyeSubData, priceIndex, e)
+										}
+									/>
+								</div>
 							</td>
 						))}
 					</tr>

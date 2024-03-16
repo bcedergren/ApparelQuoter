@@ -2,8 +2,7 @@ import { useEffect } from 'react';
 import Router from 'next/router';
 import { Container, Row, Col } from 'react-bootstrap';
 import { useSession } from 'next-auth/react';
-import { FaUserCircle } from 'react-icons/fa';
-import Layout from '../components/Layout'; // Update the import path as per your file structure
+import Layout from '@/components/Layout';
 
 const Dashboard = () => {
 	const { data: session, status } = useSession();
@@ -19,24 +18,18 @@ const Dashboard = () => {
 		return <p>Loading...</p>;
 	}
 
+	console.log(session);
+
 	return (
 		<Layout>
-			{' '}
-			{/* Wrap the page content with the Layout component */}
-			<Container className='mt-5'>
-				<Row className='justify-content-center'>
+			<Container fluid>
+				<Row>
 					<Col
-						md={8}
-						className='text-center'
+						md={12}
+						lg={12}
+						style={{ paddingLeft: 0 }}
 					>
 						<h1>Dashboard</h1>
-						{session && (
-							<div>
-								<FaUserCircle size={50} />
-								<h2>Welcome, {session.user?.name || 'Guest'}!</h2>
-								<p>You are now logged in.</p>
-							</div>
-						)}
 					</Col>
 				</Row>
 			</Container>

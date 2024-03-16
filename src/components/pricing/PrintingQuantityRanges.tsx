@@ -45,7 +45,8 @@ const PrintingQuantityRanges: React.FC<PrintingQuantityRangesProps> = ({
 						<td>
 							<Form.Control
 								size='sm'
-								type='text'
+								type='number'
+								min='0.00'
 								value={range.start}
 								onChange={(e) => handleRangeChange(index, 'start', e)}
 								style={{ display: 'inline', width: 'auto' }}
@@ -53,7 +54,8 @@ const PrintingQuantityRanges: React.FC<PrintingQuantityRangesProps> = ({
 							to
 							<Form.Control
 								size='sm'
-								type='text'
+								min='0.00'
+								type='number'
 								value={range.end}
 								onChange={(e) => handleRangeChange(index, 'end', e)}
 								style={{ display: 'inline', width: 'auto' }}
