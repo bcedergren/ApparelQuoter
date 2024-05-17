@@ -1,9 +1,11 @@
 import { useEffect } from 'react';
 import Router from 'next/router';
-import { Container } from 'react-bootstrap';
 import { useSession } from 'next-auth/react';
 import PublicLayout from '@/components/public/Layout';
-import Hero from '@/components/public/Hero';
+import Headline from '@/components/public/Headline';
+import Services from '@/components/public/Services';
+import Pricing from '@/components/public/Pricing';
+import Contact from '@/components/public/Contact';
 
 const Home = () => {
 	const { data: session } = useSession();
@@ -16,10 +18,18 @@ const Home = () => {
 
 	return (
 		<PublicLayout>
-			<Hero />
-			<Container className='my-5 py-5 bg-white'>
-				{/* Content sections for features, testimonials, etc. go here */}
-			</Container>
+			<div id='home'>
+				<Headline />
+			</div>
+			<div id='service'>
+				<Services />
+			</div>
+			<div id='pricing'>
+				<Pricing />
+			</div>
+			<div id='contact'>
+				<Contact />
+			</div>
 		</PublicLayout>
 	);
 };

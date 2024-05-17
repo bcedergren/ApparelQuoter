@@ -43,7 +43,7 @@ interface ScreenPrintingDetails {
 const initialQuoteState: Quote = {
 	_id: '',
 	customerName: '',
-	quoteType: 'Quote',
+	quoteType: 'savedQuote',
 	items: [
 		{
 			brandAndStyle: '',
@@ -135,7 +135,7 @@ const defaultSummary = {
 	totalCost: 0,
 };
 
-const Quote: NextPage = () => {
+const QuotePage: NextPage = () => {
 	const router = useRouter();
 	const { quoteId } = router.query;
 	const { data: session, status } = useSession();
@@ -559,6 +559,8 @@ const Quote: NextPage = () => {
 					...quote,
 				};
 
+				console.log(quoteWithMetadata);
+
 				const response = await fetch('/api/quotes/saveQuote', {
 					method: 'POST',
 					headers: {
@@ -700,4 +702,4 @@ const Quote: NextPage = () => {
 	);
 };
 
-export default Quote;
+export default QuotePage;

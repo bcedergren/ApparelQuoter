@@ -1,0 +1,8 @@
+.accountContainer {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-height: 100vh;
+	background: url('/01.jpg') no-repeat center center fixed;
+	background-size: cover;
+}

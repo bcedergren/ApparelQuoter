@@ -6,4 +6,7 @@ export interface User {
 	email: string;
 	password: string; // Hashed password
 	role: string;
+	rememberMe: boolean;
+	resetToken?: string;
+	resetTokenExpiry?: number;
 }

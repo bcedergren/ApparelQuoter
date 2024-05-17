@@ -145,24 +145,6 @@ const SideNavigation: React.FC<SideNavigationProps> = ({ setCollapsed }) => {
 					<SlDrawer /> {!collapsed && 'Completed Orders'}
 				</div>
 			</Nav.Link>
-			<Nav.Link
-				as={Link}
-				href='/receipt'
-				passHref
-			>
-				<div style={iconStyle}>
-					<SlDoc /> {!collapsed && 'Receipt'}
-				</div>
-			</Nav.Link>
-			<Nav.Link
-				as={Link}
-				href='/invoice'
-				passHref
-			>
-				<div style={iconStyle}>
-					<SlFolder /> {!collapsed && 'Invoice'}
-				</div>
-			</Nav.Link>
 		</Nav>
 	);
 };

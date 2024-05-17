@@ -17,10 +17,12 @@ export default async function handler(
 
 		try {
 			// Update the quoteType to "Order" for the given quoteId
-			const updateResult = await db.collection('Quotes').updateOne(
-				{ _id: new ObjectId(quoteId) },
-				{ $set: { quoteType: 'Order' } } // Set quoteType to "Order"
-			);
+			const updateResult = await db
+				.collection('Quotes')
+				.updateOne(
+					{ _id: new ObjectId(quoteId) },
+					{ $set: { quoteType: 'savedOrder' } }
+				);
 
 			if (updateResult.matchedCount === 0) {
 				return res.status(404).json({ message: 'Quote not found' });

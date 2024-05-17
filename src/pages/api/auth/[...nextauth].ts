@@ -1,19 +1,9 @@
-import NextAuth, { User as NextAuthUser } from 'next-auth';
+import NextAuth from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { verifyPassword } from '@/lib/password';
 import { connectToDatabase } from '@/utils/dbConnect';
-import { User } from '@/types/User';
-import { CustomSession } from '@/types/CustomSession';
-
-// Extend the NextAuth User type
-interface CustomUser extends NextAuthUser {
-	id: string;
-	firstName: string;
-	lastName: string;
-	companyId: string;
-	role: string;
-}
+import { User as CustomUser } from '@/types/User';
 
 export default NextAuth({
 	providers: [
@@ -37,6 +27,7 @@ export default NextAuth({
 					placeholder: 'john.doe@example.com',
 				},
 				password: { label: 'Password', type: 'password' },
+				rememberMe: { label: 'Remember me', type: 'checkbox' },
 			},
 			async authorize(credentials) {
 				if (!credentials || !credentials.email || !credentials.password) {
@@ -47,7 +38,7 @@ export default NextAuth({
 
 				const userDocument = (await db
 					.collection('User')
-					.findOne({ email: credentials.email })) as User | null;
+					.findOne({ email: credentials.email })) as CustomUser | null;
 
 				if (!userDocument) {
 					throw new Error('No user found with the email');
@@ -61,45 +52,49 @@ export default NextAuth({
 					throw new Error('Password is incorrect');
 				}
 
-				// Return user object for JWT
 				return {
-					id: userDocument._id.toString(), // Ensure _id is a string
+					id: userDocument._id.toString(),
 					email: userDocument.email,
 					firstName: userDocument.firstName,
 					lastName: userDocument.lastName,
-					companyId: userDocument.companyId.toString(), // Ensure companyId is a string
+					companyId: userDocument.companyId.toString(),
 					role: userDocument.role,
+					rememberMe: credentials.rememberMe === 'true', // Ensure correct type for rememberMe
 				};
 			},
 		}),
 	],
 	callbacks: {
 		async jwt({ token, user }) {
-			const customUser = user as CustomUser; // Now using CustomUser for type assertion
-			if (customUser) {
-				token.id = customUser.id;
-				token.email = customUser.email;
-				token.firstName = customUser.firstName;
-				token.lastName = customUser.lastName;
-				token.companyId = customUser.companyId;
-				token.role = customUser.role;
+			if (user) {
+				token.id = user.id;
+				token.email = user.email;
+				token.firstName = user.firstName;
+				token.lastName = user.lastName;
+				token.companyId = user.companyId;
+				token.role = user.role;
+				token.rememberMe = user.rememberMe;
+				token.expiration = user.rememberMe
+					? Date.now() + 30 * 24 * 60 * 60 * 1000
+					: Date.now() + 2 * 60 * 60 * 1000;
 			}
 			return token;
 		},
 		async session({ session, token }) {
-			const customSession = session as CustomSession;
-			customSession.user.id = token.id as string;
-			customSession.user.firstName = token.firstName as string;
-			customSession.user.lastName = token.lastName as string;
-			customSession.user.companyId = token.companyId as string;
-			customSession.user.role = token.role as string;
-
-			return customSession; // Return the augmented session object
+			session.user = {
+				...session.user,
+				id: token.id as string,
+				firstName: token.firstName as string,
+				lastName: token.lastName as string,
+				companyId: token.companyId as string,
+				role: token.role as string,
+				rememberMe: token.rememberMe as boolean,
+			};
+			session.expires = new Date(token.expiration!).toISOString();
+			return session;
 		},
 	},
 	pages: {
 		signIn: '/login',
-		// Add other custom pages if needed
 	},
-	// Other NextAuth options...
 });

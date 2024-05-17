@@ -22,6 +22,7 @@ import {
 import QuoteItemRow from '@/components/QuoteItemRow';
 import { Company } from '@/types/Company';
 import { createQuote } from '@/utils/pdfGenerator';
+import { formatQuoteType } from '@/utils/formatQuoteType';
 import styles from '@/styles/QuoteDetails.module.css';
 
 export type SizeKey = keyof QuoteItem['sizes'];
@@ -362,7 +363,7 @@ const QuoteDetails = () => {
 			<div className={styles.container}>
 				{customer ? (
 					<div className={styles.header}>
-						<h1 className={styles.title}>{quote.quoteType}</h1>
+						<h1 className={styles.title}>{formatQuoteType(quote.quoteType)}</h1>
 						<h4>{quote.customerName}</h4>
 						<p>
 							<strong>Contact: </strong> {customer.contactName}

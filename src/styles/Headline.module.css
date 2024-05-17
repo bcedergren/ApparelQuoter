@@ -1,0 +1,37 @@
+.headline {
+	display: flex;
+	justify-content: center; /* Centers content horizontally */
+	align-items: center; /* Centers content vertically */
+	text-align: center; /* Centers text within the container */
+	flex-direction: column; /* Stacks items vertically */
+	padding: 80px 20px;
+	background-color: #f9fafc;
+	min-height: 100vh; /* Optional: Ensures the section takes at least the height of the viewport */
+}
+
+.heroTextContainer {
+	max-width: 900px; /* Limits the width for readability */
+	width: 100%; /* Ensures it takes up the full width of its container */
+}
+
+.title {
+	font-size: 48px;
+	color: #333;
+	font-weight: bold;
+	margin-bottom: 20px; /* Space between the title and the paragraph */
+}
+
+.textPrimary {
+	color: #0056b3;
+}
+
+.lead {
+	font-size: 20px;
+	color: #666;
+	margin-bottom: 40px; /* Space before the image */
+}
+
+.headlineImage {
+	margin: 0 auto; /* Centers the image in its container */
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Optional: Adds a shadow for better visibility */
+}

@@ -1,0 +1,28 @@
+/* Services.module.css */
+
+.servicesSection {
+	background-color: #f4f4f4; /* Lighter background to differentiate section */
+	padding: 60px 0; /* Adequate padding around the section */
+}
+
+.serviceCard {
+	padding: 40px 20px; /* Uniform padding for all cards */
+	border: none; /* Remove default borders */
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+	transition: transform 0.3s ease-in-out; /* Smooth transition for hover effect */
+}
+
+.serviceCard:hover {
+	transform: translateY(-5px); /* Slight raise effect on hover */
+}
+
+.cardIcon {
+	font-size: 40px; /* Larger icons for better visibility */
+	color: #007bff; /* Bootstrap primary color, or use custom if defined */
+	margin-bottom: 15px; /* Space between icon and title */
+}
+
+.cardTitle {
+	font-size: 18px; /* Adequate sizing for readability */
+	font-weight: bold; /* Bold for emphasis */
+}

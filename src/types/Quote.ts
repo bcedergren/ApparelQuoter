@@ -3,7 +3,12 @@ export interface Quote {
 	companyId?: string;
 	selectedCustomerId?: string;
 	customerName: string;
-	quoteType: 'Invoice' | 'Quote';
+	quoteType:
+		| 'invoice'
+		| 'savedQuote'
+		| 'openOrder'
+		| 'savedOrder'
+		| 'completedOrder';
 	items: QuoteItem[]; // Array to handle multiple items
 	embroideryDetails: EmbroideryDetails;
 	printingOptions: PrintingOptions;

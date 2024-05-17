@@ -1,4 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
+import { NextApiRequest, NextApiResponse } from 'next';
 import { ObjectId } from 'mongodb';
 import { connectToDatabase } from '@/utils/dbConnect';
 
@@ -6,48 +6,54 @@ export default async function handler(
 	req: NextApiRequest,
 	res: NextApiResponse
 ) {
+	if (req.method !== 'POST') {
+		res.setHeader('Allow', ['POST']);
+		return res
+			.status(405)
+			.json({ message: `Method ${req.method} not allowed` });
+	}
+
 	const { db, client } = await connectToDatabase();
 
-	if (req.method === 'POST') {
-		try {
-			const quote = req.body;
+	try {
+		const quote = req.body;
 
-			if (quote._id) {
-				const quoteId = quote._id;
-				delete quote._id; // Remove _id from the object to prevent conflicts
+		if (quote._id && quote._id !== '') {
+			// Handling update for an existing quote
+			const quoteId = new ObjectId(quote._id);
+			delete quote._id; // Avoid conflicts during update by removing _id from the payload
 
-				const result = await db
-					.collection('Quotes')
-					.updateOne({ _id: new ObjectId(quoteId) }, { $set: quote });
+			const updateResult = await db
+				.collection('Quotes')
+				.updateOne({ _id: quoteId }, { $set: quote });
 
-				if (result.modifiedCount === 0) {
-					return res
-						.status(404)
-						.json({ message: 'Quote not found with provided ID' });
-				}
-
-				res.status(200).json({
-					message: 'Quote updated successfully',
-					quote: { _id: quoteId, ...quote },
-				});
-			} else {
-				const result = await db.collection('Quotes').insertOne(quote);
-
-				// Use insertedId to get the ID of the newly inserted document
-				const savedQuoteId = result.insertedId;
-				res.status(200).json({
-					message: 'Quote saved successfully',
-					quote: { _id: savedQuoteId, ...quote },
-				});
+			if (updateResult.modifiedCount === 0) {
+				return res
+					.status(404)
+					.json({ message: 'Quote not found with provided ID' });
 			}
-		} catch (error) {
-			console.error('Failed to save or update the quote:', error);
-			res.status(500).json({ message: 'Failed to save or update the quote' });
-		} finally {
-			await client.close();
+
+			return res.status(200).json({
+				message: 'Quote updated successfully',
+				quote: { _id: quoteId, ...quote },
+			});
+		} else {
+			// Handling new quote insertion
+			delete quote._id;
+			const insertResult = await db.collection('Quotes').insertOne(quote);
+			const newQuoteId = insertResult.insertedId;
+
+			return res.status(201).json({
+				message: 'Quote saved successfully',
+				quote: { _id: newQuoteId, ...quote },
+			});
 		}
-	} else {
-		res.setHeader('Allow', ['POST']);
-		res.status(405).json({ message: `Method ${req.method} not allowed` });
+	} catch (error) {
+		console.error('Failed to save or update the quote:', error);
+		return res
+			.status(500)
+			.json({ message: 'Failed to save or update the quote' });
+	} finally {
+		await client.close();
 	}
 }

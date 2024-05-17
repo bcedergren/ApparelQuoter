@@ -1,33 +1,46 @@
-/* .pricingTable {
-	width: 100%;
-	border-collapse: collapse;
-} */
+/* Pricing.module.css */
 
-/* .pricingTable th,
-.pricingTable td {
-	border: 1px solid #ddd;
-	padding: 8px;
-} */
-
-.pricingTable th {
-	text-align: left;
-	background-color: #4caf50;
-	color: white;
+.pricingSection {
+	padding: 60px 0; /* Adjusted padding for better section spacing */
+	background-color: #f9fafc; /* Consistent background color */
 }
 
-/* .quantityRangesSection th {
-	background-color: #f2f2f2;
-} */
+.title {
+	margin-bottom: 20px;
+	font-size: 24px; /* Larger font size for visibility */
+	font-weight: bold;
+	color: #333; /* Dark color for better contrast */
+}
 
-.wholesaleMarkupSection,
-.quantityRangesSection,
-.printingLocationNamesSection,
-.dtgPrintingPricesSection,
-.dyeSublimationPricesSection,
-.preCutVinylPricesSection,
-.minimumStitchCountSection,
-.orderQuantityDiscountsSection,
-.shippingFeesSection,
-.wholesaleWebsitesSection {
-	margin-top: 20px;
+.paraDesc {
+	max-width: 600px;
+	margin: auto; /* Centering the description */
+	font-size: 16px; /* Readable text size */
+	color: #666; /* Subtle text color */
+	margin-bottom: 40px; /* Spacing before the pricing cards start */
+}
+
+.pricingCard {
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadows for depth */
+	transition: transform 0.3s ease-in-out; /* Smooth transform on hover */
+}
+
+.pricingCard:hover {
+	transform: translateY(-5px); /* Lift effect on hover */
+}
+
+.priceHeader {
+	background-color: #007bff; /* Bootstrap primary color */
+	color: #ffffff; /* Ensures text is readable */
+	padding: 20px; /* Balanced padding */
+}
+
+.priceBody {
+	background-color: #ffffff; /* Clear distinction from header */
+	padding: 20px; /* Uniform padding */
+}
+
+.priceFooter {
+	padding: 15px; /* Sufficient padding for the footer */
+	background-color: #f8f9fa; /* Slightly different background to differentiate */
 }

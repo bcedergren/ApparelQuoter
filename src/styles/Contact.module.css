@@ -1,0 +1,29 @@
+/* Contact.module.css */
+.contact-section {
+	background-color: #f9f9f9; /* Light grey background */
+	padding: 40px 0; /* Top and bottom padding */
+}
+
+.contact-section h2 {
+	color: #333; /* Dark grey color for the header */
+	margin-bottom: 15px;
+}
+
+.contact-section p {
+	color: #666; /* Lighter text for the paragraph */
+	max-width: 600px;
+	margin-left: auto;
+	margin-right: auto;
+	line-height: 1.5;
+}
+
+.contact-section form {
+	background-color: #fff; /* White background for the form */
+	padding: 20px;
+	border-radius: 8px; /* Rounded corners for the form */
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+.contact-section button {
+	width: 100%; /* Full width button */
+}

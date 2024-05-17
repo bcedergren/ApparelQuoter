@@ -20,7 +20,7 @@ const OpenOrders: NextPage = () => {
 				if (status === 'authenticated' && session?.user?.companyId) {
 					const companyId = session?.user?.companyId;
 					const response = await fetch(
-						`/api/quotes/${companyId}?quoteType=Order`
+						`/api/quotes/${companyId}?quoteType=openOrders`
 					);
 					if (!response.ok) {
 						throw new Error('Failed to fetch quotes');
@@ -128,46 +128,50 @@ const OpenOrders: NextPage = () => {
 			)}
 			<div className='container mt-5'>
 				<h1>Open Orders</h1>
-				<ul className='list-group'>
-					{orders.map((order) => (
-						<li
-							key={order._id}
-							className='list-group-item'
-						>
-							{/* Make Quote ID a clickable link to quote-details */}
-							<Link
-								href={`/quote-details/${order._id}`}
-								className='text-decoration-none'
+				{orders.length > 0 ? (
+					<ul className='list-group'>
+						{orders.map((order) => (
+							<li
+								key={order._id}
+								className='list-group-item'
 							>
-								<h5 className='mb-1'>Order ID: {order._id}</h5>
-							</Link>
-							{/* Display the date underneath the Quote ID */}
-							{order.CreatedAt && (
-								<small className='d-block'>
-									{new Date(order.CreatedAt).toLocaleDateString()}
-								</small>
-							)}{' '}
-							<p className='mb-1'>Customer: {order.customerName}</p>
-							<p className='mb-1'>
-								Total: ${order.summary.totalCost.toFixed(2)}
-							</p>
-							<div className='d-flex justify-content-between'>
-								<button
-									className='btn btn-primary'
-									onClick={() => sendToComplete(order._id)}
+								{/* Make Quote ID a clickable link to quote-details */}
+								<Link
+									href={`/quote-details/${order._id}`}
+									className='text-decoration-none'
 								>
-									Send to Complete
-								</button>
-								<button
-									className='btn btn-danger'
-									onClick={() => openModal(order._id)}
-								>
-									Delete Order
-								</button>
-							</div>
-						</li>
-					))}
-				</ul>
+									<h5 className='mb-1'>Order ID: {order._id}</h5>
+								</Link>
+								{/* Display the date underneath the Quote ID */}
+								{order.CreatedAt && (
+									<small className='d-block'>
+										{new Date(order.CreatedAt).toLocaleDateString()}
+									</small>
+								)}{' '}
+								<p className='mb-1'>Customer: {order.customerName}</p>
+								<p className='mb-1'>
+									Total: ${order.summary.totalCost.toFixed(2)}
+								</p>
+								<div className='d-flex justify-content-between'>
+									<button
+										className='btn btn-primary'
+										onClick={() => sendToComplete(order._id)}
+									>
+										Send to Complete
+									</button>
+									<button
+										className='btn btn-danger'
+										onClick={() => openModal(order._id)}
+									>
+										Delete Order
+									</button>
+								</div>
+							</li>
+						))}
+					</ul>
+				) : (
+					<p>There are no open orders.</p>
+				)}
 			</div>
 		</Layout>
 	);

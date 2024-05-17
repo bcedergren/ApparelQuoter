@@ -1,6 +1,5 @@
 import { Session } from 'next-auth';
 
-// Extend the built-in session/user types to include the custom user fields
 export interface CustomSession extends Session {
 	user: {
 		id: string;
@@ -8,5 +7,6 @@ export interface CustomSession extends Session {
 		lastName: string;
 		companyId: string;
 		role: string;
+		rememberMe: boolean;
 	} & Session['user']; // Include existing session user fields
 }

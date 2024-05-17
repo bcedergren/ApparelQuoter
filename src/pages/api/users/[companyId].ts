@@ -3,7 +3,7 @@ import { connectToDatabase } from '@/utils/dbConnect';
 import { ObjectId } from 'mongodb';
 import { User } from '@/types/User';
 
-type ClientUser = Omit<User, 'password'>;
+type ClientUser = Omit<User, 'password' | 'rememberMe'>;
 
 export default async function handler(
 	req: NextApiRequest,

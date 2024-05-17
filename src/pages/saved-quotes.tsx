@@ -19,7 +19,9 @@ const SavedQuotes: NextPage = () => {
 			try {
 				if (status === 'authenticated' && session?.user?.companyId) {
 					const companyId = session?.user?.companyId;
-					const response = await fetch(`/api/quotes/${companyId}`);
+					const response = await fetch(
+						`/api/quotes/${companyId}?quoteType=savedQuotes`
+					);
 					if (!response.ok) {
 						throw new Error('Failed to fetch quotes');
 					}
@@ -126,46 +128,50 @@ const SavedQuotes: NextPage = () => {
 			)}
 			<div className='container mt-5'>
 				<h1>Saved Quotes</h1>
-				<ul className='list-group'>
-					{quotes.map((quote) => (
-						<li
-							key={quote._id}
-							className='list-group-item'
-						>
-							{/* Make Quote ID a clickable link to quote-details */}
-							<Link
-								href={`/quote-details/${quote._id}`}
-								className='text-decoration-none'
+				{quotes.length > 0 ? (
+					<ul className='list-group'>
+						{quotes.map((quote) => (
+							<li
+								key={quote._id}
+								className='list-group-item'
 							>
-								<h5 className='mb-1'>Quote ID: {quote._id}</h5>
-							</Link>
-							{/* Display the date underneath the Quote ID */}
-							{quote.CreatedAt && (
-								<small className='d-block'>
-									{new Date(quote.CreatedAt).toLocaleDateString()}
-								</small>
-							)}{' '}
-							<p className='mb-1'>Customer: {quote.customerName}</p>
-							<p className='mb-1'>
-								Total: ${quote.summary.totalCost.toFixed(2)}
-							</p>
-							<div className='d-flex justify-content-between'>
-								<button
-									className='btn btn-primary'
-									onClick={() => sendToOrders(quote._id)}
+								{/* Make Quote ID a clickable link to quote-details */}
+								<Link
+									href={`/quote-details/${quote._id}`}
+									className='text-decoration-none'
 								>
-									Send to Orders
-								</button>
-								<button
-									className='btn btn-danger'
-									onClick={() => openModal(quote._id)}
-								>
-									Delete Quote
-								</button>
-							</div>
-						</li>
-					))}
-				</ul>
+									<h5 className='mb-1'>Quote ID: {quote._id}</h5>
+								</Link>
+								{/* Display the date underneath the Quote ID */}
+								{quote.CreatedAt && (
+									<small className='d-block'>
+										{new Date(quote.CreatedAt).toLocaleDateString()}
+									</small>
+								)}{' '}
+								<p className='mb-1'>Customer: {quote.customerName}</p>
+								<p className='mb-1'>
+									Total: ${quote.summary.totalCost.toFixed(2)}
+								</p>
+								<div className='d-flex justify-content-between'>
+									<button
+										className='btn btn-primary'
+										onClick={() => sendToOrders(quote._id)}
+									>
+										Send to Orders
+									</button>
+									<button
+										className='btn btn-danger'
+										onClick={() => openModal(quote._id)}
+									>
+										Delete Quote
+									</button>
+								</div>
+							</li>
+						))}
+					</ul>
+				) : (
+					<p>There are no saved quotes</p>
+				)}
 			</div>
 		</Layout>
 	);

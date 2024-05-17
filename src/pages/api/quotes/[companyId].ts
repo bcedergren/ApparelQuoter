@@ -11,21 +11,24 @@ export default async function handler(
 	}
 
 	const { companyId, quoteType } = req.query;
-
-	console.log(quoteType);
-
 	const { db, client } = await connectToDatabase();
 
 	try {
-		const query = { companyId: companyId, quoteType: quoteType }; // Use the quoteType from the query parameters
-		const quotes = await db.collection('Quotes').find(query).toArray();
+		// Construct the query based on provided parameters
+		const query: any = { companyId: companyId };
+		if (quoteType) {
+			query.quoteType = quoteType;
+		}
 
+		const quotes = await db.collection('Quotes').find(query).toArray();
 		const transformedQuotes = quotes.map((doc) => ({
 			...doc,
 			_id: doc._id.toString(), // Convert ObjectId to string
 			companyId: doc.companyId,
 			// Include other fields as needed
 		}));
+
+		console.log(transformedQuotes);
 
 		res.status(200).json({ quotes: transformedQuotes });
 	} catch (error) {

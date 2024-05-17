@@ -36,7 +36,7 @@ const PrintingOptions: FC<PrintingOptionsProps> = ({
 
 	return (
 		<div>
-			<h6>SCREEN PRINTING, DTG, SUBLIMATION & VINYL</h6>
+			<h6>SCREEN PRINTING, DTG & SUBLIMATION</h6>
 			<Form>
 				<Row>
 					<Col>
@@ -49,6 +49,12 @@ const PrintingOptions: FC<PrintingOptionsProps> = ({
 									handleChange('colorsFront', parseInt(e.target.value, 10))
 								}
 							/>
+						</InputGroup>
+					</Col>
+				</Row>
+				<Row>
+					<Col>
+						<InputGroup>
 							<InputGroup.Checkbox
 								checked={options.flashFront}
 								onChange={(e) => handleChange('flashFront', e.target.checked)}
@@ -63,6 +69,8 @@ const PrintingOptions: FC<PrintingOptionsProps> = ({
 							<InputGroup.Text>DTG Dark</InputGroup.Text>
 						</InputGroup>
 					</Col>
+				</Row>
+				<Row>
 					<Col>
 						<InputGroup>
 							<InputGroup.Text>Print Colors - Back</InputGroup.Text>

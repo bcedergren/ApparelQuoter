@@ -1,0 +1,35 @@
+/* PublicHeader.module.css */
+.headerContainer {
+	background-color: #f8f9fa; /* Light background, can be adjusted */
+	padding: 0.5rem 1rem; /* Slightly reduced padding for a more compact look */
+}
+
+.brandLogo {
+	display: flex;
+	align-items: center; /* Ensures the logo and the text are aligned nicely */
+}
+
+.navLink {
+	color: #333; /* Darker text for better readability on light bg */
+	font-weight: 500; /* Slightly bolder to stand out */
+	transition: color 0.3s ease-in-out; /* Smooth transition for hover effects */
+}
+
+.navLink:hover,
+.navLink:focus {
+	color: #0056b3; /* Highlight color when hovered or focused */
+	text-decoration: none; /* Removes underline on hover/focus for cleaner look */
+}
+
+.navToggle {
+	border: none; /* Removes default border */
+	background-color: transparent; /* Makes background transparent */
+	outline: none; /* Removes outline to avoid focus ring */
+	box-shadow: none; /* Removes Bootstrap default shadow */
+}
+
+/* Enhanced styling for when Navbar is expanded */
+.navExpanded {
+	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+	background-color: #fff; /* Solid white background */
+}

@@ -52,7 +52,7 @@ interface Prices {
 const initialQuoteState: Quote = {
 	_id: '',
 	customerName: '',
-	quoteType: 'Quote',
+	quoteType: 'savedQuote',
 	items: [
 		{
 			brandAndStyle: '',
