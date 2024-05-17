@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { connectToDatabase } from '@/utils/dbConnect';
 import nodemailer from 'nodemailer';
 import { v4 as uuidv4 } from 'uuid';
-import { User } from '@/types/User';
+import { hostname } from 'os';
 
 export default async function handler(
 	req: NextApiRequest,
@@ -14,45 +14,61 @@ export default async function handler(
 	}
 
 	const { email } = req.body;
-	const { db } = await connectToDatabase();
 
-	const user = (await db.collection('users').findOne({ email })) as User | null;
-
-	if (!user) {
-		return res.status(404).json({ message: 'User not found' });
+	if (!email) {
+		return res.status(400).json({ message: 'Email is required' });
 	}
 
-	const resetToken = uuidv4();
-	const resetTokenExpiry = Date.now() + 3600000; // 1 hour
+	try {
+		const { db } = await connectToDatabase();
+		// Case-insensitive email query
+		const user = await db
+			.collection('User')
+			.findOne({ email: { $regex: new RegExp(`^${email}$`, 'i') } });
 
-	await db.collection('User').updateOne(
-		{ email },
-		{
-			$set: {
-				resetToken,
-				resetTokenExpiry,
-			},
+		if (!user) {
+			return res.status(404).json({ message: 'User not found' });
 		}
-	);
 
-	const transporter = nodemailer.createTransport({
-		service: 'gmail',
-		auth: {
-			user: process.env.GMAIL_USER,
-			pass: process.env.GMAIL_PASS,
-		},
-	});
+		const resetToken = uuidv4();
+		const resetTokenExpiry = Date.now() + 3600000; // 1 hour
 
-	const resetUrl = `${process.env.NEXTAUTH_URL}/reset-password?token=${resetToken}&email=${email}`;
+		const updateResult = await db.collection('User').updateOne(
+			{ email: { $regex: new RegExp(`^${email}$`, 'i') } },
+			{
+				$set: {
+					resetToken,
+					resetTokenExpiry,
+				},
+			}
+		);
 
-	const mailOptions = {
-		from: process.env.GMAIL_USER,
-		to: email,
-		subject: 'Password Reset',
-		html: `<p>You requested a password reset</p><p>Click <a href="${resetUrl}">here</a> to reset your password</p>`,
-	};
+		const transporter = nodemailer.createTransport({
+			host: process.env.SMTP_HOST,
+			port: parseInt(process.env.SMTP_PORT as string, 10),
+			secure: true, // true for port 465, false for other ports
+			auth: {
+				user: process.env.SMTP_USER,
+				pass: process.env.SMTP_PASS,
+			},
+		});
 
-	await transporter.sendMail(mailOptions);
+		const resetUrl = `${process.env.NEXTAUTH_URL}/reset-password?token=${resetToken}&email=${email}`;
 
-	res.status(200).json({ message: 'Reset link sent' });
+		const mailOptions = {
+			hostname: process.env.SMTP_HOST,
+			port: parseInt(process.env.SMTP_PORT as string, 10),
+			from: process.env.SMTP_USERNAME,
+			to: email,
+			subject: 'Password Reset',
+			html: `<p>You requested a password reset</p><p>Click <a href="${resetUrl}">here</a> to reset your password</p>`,
+		};
+
+		await transporter.sendMail(mailOptions);
+
+		res.status(200).json({ message: 'Reset link sent' });
+	} catch (error) {
+		console.error(`Error during password reset process: ${error}`);
+		res.status(500).json({ message: 'Internal server error' });
+	}
 }

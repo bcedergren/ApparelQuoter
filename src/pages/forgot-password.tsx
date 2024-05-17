@@ -15,10 +15,20 @@ const ForgotPasswordPage = () => {
 	const handleSubmit = async (e: FormEvent) => {
 		e.preventDefault();
 
-		// Add your form submission logic here
 		try {
-			// Assume a function sendResetLink exists to handle the form submission
-			await sendResetLink(email);
+			const res = await fetch('/api/auth/forgot-password', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ email }),
+			});
+			const data = await res.json();
+
+			if (!res.ok) {
+				throw new Error(data.message || 'Failed to send reset link.');
+			}
+
 			setSuccess('Reset link sent! Please check your email.');
 			setError('');
 		} catch (err) {
@@ -89,16 +99,3 @@ const ForgotPasswordPage = () => {
 };
 
 export default ForgotPasswordPage;
-
-async function sendResetLink(email: string) {
-	// Replace this with actual API call
-	return new Promise((resolve, reject) => {
-		setTimeout(() => {
-			if (email === 'test@example.com') {
-				resolve('Success');
-			} else {
-				reject('Error');
-			}
-		}, 1000);
-	});
-}
