@@ -1,78 +1,63 @@
-import React, { useState } from 'react';
-import { signIn, useSession } from 'next-auth/react';
-import { Navbar, Container, Nav } from 'react-bootstrap';
-import styles from '@/styles/Pricing.module.css';
+import Link from 'next/link';
+import { Link as ScrollLink } from 'react-scroll';
+import styles from '@/styles/Header.module.css';
 
-const PublicHeader: React.FC = () => {
-	const { data: session } = useSession();
-	const [expanded, setExpanded] = useState<boolean>(false);
-
-	const toggleNavbar = () => setExpanded(!expanded);
-
-	return (
-		<Navbar
-			bg='light'
-			expand='lg'
-			expanded={expanded}
-			className={`${styles.headerContainer} sticky-top`} // Apply custom styles
-		>
-			<Container>
-				<Navbar.Brand href='/'>
-					<h3>ApparelQuoter</h3>
-				</Navbar.Brand>
-				<Navbar.Toggle
-					aria-controls='responsive-navbar-nav'
-					onClick={toggleNavbar}
-					className={styles.navToggle} // Apply custom styles
-				/>
-				<Navbar.Collapse
-					id='responsive-navbar-nav'
-					className={expanded ? styles.navExpanded : ''}
+const Header = () => (
+	<header className={styles.header}>
+		<div className={styles.container}>
+			<div className={styles.logo}>
+				<Link href='/'>ApparelQuoter</Link>
+			</div>
+			<nav className={styles.nav}>
+				<ScrollLink
+					to='home'
+					smooth={true}
+					duration={500}
+					className={styles.navLink}
 				>
-					<Nav className='ms-auto'>
-						<Nav.Link
-							href='#home'
-							className={styles.navLink}
-						>
-							Home
-						</Nav.Link>
-						<Nav.Link
-							href='#service'
-							className={styles.navLink}
-						>
-							Services
-						</Nav.Link>
-						<Nav.Link
-							href='#pricing'
-							className={styles.navLink}
-						>
-							Pricing
-						</Nav.Link>
-						<Nav.Link
-							href='#review'
-							className={styles.navLink}
-						>
-							Testimonials
-						</Nav.Link>
-						<Nav.Link
-							href='#contact'
-							className={styles.navLink}
-						>
-							Contact
-						</Nav.Link>
-						{!session && (
-							<Nav.Link
-								onClick={() => signIn()}
-								className={styles.navLink}
-							>
-								Login
-							</Nav.Link>
-						)}
-					</Nav>
-				</Navbar.Collapse>
-			</Container>
-		</Navbar>
-	);
-};
+					Home
+				</ScrollLink>
+				<ScrollLink
+					to='features'
+					smooth={true}
+					duration={500}
+					className={styles.navLink}
+				>
+					Features
+				</ScrollLink>
+				<ScrollLink
+					to='pricing'
+					smooth={true}
+					duration={500}
+					className={styles.navLink}
+				>
+					Pricing
+				</ScrollLink>
+				{/* <ScrollLink
+					to='testimonials'
+					smooth={true}
+					duration={500}
+					className={styles.navLink}
+				>
+					Testimonials
+				</ScrollLink> */}
+				<ScrollLink
+					to='contact'
+					smooth={true}
+					duration={500}
+					className={styles.navLink}
+				>
+					Contact
+				</ScrollLink>
+				<Link
+					href='/login'
+					className={styles.navLink}
+				>
+					Login
+				</Link>
+			</nav>
+		</div>
+	</header>
+);
 
-export default PublicHeader;
+export default Header;

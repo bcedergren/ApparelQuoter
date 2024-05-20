@@ -1,24 +1,50 @@
 @import url('https://fonts.googleapis.com/css2?family=Muli:wght@400;500;600;700&display=swap');
 
-/* Keyframes for animations */
-@keyframes fadeIn {
-	from {
-		opacity: 0;
-		transform: translateY(-20px);
-	}
-	to {
-		opacity: 1;
-		transform: translateY(0);
-	}
+/* General Public Page Styles */
+body.public-styles {
+	font-family: 'Muli', sans-serif;
+	overflow-x: hidden !important;
+	font-size: 16px;
+	color: #3c4858;
 }
 
-/* Currency Input Styles */
-.currency-input {
+body.public-styles h1,
+body.public-styles h2,
+body.public-styles h3,
+body.public-styles h4,
+body.public-styles h5,
+body.public-styles h6,
+body.public-styles .h1,
+body.public-styles .h2,
+body.public-styles .h3,
+body.public-styles .h4,
+body.public-styles .h5,
+body.public-styles .h6 {
+	font-family: 'Muli', sans-serif;
+	line-height: 1.5;
+	font-weight: 600 !important;
+}
+
+body.public-styles ::selection {
+	background: #465467;
+	color: #ffffff;
+}
+
+body.public-styles a {
+	text-decoration: none !important;
+}
+
+body.public-styles p {
+	line-height: 1.6;
+}
+
+/* Existing Global Styles */
+body.public-styles .currency-input {
 	position: relative;
 	display: inline-block;
 }
 
-.currency-symbol {
+body.public-styles .currency-symbol {
 	position: absolute;
 	left: 8px;
 	top: 50%;
@@ -27,17 +53,16 @@
 	color: #000;
 }
 
-input[type='number'] {
+body.public-styles input[type='number'] {
 	margin-left: 5px;
 }
 
-/* Percentage Input Styles */
-.percentage-input {
+body.public-styles .percentage-input {
 	position: relative;
 	display: inline-block;
 }
 
-.percentage-symbol {
+body.public-styles .percentage-symbol {
 	position: absolute;
 	right: 8px;
 	top: 50%;
@@ -46,54 +71,17 @@ input[type='number'] {
 	color: #000;
 }
 
-.percentage-symbol > input[type='number'] {
+body.public-styles .percentage-symbol > input[type='number'] {
 	padding-right: 20px;
 }
 
 /* Existing Global Styles */
-body {
-	font-family: 'Muli', sans-serif;
-	overflow-x: hidden !important;
-	font-size: 16px;
-	color: #3c4858;
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-.h1,
-.h2,
-.h3,
-.h4,
-.h5,
-.h6 {
-	font-family: 'Muli', sans-serif;
-	line-height: 1.5;
-	font-weight: 600 !important;
-}
-
-::selection {
-	background: #465467;
-	color: #ffffff;
-}
-
-a {
-	text-decoration: none !important;
-}
-
-p {
-	line-height: 1.6;
-}
-
-.section {
+body.public-styles .section {
 	padding: 100px 0;
 	position: relative;
 }
 
-.bg-overlay {
+body.public-styles .bg-overlay {
 	background-color: rgba(60, 72, 88, 0.7);
 	position: absolute;
 	top: 0;
@@ -104,19 +92,19 @@ p {
 	height: 100%;
 }
 
-.bg-overlay-white {
+body.public-styles .bg-overlay-white {
 	background-color: rgba(255, 255, 255, 0.7);
 }
 
-.title-heading {
+body.public-styles .title-heading {
 	line-height: 26px;
 }
-.title-heading .heading {
+body.public-styles .title-heading .heading {
 	font-size: 40px !important;
 	letter-spacing: 1px;
 }
 
-.form-control {
+body.public-styles .form-control {
 	box-shadow: none;
 	background-color: transparent;
 	border: 1px solid #ced4da;
@@ -126,30 +114,31 @@ p {
 	padding: 4px 10px;
 	border-radius: 7px;
 	transition: all 0.5s ease;
+	width: 100%;
 }
-.form-control:focus,
-.form-control.active {
+body.public-styles .form-control:focus,
+body.public-styles .form-control.active {
 	border-color: #0666db;
 	box-shadow: none;
 }
 
-.btn-primary {
+body.public-styles .btn-primary {
 	background-color: #0666db !important;
 	border: 1px solid #0666db !important;
 	color: #ffffff !important;
 	box-shadow: 0 3px 7px rgba(6, 102, 219, 0.5);
 }
-.btn-primary:hover,
-.btn-primary:focus,
-.btn-primary:active,
-.btn-primary.active,
-.btn-primary.focus {
+body.public-styles .btn-primary:hover,
+body.public-styles .btn-primary:focus,
+body.public-styles .btn-primary:active,
+body.public-styles .btn-primary.active,
+body.public-styles .btn-primary.focus {
 	background-color: #054fa9 !important;
 	border-color: #054fa9 !important;
 	color: #ffffff !important;
 }
 
-.btn {
+body.public-styles .btn {
 	padding: 8px 20px;
 	outline: none;
 	text-decoration: none;
@@ -159,61 +148,61 @@ p {
 	font-weight: 600;
 	border-radius: 7px;
 }
-.btn:focus {
+body.public-styles .btn:focus {
 	box-shadow: none !important;
 }
 
-.shadow {
+body.public-styles .shadow {
 	box-shadow: 0 0 3px rgba(22, 28, 45, 0.15) !important;
 }
 
-.error {
+body.public-styles .error {
 	margin: 8px 0px;
 	display: none;
 	color: #e73636;
 }
 
-.error_message {
+body.public-styles .error_message {
 	background-color: rgba(240, 115, 90, 0.1) !important;
 	border: 2px solid rgba(240, 115, 90, 0.1) !important;
 	color: #f0735a !important;
 	font-size: 14px;
 }
 
-#success_page {
+body.public-styles #success_page {
 	background-color: rgba(83, 199, 151, 0.1) !important;
 	border: 2px solid rgba(83, 199, 151, 0.1) !important;
 	color: #53c797 !important;
 }
-#success_page p {
+body.public-styles #success_page p {
 	margin-bottom: 0 !important;
 }
 
-.mt-100 {
+body.public-styles .mt-100 {
 	margin-top: 100px;
 }
 
-.mb-60 {
+body.public-styles .mb-60 {
 	margin-bottom: 60px;
 }
 
 @media (min-width: 768px) {
-	.margin-top-100 {
+	body.public-styles .margin-top-100 {
 		margin-top: 100px;
 	}
 }
 
 @media (max-width: 768px) {
-	.section {
+	body.public-styles .section {
 		padding: 60px 0;
 	}
-	.title-heading .heading {
+	body.public-styles .title-heading .heading {
 		font-size: 30px !important;
 	}
-	.title-heading .para-desc {
+	body.public-styles .title-heading .para-desc {
 		font-size: 15px;
 	}
-	.mt-60 {
+	body.public-styles .mt-60 {
 		margin-top: 60px;
 	}
 }

@@ -1,24 +1,45 @@
-.headline {
-	display: flex;
-	justify-content: center;
-	align-items: center;
+/* Example CSS module for the Home page */
+
+.main {
+	padding: 2rem;
+}
+
+.section {
+	padding: 100px 0;
 	position: relative;
 }
 
-.container {
-	display: flex;
-	flex-direction: column;
-	min-height: 100vh;
+.section-two {
+	padding: 60px 0;
+	position: relative;
 }
 
-.content {
-	flex: 1;
+.title-heading {
+	line-height: 26px;
 }
 
-.footer {
-	background-color: #008080;
-	color: white;
-	text-align: center;
-	padding: 1rem 0;
-	height: 110px;
+.title-heading .heading {
+	font-size: 40px !important;
+	letter-spacing: 1px;
+}
+
+.section-title {
+	position: relative;
+}
+
+.section-title .title {
+	letter-spacing: 0.5px;
+	font-size: 24px !important;
+}
+
+.para-desc {
+	max-width: 600px;
+}
+
+.mt-100 {
+	margin-top: 100px;
+}
+
+.mb-60 {
+	margin-bottom: 60px;
 }

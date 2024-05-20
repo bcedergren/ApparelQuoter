@@ -6,6 +6,8 @@ import styles from '@/styles/ForgotPassword.module.css';
 import Icon from '@mdi/react';
 import { mdiHome } from '@mdi/js';
 import AccountLayout from '@/components/account/AccountLayout';
+import Image from 'next/image';
+import forgotPasswordImage from '../../public/forgotPassword.png'; // Assuming the image is placed in the public folder
 
 const ForgotPasswordPage = () => {
 	const [email, setEmail] = useState('');
@@ -40,57 +42,74 @@ const ForgotPasswordPage = () => {
 	return (
 		<AccountLayout>
 			<Container className={styles.forgotPasswordContainer}>
-				<Row className='justify-content-center'>
-					<Col className={styles.forgotPasswordCard}>
-						<div className={styles.textCenter}>
-							<h3>ApparelQuoter</h3>
+				<Row className={styles.forgotPasswordCardContainer}>
+					<Col
+						md={6}
+						lg={5}
+						className={styles.forgotPasswordCard}
+					>
+						<div>
+							<div className={styles.textCenter}>
+								<h1>ApparelQuoter</h1>
+							</div>
+							<div className={`${styles.title} ${styles.mt4}`}>
+								<h4>Forgot Password</h4>
+							</div>
+							<p className={styles.description}>
+								Enter your email address to receive a password reset link.
+							</p>
+							<Form onSubmit={handleSubmit}>
+								<Form.Group className={styles.formGroup}>
+									<Form.Label className={styles.formLabel}>
+										Email Address
+									</Form.Label>
+									<Form.Control
+										type='email'
+										value={email}
+										onChange={(e) => setEmail(e.target.value)}
+										required
+										className={styles.formControl}
+										placeholder='Enter your email'
+									/>
+								</Form.Group>
+								{error && <div className={styles.errorMessage}>{error}</div>}
+								{success && (
+									<div className={styles.successMessage}>{success}</div>
+								)}
+								<Button
+									type='submit'
+									className={styles.btnPrimary}
+								>
+									Send Reset Link
+								</Button>
+							</Form>
+							<div className={`${styles.textCenter} ${styles.mt4}`}>
+								<Link
+									href='/'
+									className={styles.textDark}
+								>
+									<Icon
+										path={mdiHome}
+										size={1}
+										color='blue'
+									/>
+								</Link>
+							</div>
 						</div>
-						<div className={`${styles.title} ${styles.mt4}`}>
-							<h5>Forgot Password</h5>
-						</div>
-						<p className={styles.description}>
-							Enter your email address to receive a password reset link.
-						</p>
-						<Form onSubmit={handleSubmit}>
-							<Form.Group className={styles.formGroup}>
-								<Form.Label className={styles.formLabel}>
-									Email Address
-								</Form.Label>
-								<Form.Control
-									type='email'
-									value={email}
-									onChange={(e) => setEmail(e.target.value)}
-									required
-									className={styles.formControl}
-									placeholder='Enter your email'
-								/>
-							</Form.Group>
-							{error && <div className={styles.errorMessage}>{error}</div>}
-							{success && (
-								<div className={styles.successMessage}>{success}</div>
-							)}
-							<Button
-								type='submit'
-								className={styles.btnPrimary}
-							>
-								Send Reset Link
-							</Button>
-						</Form>
-						<Col
-							xs={12}
-							className='text-center mt-3'
-						>
-							<Link
-								href='/'
-								className='text-dark fw-bold'
-							>
-								<Icon
-									path={mdiHome}
-									size={1}
-									color='blue'
-								/>
-							</Link>
-						</Col>
+					</Col>
+					<Col
+						md={6}
+						lg={5}
+						className={styles.imageCol}
+					>
+						<Image
+							src={forgotPasswordImage}
+							alt='Forgot Password Image'
+							className={styles.forgotPasswordImage}
+							layout='responsive'
+							width={600}
+							height={600}
+						/>
 					</Col>
 				</Row>
 			</Container>

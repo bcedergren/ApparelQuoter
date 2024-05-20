@@ -14,7 +14,7 @@ export default async function handler(
 	const { email, password } = req.body;
 
 	const { db } = await connectToDatabase();
-	const user = await db.collection('users').findOne({ email });
+	const user = await db.collection('Users').findOne({ email });
 
 	if (!user) {
 		return res.status(401).json({ message: 'Invalid email or password' });

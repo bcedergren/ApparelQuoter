@@ -9,20 +9,18 @@ const Headline: React.FC = () => {
 
 	return (
 		<div className={styles.headline}>
-			<div className={styles.heroTextContainer}>
+			<div className={styles.container}>
 				<h1 className={`display-4 fw-bold mb-3 ${styles.title}`}>
-					We&apos;re Creating{' '}
-					<span className={styles.textPrimary}>Solutions...</span>
+					Streamline Your Apparel Business
 				</h1>
-				<p className={`lead mb-5 ${styles.lead}`}>
-					Launch your campaign and benefit from our expertise on designing and
-					managing conversion centered bootstrap4 html page.
-				</p>
+				<h3 className={`lead mb-5 ${styles.lead}`}>
+					Enhancing Productivity for Apparel Decorators
+				</h3>
 				<Image
-					src='/saas-2.png' // Ensure your public directory contains this image
+					src='/WorkTogether.png' // Ensure your public directory contains this image
 					alt='SaaS Visual Representation'
-					width={1233}
-					height={618}
+					width={800}
+					height={600}
 					className={styles.headlineImage}
 				/>
 			</div>

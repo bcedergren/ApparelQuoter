@@ -1,73 +1,74 @@
-// Contact.tsx
-import React from 'react';
-import { Container, Row, Col, Form, Button } from 'react-bootstrap';
+import { useState, FormEvent } from 'react';
+import styles from '@/styles/Contact.module.css';
 
-const Contact: React.FC = () => {
+const Contact = () => {
+	const [formData, setFormData] = useState({
+		name: '',
+		email: '',
+		subject: '',
+		message: '',
+	});
+
+	const handleChange = (
+		e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+	) => {
+		const { name, value } = e.target;
+		setFormData({
+			...formData,
+			[name]: value,
+		});
+	};
+
+	const handleSubmit = (e: FormEvent) => {
+		e.preventDefault();
+		// handle form submission
+	};
+
 	return (
-		<section className='contact-section py-5 bg-light'>
-			<Container>
-				<Row className='justify-content-center'>
-					<Col lg={8}>
-						<h2 className='text-center mb-4'>Get in touch!</h2>
-						<p className='text-center mb-5'>
-							Launch your campaign and benefit from our expertise on designing
-							and managing conversion centered bootstrap4 html page.
-						</p>
-						<Form>
-							<Row>
-								<Col
-									md={6}
-									className='mb-3'
-								>
-									<Form.Group>
-										<Form.Label>Your Name *</Form.Label>
-										<Form.Control
-											type='text'
-											placeholder='First Name'
-											required
-										/>
-									</Form.Group>
-								</Col>
-								<Col
-									md={6}
-									className='mb-3'
-								>
-									<Form.Group>
-										<Form.Label>Your Email *</Form.Label>
-										<Form.Control
-											type='email'
-											placeholder='Your email'
-											required
-										/>
-									</Form.Group>
-								</Col>
-							</Row>
-							<Form.Group className='mb-3'>
-								<Form.Label>Subject</Form.Label>
-								<Form.Control
-									type='text'
-									placeholder='Subject'
-								/>
-							</Form.Group>
-							<Form.Group className='mb-4'>
-								<Form.Label>Comments</Form.Label>
-								<Form.Control
-									as='textarea'
-									rows={3}
-									placeholder='Your Message'
-								/>
-							</Form.Group>
-							<Button
-								variant='primary'
-								type='submit'
-							>
-								Send Message
-							</Button>
-						</Form>
-					</Col>
-				</Row>
-			</Container>
-		</section>
+		<div
+			className={styles.contactSection}
+			id='contact'
+		>
+			<h2>Get in touch!</h2>
+			<p>
+				Have Questions? We&apos;re Here to Help! Contact us to learn how
+				ApparelQuoter can streamline your business operations. Let&apos;s get
+				started on your journey to success!
+			</p>
+			<form onSubmit={handleSubmit}>
+				<input
+					type='text'
+					name='name'
+					placeholder='Your Name *'
+					value={formData.name}
+					onChange={handleChange}
+					required
+				/>
+				<input
+					type='email'
+					name='email'
+					placeholder='Your Email *'
+					value={formData.email}
+					onChange={handleChange}
+					required
+				/>
+				<input
+					type='text'
+					name='subject'
+					placeholder='Subject'
+					value={formData.subject}
+					onChange={handleChange}
+				/>
+				<textarea
+					name='message'
+					placeholder='Your Message'
+					value={formData.message}
+					onChange={handleChange}
+					required
+				></textarea>
+				<button type='submit'>Send Message</button>
+			</form>
+		</div>
 	);
 };
 

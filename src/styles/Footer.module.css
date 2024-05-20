@@ -1,40 +1,14 @@
-/* Footer.module.css */
-
-.footerContainer {
-	background-color: #000; /* Dark background for the footer */
-	color: #fff; /* White text color */
-	padding: 40px 0; /* Padding for top and bottom */
+.footer {
+	background: black;
+	color: white;
+	padding: 20px;
+	text-align: center;
 }
 
-.footerText {
-	font-size: 0.875rem; /* Smaller font size for the footer text */
-	margin-top: 20px;
-	text-align: center; /* Center the text */
-}
-
-.socialIcon {
-	padding: 0;
-	margin: 0;
-	list-style: none; /* Remove default list styling */
-	justify-content: center; /* Center align the icons */
-	display: flex; /* Use flexbox for alignment */
-}
-
-.socialLink {
-	color: #fff; /* White color for icons */
-	margin: 0 10px; /* Spacing between icons */
-	display: inline-block;
-}
-
-.upArrow {
+.footer .scrollTop {
+	display: block;
+	margin: 0 auto 10px;
+	font-size: 1.5rem;
+	color: white;
 	cursor: pointer;
-	color: #fff; /* White color for the arrow */
-	font-size: 24px; /* Size of the arrow */
-	display: inline-block; /* Ensure it's in line */
-	margin-top: 20px; /* Space above the arrow */
-}
-
-.companyLink {
-	color: #fff; /* Style for the company link */
-	text-decoration: none; /* No underline */
 }

@@ -7,6 +7,8 @@ import styles from '@/styles/Login.module.css';
 import Icon from '@mdi/react';
 import { mdiFacebook, mdiGoogle, mdiHome } from '@mdi/js';
 import AccountLayout from '@/components/account/AccountLayout';
+import Image from 'next/image';
+import signInImage from '../../public/SignIn.png';
 
 const LoginPage = () => {
 	const [email, setEmail] = useState('');
@@ -18,8 +20,6 @@ const LoginPage = () => {
 
 	const handleSubmit = async (e: FormEvent) => {
 		e.preventDefault();
-
-		console.log('loggin in');
 
 		const result = await signIn('credentials', {
 			redirect: false,
@@ -39,145 +39,153 @@ const LoginPage = () => {
 	return (
 		<AccountLayout>
 			<Container className={styles.loginContainer}>
-				<Row className='justify-content-center'>
-					<Col className={styles.card}>
+				<Row className={styles.centerContent}>
+					<Col
+						md={6}
+						lg={5}
+						className={styles.card}
+					>
 						<div className={styles.textCenter}>
-							<h3>ApparelQuoter</h3>
+							<h1>ApparelQuoter</h1>
 						</div>
-						<div
-							className={`${styles.loginPage} ${styles.bgWhite} ${styles.shadowLg} ${styles.rounded} ${styles.p4} ${styles.mt4} ${styles.positionRelative}`}
+						<div className={styles.textCenter}>
+							<h3>Sign In</h3>
+						</div>
+						<Form
+							className={styles.loginForm}
+							onSubmit={handleSubmit}
 						>
-							<div className={styles.textCenter}>
-								<h5 className='mb-4 pb-2'>Sign In</h5>
-							</div>
-							<Form className={styles.loginForm}>
+							<Form.Group className={styles.marginBottom}>
 								<Row>
-									<Col xs={12}>
-										<Form.Group className='mb-3'>
-											<Form.Label className={styles.formLabel}>
-												Your Email *
-											</Form.Label>
-											<Form.Control
-												type='email'
-												value={email}
-												onChange={(e) => setEmail(e.target.value)}
-												required
-												placeholder='Your Email :'
-											/>
-										</Form.Group>
-									</Col>
-									<Col xs={12}>
-										<Form.Group className='mb-3'>
-											<Form.Label className={styles.formLabel}>
-												Password *
-											</Form.Label>
-											<Form.Control
-												type='password'
-												value={password}
-												onChange={(e) => setPassword(e.target.value)}
-												required
-												placeholder='Password :'
-											/>
-										</Form.Group>
-									</Col>
-									<Col
-										xs={12}
-										className='d-flex justify-content-between'
-									>
-										<Form.Check
-											type='checkbox'
-											label='Remember me'
-											checked={rememberMe}
-											onChange={(e) => setRememberMe(e.target.checked)}
-											className='mb-3'
-										/>
-										<Link
-											href='/forgot-password'
-											className={styles.textDark}
-										>
-											Forgot password?
-										</Link>
-									</Col>
-									<Col xs={12}>
-										<Button
-											className='btn btn-primary w-100'
-											onClick={handleSubmit}
-										>
-											Sign in
-										</Button>
-									</Col>
-									<Col
-										xs={12}
-										className='text-center mt-4'
-									>
-										<h6 className='mb-0'>Or Login With</h6>
-									</Col>
-									<Col
-										sm={6}
-										className='mt-4'
-									>
-										<Button
-											variant='light'
-											className='w-100'
-										>
-											<Icon
-												path={mdiFacebook}
-												size={1}
-												color='blue'
-											/>
-											Facebook
-										</Button>
-									</Col>
-									<Col
-										sm={6}
-										className='mt-4'
-									>
-										<Button
-											variant='light'
-											className='w-100'
-										>
-											<Icon
-												path={mdiGoogle}
-												size={1}
-												color='red'
-											/>{' '}
-											Google
-										</Button>
-									</Col>
-									<Col
-										xs={12}
-										className='text-center mt-3'
-									>
-										<p className='mb-0'>
-											<small className='text-dark me-2'>
-												Don&apos;t have an account ?
-											</small>
-											<Link
-												href='/register'
-												className='text-dark fw-bold'
-											>
-												Sign Up
-											</Link>
-										</p>
-									</Col>
-									<Col
-										xs={12}
-										className='text-center mt-3'
-									>
-										<Link
-											href='/'
-											className='text-dark fw-bold'
-										>
-											<Icon
-												path={mdiHome}
-												size={1}
-												color='blue'
-											/>
-										</Link>
-									</Col>
+									<Form.Label className={styles.formLabel}>
+										Your Email:
+									</Form.Label>
 								</Row>
-							</Form>
-						</div>
+								<Form.Control
+									type='email'
+									value={email}
+									onChange={(e) => setEmail(e.target.value)}
+									required
+									placeholder='Your Email'
+									className={styles.formControl}
+								/>
+							</Form.Group>
+							<Form.Group className={styles.marginBottom}>
+								<Row>
+									<Form.Label className={styles.formLabel}>
+										Password:
+									</Form.Label>
+								</Row>
+								<Form.Control
+									type='password'
+									value={password}
+									onChange={(e) => setPassword(e.target.value)}
+									required
+									placeholder='Password'
+									className={styles.formControl}
+								/>
+							</Form.Group>
+							<div
+								className={`${styles.rememberMeContainer} ${styles.marginBottom}`}
+							>
+								<Form.Check
+									className={styles.formCheck}
+									type='checkbox'
+									label='Remember me'
+									checked={rememberMe}
+									onChange={(e) => setRememberMe(e.target.checked)}
+								/>
+								<Link
+									href='/forgot-password'
+									className={styles.textDark}
+								>
+									Forgot password?
+								</Link>
+							</div>
+							<Button
+								type='submit'
+								className={styles.btnPrimary}
+							>
+								Sign in
+							</Button>
+							<div className={`${styles.orLoginWith} ${styles.marginTop}`}>
+								<h4>Or Login With</h4>
+							</div>
+							<Row className={styles.marginTop}>
+								<Col
+									sm={6}
+									className={styles.marginBottom}
+								>
+									<Button
+										variant='light'
+										className={styles.socialButton}
+									>
+										<Icon
+											path={mdiFacebook}
+											size={1}
+											color='blue'
+											className={styles.socialIcon}
+										/>{' '}
+										Facebook
+									</Button>
+								</Col>
+								<Col
+									sm={6}
+									className={styles.marginBottom}
+								>
+									<Button
+										variant='light'
+										className={styles.socialButton}
+									>
+										<Icon
+											path={mdiGoogle}
+											size={1}
+											color='red'
+											className={styles.socialIcon}
+										/>{' '}
+										Google
+									</Button>
+								</Col>
+							</Row>
+							<div className={styles.marginTop}>
+								<p className={styles.textCenter}>
+									<small className='text-dark me-2'>
+										Don&apos;t have an account?{' '}
+									</small>
+									<Link
+										href='/register'
+										className={styles.boldText}
+									>
+										Sign Up
+									</Link>
+								</p>
+							</div>
+							<div className={`${styles.homeButton} ${styles.marginTop}`}>
+								<Link
+									href='/'
+									className={styles.boldText}
+								>
+									<Icon
+										path={mdiHome}
+										size={1}
+										color='blue'
+									/>
+								</Link>
+							</div>
+						</Form>
+					</Col>
+					<Col
+						md={6}
+						lg={5}
+						className={styles.imageCol}
+					>
+						<Image
+							src={signInImage}
+							alt='Sign In Image'
+							className={styles.signInImage}
+							height={800}
+							width={800}
+						/>
 					</Col>
 				</Row>
 			</Container>

@@ -1,42 +1,33 @@
-// PricingCard component
 import React from 'react';
-import { Col, Card, Button } from 'react-bootstrap';
-import styles from '@/styles//Pricing.module.css';
+import Link from 'next/link';
+import styles from '@/styles/PricingCard.module.css';
 
-interface PricingPlan {
-	plan: string;
+interface Plan {
+	name: string;
 	price: string;
+	target: string;
 	features: string[];
 }
 
-const PricingCard: React.FC<PricingPlan> = ({ plan, price, features }) => {
+interface PricingCardProps {
+	plan: Plan;
+}
+
+const PricingCard: React.FC<PricingCardProps> = ({ plan }) => {
 	return (
-		<Col
-			lg={3}
-			md={6}
-			className='mt-4 pt-2'
-		>
-			<Card className={styles.pricingCard}>
-				<Card.Header className={styles.priceHeader}>
-					<h5 className='price-title'>{plan}</h5>
-					<h2 className='price'>{price}</h2>
-					<p className='mb-0'>/mo</p>
-				</Card.Header>
-				<Card.Body className={styles.priceBody}>
-					{features.map((feature, index) => (
-						<p
-							key={index}
-							className='text-muted mt-2'
-						>
-							{feature}
-						</p>
-					))}
-				</Card.Body>
-				<Card.Footer className={styles.priceFooter}>
-					<Button variant='primary'>Buy Now</Button>
-				</Card.Footer>
-			</Card>
-		</Col>
+		<div className={styles.pricingCard}>
+			<h3>{plan.name}</h3>
+			<h5>{plan.target}</h5>
+			<p>{plan.price}</p>
+			<ul>
+				{plan.features.map((feature: string, index: number) => (
+					<li key={index}>{feature}</li>
+				))}
+			</ul>
+			<Link href={`/register?plan=${plan.name}`}>
+				<span className={styles.btnPrimary}>Sign Up</span>
+			</Link>
+		</div>
 	);
 };
 

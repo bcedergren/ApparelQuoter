@@ -1,0 +1,80 @@
+/* Add your dashboard specific styles here */
+.dashboard-container {
+	padding: 20px;
+}
+
+.sidebar {
+	background-color: #ffffff;
+	border-right: 1px solid #e7e7e7;
+	min-height: 100vh;
+	position: fixed;
+	width: 240px;
+	top: 0;
+	left: 0;
+	bottom: 0;
+}
+
+.main-content {
+	margin-left: 240px;
+	padding: 20px;
+}
+
+.droppable-col {
+	background-color: #ffffff;
+	border-radius: 5px;
+	padding: 10px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+	margin-bottom: 20px;
+}
+
+.draggable-item {
+	background-color: #ffffff;
+	border-radius: 5px;
+	padding: 10px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+	margin-bottom: 10px;
+}
+
+.draggable-item h5 {
+	margin: 0;
+	font-size: 16px;
+	font-weight: 600;
+}
+
+.draggable-item .quote-item {
+	font-size: 14px;
+	color: #6c757d;
+}
+
+.draggable-item .quote-item strong {
+	color: #3c4858;
+}
+
+.text-center {
+	text-align: center;
+}
+
+.mt-2 {
+	margin-top: 20px;
+}
+
+.py-3 {
+	padding-top: 30px;
+	padding-bottom: 30px;
+}
+
+.bg-light {
+	background-color: #f8f9fa !important;
+}
+
+.text-dark {
+	color: #343a40 !important;
+}
+
+.flex {
+	display: flex;
+}
+
+.overflow-auto {
+	overflow: auto;
+}

@@ -1,80 +1,68 @@
-// Pricing.tsx
-import React from 'react';
-import { Row, Col } from 'react-bootstrap';
-import PricingCard from './PricingCard';
-import styles from '@/styles/Pricing.module.css'; // Import CSS module
+import PricingCard from '@/components/public/PricingCard';
+import styles from '@/styles/Pricing.module.css';
 
-const Pricing: React.FC = () => {
+const plans = [
+	{
+		name: 'Starter Plan',
+		price: '$9.99 /mo',
+		target:
+			'Small startups or solo entrepreneurs who are just starting out and need basic features to get going.',
+		features: [
+			'Access for 1 user',
+			'Manage up to 10 clients',
+			'Basic quoting tools',
+			'Limited support (email support only)',
+		],
+	},
+	{
+		name: 'Standard Plan',
+		price: '$19.99 /mo',
+		target:
+			'Small businesses that are growing and need more advanced tools and user access',
+		features: [
+			'Access for up to 5 users',
+			'Manage up to 50 clients',
+			'Advanced quoting tools',
+			'Order tracking',
+			'CRM integration',
+			'Priority email support',
+		],
+	},
+	{
+		name: 'Professional Plan',
+		price: '$49.99 /mo',
+		target:
+			'Medium-sized businesses that require comprehensive management tools and more user access.',
+		features: [
+			'Access for up to 20 users',
+			'Manage up to 200 clients',
+			'All Professional Plan features',
+			'Invoicing and billing tools',
+			'Inventory management',
+			'Design collaboration tools',
+			'Analytics and reporting',
+			'Phone support',
+		],
+	},
+];
+
+const Pricing = () => {
 	return (
-		<section className={styles.pricingSection}>
-			<div className='container'>
-				<Row className='justify-content-center'>
-					<Col
-						lg={12}
-						className='text-center'
-					>
-						<h4 className={styles.title}>Our Pricing Plans</h4>
-						<p className={styles.paraDesc}>
-							Choose the plan that fits your needs.
-						</p>
-					</Col>
-				</Row>
-				<Row>
-					{pricingPlans.map((plan, index) => (
-						<PricingCard
-							key={index}
-							plan={plan.plan}
-							price={plan.price}
-							features={plan.features}
-						/>
-					))}
-				</Row>
+		<section
+			className={styles.pricingSection}
+			id='pricing'
+		>
+			<h2>Our Pricing Plans</h2>
+			<div className={styles.pricingCards}>
+				{plans.map((plan, index) => (
+					<PricingCard
+						key={index}
+						plan={plan}
+					/>
+				))}
 			</div>
 		</section>
 	);
 };
 
 export default Pricing;
-
-const pricingPlans = [
-	{
-		plan: 'Starter',
-		price: '$0.00',
-		features: [
-			'Full Access',
-			'Enhanced Security',
-			'Source Files',
-			'1 Domain Free',
-		],
-	},
-	{
-		plan: 'Professional',
-		price: '$9.99',
-		features: [
-			'Full Access',
-			'Source Files',
-			'Enhanced Security',
-			'1 Domain Free',
-		],
-	},
-	{
-		plan: 'Standard',
-		price: '$19.99',
-		features: [
-			'Full Access',
-			'Enhanced Security',
-			'Source Files',
-			'1 Domain Free',
-		],
-	},
-	{
-		plan: 'Premium',
-		price: '$29.99',
-		features: [
-			'Full Access',
-			'Source Files',
-			'Enhanced Security',
-			'1 Domain Free',
-		],
-	},
-];

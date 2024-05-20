@@ -11,6 +11,7 @@ import {
 } from 'react-beautiful-dnd';
 import { Quote, QuoteItem } from '@/types/Quote';
 import { formatColumnHeader } from '@/utils/formatQuoteType';
+import styles from '@/styles/App.module.css'; // Import App-specific styles
 
 interface Order {
 	id: string;
@@ -41,6 +42,8 @@ interface UpdateResponse {
 const Dashboard = () => {
 	const { data: session, status } = useSession();
 	const [orders, setOrders] = useState<OrdersState>(initialOrders);
+
+	console.log(session);
 
 	useEffect(() => {
 		if (status === 'unauthenticated') {
@@ -228,7 +231,7 @@ const Dashboard = () => {
 		<Layout>
 			<Container
 				fluid
-				className='bg-light text-dark'
+				className={styles.appContainer}
 			>
 				<h1>Dashboard</h1>
 				<DragDropContext onDragEnd={onDragEnd}>
@@ -263,7 +266,7 @@ const Dashboard = () => {
 															ref={provided.innerRef}
 															{...provided.draggableProps}
 															{...provided.dragHandleProps}
-															className='card my-2'
+															className={styles.appCard}
 														>
 															<div className='card-body'>
 																<h5>{item.customerName}</h5>
