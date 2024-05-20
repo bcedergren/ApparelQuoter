@@ -8,7 +8,6 @@ import Icon from '@mdi/react';
 import { mdiFacebook, mdiGoogle, mdiHome } from '@mdi/js';
 import AccountLayout from '@/components/account/AccountLayout';
 import Image from 'next/image';
-import signInImage from '../../public/SignIn.png';
 
 const LoginPage = () => {
 	const [email, setEmail] = useState('');
@@ -180,7 +179,7 @@ const LoginPage = () => {
 						className={styles.imageCol}
 					>
 						<Image
-							src={signInImage}
+							src='/signIn.png'
 							alt='Sign In Image'
 							className={styles.signInImage}
 							height={800}
