@@ -1,5 +1,5 @@
 import type { NextPage } from 'next';
-import Layout from '@/components/Layout';
+import Layout from '@/components/app/Layout';
 
 // Example type for receipt items, adjust according to your actual data structure
 interface ReceiptItem {

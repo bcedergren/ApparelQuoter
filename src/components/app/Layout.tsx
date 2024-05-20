@@ -1,7 +1,7 @@
 import { ReactNode, useState } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import { useSession } from 'next-auth/react';
-import Header from '@/components/Header';
+import Header from '@/components/app/Header';
 import SideNavigation from './SideNavigation';
 
 type LayoutProps = {

@@ -1,0 +1,49 @@
+.termsContainer {
+	padding: 50px 20px;
+	max-width: 800px;
+	margin: 0 auto;
+	background-color: #fff;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+	border-radius: 8px;
+}
+
+/* h1 {
+	font-size: 2.5rem;
+	margin-bottom: 20px;
+	text-align: center;
+}
+
+p {
+	font-size: 1rem;
+	line-height: 1.6;
+	margin-bottom: 20px;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 30px;
+	margin-bottom: 15px;
+} */
+
+.section {
+	margin-bottom: 30px;
+}
+
+/* Media query for small screens */
+@media (max-width: 768px) {
+	.termsContainer {
+		padding: 30px 10px;
+	}
+
+	/* h1 {
+		font-size: 2rem;
+	}
+
+	h2 {
+		font-size: 1.25rem;
+	}
+
+	p {
+		font-size: 0.9rem;
+	} */
+}

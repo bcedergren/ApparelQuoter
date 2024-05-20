@@ -17,7 +17,7 @@ const Headline: React.FC = () => {
 					Enhancing Productivity for Apparel Decorators
 				</h3>
 				<Image
-					src='/WorkTogether.png' // Ensure your public directory contains this image
+					src='/WorkTogether.png'
 					alt='SaaS Visual Representation'
 					width={800}
 					height={600}

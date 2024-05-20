@@ -3,5 +3,13 @@
 	justify-content: center;
 	align-items: center;
 	min-height: 100vh;
-	background-size: cover;
+	background-color: #f9f9f9;
+	padding: 20px;
+}
+
+/* Media query for small screens */
+@media (max-width: 768px) {
+	.accountContainer {
+		padding: 10px;
+	}
 }

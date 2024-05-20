@@ -4,8 +4,8 @@ import { Container, Row, Col, Button } from 'react-bootstrap';
 import { SlPlus } from 'react-icons/sl';
 import { User } from '@/types/User';
 import { CustomSession } from '@/types/CustomSession';
-import AddUserModal from '@/components/AddUserModal';
-import Layout from '@/components/Layout';
+import AddUserModal from '@/components/app/AddUserModal';
+import Layout from '@/components/app/Layout';
 
 const UsersPage: FC = () => {
 	const { data: sessionData } = useSession();

@@ -1,5 +1,5 @@
 import type { NextPage } from 'next';
-import Layout from '../../components/Layout'; // Adjust the import path according to your project structure
+import Layout from '../../components/app/Layout'; // Adjust the import path according to your project structure
 
 // Example type for invoice items, adjust according to your actual data structure
 interface InvoiceItem {

@@ -4,7 +4,7 @@ import type { NextPage } from 'next';
 import Link from 'next/link';
 import { Modal } from 'react-bootstrap';
 import { Quote } from '@/types/Quote';
-import Layout from '@/components/Layout';
+import Layout from '@/components/app/Layout';
 
 const SavedQuotes: NextPage = () => {
 	const { data: session, status } = useSession();

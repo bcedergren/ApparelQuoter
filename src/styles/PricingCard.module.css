@@ -6,7 +6,8 @@
 	background-color: #fff;
 	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 	transition: transform 0.3s ease;
-	flex: 1 1 22%; /* Ensure all four cards fit in one row */
+	flex: 1 1 calc(25% - 32px);
+	max-width: calc(25% - 32px);
 	margin: 1%;
 }
 
@@ -55,4 +56,34 @@
 
 .pricingCard a:hover {
 	background-color: #054fa9;
+}
+
+/* Media query for small screens */
+@media (max-width: 768px) {
+	.pricingCard {
+		flex: 1 1 90%;
+		max-width: 90%;
+		margin: 10px 0;
+	}
+
+	.pricingCard h3 {
+		font-size: 20px;
+	}
+
+	.pricingCard h4 {
+		font-size: 18px;
+	}
+
+	.pricingCard p {
+		font-size: 18px;
+	}
+
+	.pricingCard ul li {
+		font-size: 14px;
+	}
+
+	.pricingCard a {
+		padding: 10px 20px;
+		font-size: 14px;
+	}
 }

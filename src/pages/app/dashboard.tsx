@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import Router from 'next/router';
 import { Container, Row, Col } from 'react-bootstrap';
 import { useSession } from 'next-auth/react';
-import Layout from '@/components/Layout';
+import Layout from '@/components/app/Layout';
 import {
 	DragDropContext,
 	Droppable,

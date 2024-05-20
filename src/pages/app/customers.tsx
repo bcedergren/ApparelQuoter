@@ -11,9 +11,9 @@ import {
 	Table,
 } from 'react-bootstrap';
 import { SlPlus, SlPencil, SlTrash } from 'react-icons/sl';
-import Layout from '@/components/Layout';
-import AddEditCustomerModal from '@/components/AddEditCustomerModal';
-import DeleteConfirmationModal from '@/components/DeleteConfirmationModal';
+import Layout from '@/components/app/Layout';
+import AddEditCustomerModal from '@/components/app/AddEditCustomerModal';
+import DeleteConfirmationModal from '@/components/app/DeleteConfirmationModal';
 import { Customer } from '@/types/Customer';
 
 const Customers: NextPage = () => {

@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { Button, Spinner } from 'react-bootstrap';
-import Layout from '@/components/Layout';
+import Layout from '@/components/app/Layout';
 import {
 	Quote,
 	QuoteItem,
@@ -19,7 +19,7 @@ import {
 	ArtCost,
 	ScreenPrinting,
 } from '@/types/Price';
-import QuoteItemRow from '@/components/QuoteItemRow';
+import QuoteItemRow from '@/components/app/QuoteItemRow';
 import { Company } from '@/types/Company';
 import { createQuote } from '@/utils/pdfGenerator';
 import { formatQuoteType } from '@/utils/formatQuoteType';

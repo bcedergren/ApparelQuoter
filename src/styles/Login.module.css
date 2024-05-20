@@ -116,3 +116,19 @@
 	max-width: 100% !important;
 	height: auto !important;
 }
+
+/* Media query for small screens */
+@media (max-width: 768px) {
+	.card,
+	.loginForm {
+		width: 100%;
+	}
+
+	.centerContent {
+		padding: 10px;
+	}
+
+	.signInImage {
+		display: none;
+	}
+}

@@ -125,3 +125,19 @@
 .centered {
 	margin: auto;
 }
+
+/* Media query for small screens */
+@media (max-width: 768px) {
+	.card,
+	.registerForm {
+		width: 100%;
+	}
+
+	.centerContent {
+		padding: 10px;
+	}
+
+	.registerImage {
+		display: none;
+	}
+}

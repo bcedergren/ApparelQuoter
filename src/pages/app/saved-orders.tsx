@@ -3,7 +3,7 @@ import { useSession } from 'next-auth/react';
 import type { NextPage } from 'next';
 import Link from 'next/link';
 import { Modal } from 'react-bootstrap';
-import Layout from '@/components/Layout';
+import Layout from '@/components/app/Layout';
 import { Quote } from '@/types/Quote';
 
 const SavedOrders: NextPage = () => {

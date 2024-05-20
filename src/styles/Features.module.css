@@ -40,3 +40,23 @@
 	font-size: 1em;
 	color: #666;
 }
+
+/* Media query for small screens */
+@media (max-width: 768px) {
+	.featureCard {
+		width: 90%;
+		margin: 10px 0;
+	}
+
+	.featureCard i {
+		font-size: 2.5em;
+	}
+
+	.featureCard h3 {
+		font-size: 1.2em;
+	}
+
+	.featureCard p {
+		font-size: 0.9em;
+	}
+}

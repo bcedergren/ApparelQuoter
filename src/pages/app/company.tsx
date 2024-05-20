@@ -2,7 +2,7 @@ import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { NextPage } from 'next';
 import { useSession } from 'next-auth/react';
 import { Container, Row, Col, Form, Button, Spinner } from 'react-bootstrap';
-import Layout from '@/components/Layout';
+import Layout from '@/components/app/Layout';
 import { Company } from '@/types/Company'; // Ensure this type correctly defines the company structure
 
 const CompanyPage: NextPage = () => {

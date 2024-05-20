@@ -13,17 +13,17 @@ import {
 	Alert,
 	Modal,
 } from 'react-bootstrap';
-import Layout from '@/components/Layout';
-import CustomerDropdown from '@/components/quote/CustomerDropdown';
-import BrandStyleQuantity from '@/components/quote/BrandStyleQuantity';
-import BrandStylePricing from '@/components/quote/BrandStylePricing';
-import ApparelAndShipping from '@/components/quote/ApparelShipping';
-import PrintingOptions from '@/components/quote/PrintingOptions';
-import VinylDetails from '@/components/quote/VinylDetails ';
-import PrintingDetails from '@/components/quote/PrintingDetails';
-import ScreenPrintingDetails from '@/components/quote/ScreenPrintingDetails';
-import EmbroideryOptions from '@/components/quote/EmbroideryOptions';
-import SummaryComponent from '@/components/quote/SummaryComponent';
+import Layout from '@/components/app/Layout';
+import CustomerDropdown from '@/components/app/quote/CustomerDropdown';
+import BrandStyleQuantity from '@/components/app/quote/BrandStyleQuantity';
+import BrandStylePricing from '@/components/app/quote/BrandStylePricing';
+import ApparelAndShipping from '@/components/app/quote/ApparelShipping';
+import PrintingOptions from '@/components/app/quote/PrintingOptions';
+import VinylDetails from '@/components/app/quote/VinylDetails ';
+import PrintingDetails from '@/components/app/quote/PrintingDetails';
+import ScreenPrintingDetails from '@/components/app/quote/ScreenPrintingDetails';
+import EmbroideryOptions from '@/components/app/quote/EmbroideryOptions';
+import SummaryComponent from '@/components/app/quote/SummaryComponent';
 import { Customer } from '@/types/Customer';
 import { Price } from '@/types/Price';
 import { Quote, QuoteItem } from '@/types/Quote';
