@@ -7,7 +7,7 @@ import Icon from '@mdi/react';
 import { mdiHome } from '@mdi/js';
 import AccountLayout from '@/components/account/AccountLayout';
 import Image from 'next/image';
-import forgotPasswordImage from '../../public/forgotPassword.png'; // Assuming the image is placed in the public folder
+import forgotPasswordImage from '../../public/forgotPassword.png';
 
 const ForgotPasswordPage = () => {
 	const [email, setEmail] = useState('');
