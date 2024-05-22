@@ -1,3 +1,4 @@
+/* App Header Styles */
 .header {
 	position: fixed;
 	top: 0;
@@ -22,21 +23,9 @@
 	width: 100%;
 }
 
-.logo img {
-	max-height: 36px;
-}
-
-.hamburger {
-	display: none;
-	flex-direction: column;
-	cursor: pointer;
-}
-
-.hamburger div {
-	width: 25px;
-	height: 2px;
-	background-color: #333;
-	margin: 3px 0;
+.welcome {
+	font-size: 16px;
+	color: #333;
 }
 
 .nav {
@@ -47,18 +36,22 @@
 .navLink {
 	cursor: pointer;
 	font-size: 18px;
-	color: #3c4858;
+	color: #fff;
 	text-decoration: none;
 	transition: color 0.3s;
 }
 
 .navLink:hover {
-	color: #0666db;
+	background: #696767;
 }
 
-.navDropdown {
+.dropdownContainer {
+	position: relative;
+}
+
+.dropdownMenu {
 	position: absolute;
-	top: 75px;
+	top: 50px;
 	right: 0;
 	background-color: #fff;
 	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -67,24 +60,29 @@
 	padding: 10px 0;
 	margin: 0;
 	border-radius: 4px;
-	width: 100%;
-	display: none;
 }
 
-.navDropdown.show {
-	display: block;
-}
-
-.navDropdown a {
-	display: block;
+.dropdownMenu li {
 	padding: 10px 20px;
-	color: #3c4858;
-	text-decoration: none;
 }
 
-.navDropdown a:hover {
+.dropdownMenu li:hover {
 	background-color: #f1f1f1;
+}
+
+.dropdownMenu a {
+	color: #333;
+	text-decoration: none;
+	display: flex;
+	align-items: center;
+}
+
+.dropdownMenu a:hover {
 	color: #0666db;
+}
+
+.dropdownMenu a span {
+	margin-left: 5px;
 }
 
 /* Media query for small screens */
@@ -93,16 +91,12 @@
 		display: none;
 	}
 
-	.hamburger {
-		display: flex;
-	}
-
-	.navDropdown {
+	.dropdownMenu {
 		width: 100%;
 		right: 0;
 	}
 
-	.navDropdown a {
+	.dropdownMenu a {
 		text-align: center;
 		justify-content: center;
 	}
