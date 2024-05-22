@@ -13,7 +13,7 @@ const Terms = () => {
 			<Header />
 			<Container className={styles.termsContainer}>
 				<h1>Terms and Conditions</h1>
-				<p>Last updated: [Date]</p>
+				<p>Last updated: 6/1/2024</p>
 
 				<section className={styles.section}>
 					<h2>1. Introduction</h2>
@@ -77,6 +77,58 @@ const Terms = () => {
 					<p>
 						If you have any questions about these terms, please contact us at
 						support@apparelquoter.com.
+					</p>
+				</section>
+
+				<section className={styles.section}>
+					<h2>9. Intellectual Property</h2>
+					<p>
+						The service and its original content, features, and functionality
+						are and will remain the exclusive property of ApparelQuoter and its
+						licensors.
+					</p>
+				</section>
+
+				<section className={styles.section}>
+					<h2>10. Links to Other Websites</h2>
+					<p>
+						Our service may contain links to third-party websites or services
+						that are not owned or controlled by ApparelQuoter.
+					</p>
+					<p>
+						ApparelQuoter has no control over, and assumes no responsibility
+						for, the content, privacy policies, or practices of any third-party
+						websites or services.
+					</p>
+				</section>
+
+				<section className={styles.section}>
+					<h2>11. Limitation of Liability</h2>
+					<p>
+						In no event shall ApparelQuoter, nor its directors, employees,
+						partners, agents, suppliers, or affiliates, be liable for any
+						indirect, incidental, special, consequential, or punitive damages,
+						including without limitation, loss of profits, data, use, goodwill,
+						or other intangible losses, resulting from (i) your use or inability
+						to use the service; (ii) any unauthorized access to or use of our
+						servers and/or any personal information stored therein; (iii) any
+						interruption or cessation of transmission to or from our service;
+						(iv) any bugs, viruses, trojan horses, or the like that may be
+						transmitted to or through our service by any third party; (v) any
+						errors or omissions in any content or for any loss or damage
+						incurred as a result of the use of any content posted, emailed,
+						transmitted, or otherwise made available through the service; and/or
+						(vi) any decisions you make based on information obtained from the
+						service.
+					</p>
+				</section>
+
+				<section className={styles.section}>
+					<h2>12. Governing Law</h2>
+					<p>
+						These terms shall be governed and construed in accordance with the
+						laws of The United States of America, without regard to its conflict
+						of law provisions.
 					</p>
 				</section>
 			</Container>

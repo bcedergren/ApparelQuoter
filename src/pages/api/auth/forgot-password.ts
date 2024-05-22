@@ -1,8 +1,43 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { connectToDatabase } from '@/utils/dbConnect';
-import nodemailer from 'nodemailer';
 import { v4 as uuidv4 } from 'uuid';
-import { hostname } from 'os';
+import sgMail from '@sendgrid/mail';
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
+
+const sendEmailWithSendGrid = async (
+	email: string,
+	resetUrl: string,
+	retries: number = 0
+): Promise<void> => {
+	const fromEmail = process.env.SENDGRID_FROM_EMAIL;
+
+	if (!fromEmail) {
+		throw new Error('SENDGRID_FROM_EMAIL environment variable is not set');
+	}
+
+	const msg = {
+		to: email,
+		from: fromEmail,
+		subject: 'Password Reset',
+		html: `<p>You requested a password reset</p><p>Click <a href="${resetUrl}">here</a> to reset your password</p>`,
+	};
+
+	try {
+		await sgMail.send(msg);
+	} catch (error) {
+		if (retries < MAX_RETRIES) {
+			console.warn(`Retrying email send (${retries + 1}/${MAX_RETRIES})...`);
+			await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY));
+			await sendEmailWithSendGrid(email, resetUrl, retries + 1);
+		} else {
+			throw error;
+		}
+	}
+};
+
+const MAX_RETRIES = 3;
+const RETRY_DELAY = 5000; // 5 seconds
 
 export default async function handler(
 	req: NextApiRequest,
@@ -21,7 +56,6 @@ export default async function handler(
 
 	try {
 		const { db } = await connectToDatabase();
-		// Case-insensitive email query
 		const user = await db
 			.collection('User')
 			.findOne({ email: { $regex: new RegExp(`^${email}$`, 'i') } });
@@ -33,7 +67,7 @@ export default async function handler(
 		const resetToken = uuidv4();
 		const resetTokenExpiry = Date.now() + 3600000; // 1 hour
 
-		const updateResult = await db.collection('User').updateOne(
+		await db.collection('User').updateOne(
 			{ email: { $regex: new RegExp(`^${email}$`, 'i') } },
 			{
 				$set: {
@@ -43,28 +77,9 @@ export default async function handler(
 			}
 		);
 
-		const transporter = nodemailer.createTransport({
-			host: process.env.SMTP_HOST,
-			port: parseInt(process.env.SMTP_PORT as string, 10),
-			secure: true, // true for port 465, false for other ports
-			auth: {
-				user: process.env.SMTP_USER,
-				pass: process.env.SMTP_PASS,
-			},
-		});
-
 		const resetUrl = `${process.env.NEXTAUTH_URL}/reset-password?token=${resetToken}&email=${email}`;
 
-		const mailOptions = {
-			hostname: process.env.SMTP_HOST,
-			port: parseInt(process.env.SMTP_PORT as string, 10),
-			from: process.env.SMTP_USERNAME,
-			to: email,
-			subject: 'Password Reset',
-			html: `<p>You requested a password reset</p><p>Click <a href="${resetUrl}">here</a> to reset your password</p>`,
-		};
-
-		await transporter.sendMail(mailOptions);
+		await sendEmailWithSendGrid(email, resetUrl);
 
 		res.status(200).json({ message: 'Reset link sent' });
 	} catch (error) {

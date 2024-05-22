@@ -106,7 +106,6 @@ const ForgotPasswordPage = () => {
 							src={forgotPasswordImage}
 							alt='Forgot Password Image'
 							className={styles.forgotPasswordImage}
-							layout='responsive'
 							width={600}
 							height={600}
 						/>

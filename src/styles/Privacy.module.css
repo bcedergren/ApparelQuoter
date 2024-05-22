@@ -1,4 +1,4 @@
-.termsContainer {
+.privacyContainer {
 	margin-top: 80px;
 	padding: 20px;
 }
@@ -15,11 +15,11 @@
 	margin: 10px 0;
 }
 
-.section a {
+.privacyContainer a {
 	color: #0666db;
 	text-decoration: none;
 }
 
-.section a:hover {
+.privacyContainer a:hover {
 	text-decoration: underline;
 }

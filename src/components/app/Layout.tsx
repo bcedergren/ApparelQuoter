@@ -3,6 +3,7 @@ import { useSession } from 'next-auth/react';
 import Header from '@/components/app/Header';
 import SideNavigation from './SideNavigation';
 import styles from '@/styles/Layout.module.css';
+import Footer from './Footer';
 
 type LayoutProps = {
 	children: ReactNode;
@@ -29,6 +30,7 @@ const Layout = ({ children }: LayoutProps) => {
 			>
 				{session && <Header />}
 				<div className={styles.content}>{children}</div>
+				<Footer isCollapsed={collapsed} />
 			</main>
 		</div>
 	);
