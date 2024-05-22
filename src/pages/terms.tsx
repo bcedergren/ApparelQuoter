@@ -3,6 +3,7 @@ import Head from 'next/head';
 import Header from '@/components/public/Header';
 import Footer from '@/components/public/Footer';
 import styles from '@/styles/Terms.module.css';
+import Link from 'next/link';
 
 const Terms = () => {
 	return (
@@ -35,7 +36,7 @@ const Terms = () => {
 					<h2>3. Privacy Policy</h2>
 					<p>
 						Your privacy is very important to us. Please read our{' '}
-						<a href='/privacy'>Privacy Policy</a> for more information.
+						<Link href='/privacy'>Privacy Policy</Link> for more information.
 					</p>
 				</section>
 
