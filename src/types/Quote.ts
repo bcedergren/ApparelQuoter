@@ -4,11 +4,11 @@ export interface Quote {
 	selectedCustomerId?: string;
 	customerName: string;
 	quoteType:
-		| 'invoice'
-		| 'savedQuote'
-		| 'openOrder'
-		| 'savedOrder'
-		| 'completedOrder';
+		| 'invoices'
+		| 'savedQuotes'
+		| 'openOrders'
+		| 'savedOrders'
+		| 'completedOrders';
 	items: QuoteItem[]; // Array to handle multiple items
 	embroideryDetails: EmbroideryDetails;
 	printingOptions: PrintingOptions;
@@ -23,6 +23,7 @@ export interface Quote {
 
 export interface QuoteItem {
 	brandAndStyle: string;
+	quoteType: string;
 	color: string;
 	standardPrice: number; // This field is for sizes XS through XL
 	sizes: {
@@ -75,6 +76,7 @@ export interface PrintingDetails {
 	inkType: string;
 	artworkNeeded: boolean;
 	deliveryDueDays: number;
+	deliveryDueDate: Date;
 }
 
 export interface ApparelAndShipping {

@@ -1,91 +1,91 @@
-/* General Styles for Dashboard Pages */
-body.dashboard-styles {
+/* General Styles for Application Pages */
+body.app-styles {
 	font-family: 'Muli', sans-serif;
 	overflow-x: hidden !important;
 	font-size: 16px;
 	color: #3c4858;
 }
 
-body.dashboard-styles h1,
-body.dashboard-styles h2,
-body.dashboard-styles h3,
-body.dashboard-styles h4,
-body.dashboard-styles h5,
-body.dashboard-styles h6,
-body.dashboard-styles .h1,
-body.dashboard-styles .h2,
-body.dashboard-styles .h3,
-body.dashboard-styles .h4,
-body.dashboard-styles .h5,
-body.dashboard-styles .h6 {
+body.app-styles h1,
+body.app-styles h2,
+body.app-styles h3,
+body.app-styles h4,
+body.app-styles h5,
+body.app-styles h6,
+body.app-styles .h1,
+body.app-styles .h2,
+body.app-styles .h3,
+body.app-styles .h4,
+body.app-styles .h5,
+body.app-styles .h6 {
 	font-family: 'Muli', sans-serif;
 	line-height: 1.5;
 	font-weight: 600 !important;
 }
 
-body.dashboard-styles ::selection {
+body.app-styles ::selection {
 	background: #465467;
 	color: #ffffff;
 }
 
-body.dashboard-styles a {
+body.app-styles a {
 	text-decoration: none !important;
 }
 
-body.dashboard-styles p {
+body.app-styles p {
 	line-height: 1.6;
 }
 
-body.dashboard-styles .container {
+body.app-styles .container {
 	max-width: 1140px !important;
 }
 
-body.dashboard-styles .bg-light {
+body.app-styles .bg-light {
 	background-color: #f9fafc !important;
 }
 
-body.dashboard-styles .text-dark {
+body.app-styles .text-dark {
 	color: #3c4858 !important;
 }
 
 /* Button Styles */
-body.dashboard-styles .btn-primary {
+body.app-styles .btn-primary {
 	background-color: #0666db !important;
 	border: 1px solid #0666db !important;
 	color: #ffffff !important;
 	box-shadow: 0 3px 7px rgba(6, 102, 219, 0.5);
 }
 
-body.dashboard-styles .btn-primary:hover,
-body.dashboard-styles .btn-primary:focus,
-body.dashboard-styles .btn-primary:active,
-body.dashboard-styles .btn-primary.active,
-body.dashboard-styles .btn-primary.focus {
+body.app-styles .btn-primary:hover,
+body.app-styles .btn-primary:focus,
+body.app-styles .btn-primary:active,
+body.app-styles .btn-primary.active,
+body.app-styles .btn-primary.focus {
 	background-color: #054fa9 !important;
 	border-color: #054fa9 !important;
 	color: #ffffff !important;
 }
 
 /* Shadow and Borders */
-body.dashboard-styles .shadow {
+body.app-styles .shadow {
 	box-shadow: 0 0 3px rgba(22, 28, 45, 0.15) !important;
 }
 
-body.dashboard-styles .border {
+body.app-styles .border {
 	border: 1px solid #e9ecef !important;
 }
 
-body.dashboard-styles .rounded {
+body.app-styles .rounded {
 	border-radius: 7px !important;
 }
 
-body.dashboard-styles .rounded-top {
+body.app-styles .rounded-top {
 	border-top-left-radius: 7px !important;
 	border-top-right-radius: 7px !important;
 }
 
 /* Form Control */
-body.dashboard-styles .form-control {
+body.app-styles .form-control {
 	box-shadow: none;
 	background-color: transparent;
 	border: 1px solid #ced4da;
@@ -97,26 +97,76 @@ body.dashboard-styles .form-control {
 	transition: all 0.5s ease;
 }
 
-body.dashboard-styles .form-control:focus,
-body.dashboard-styles .form-control.active {
+body.app-styles .form-control:focus,
+body.app-styles .form-control.active {
 	border-color: #0666db;
 	box-shadow: none;
 }
 
 /* Utility Classes */
-body.dashboard-styles .mt-100 {
+body.app-styles .mt-100 {
 	margin-top: 100px;
 }
 
-body.dashboard-styles .mb-60 {
+body.app-styles .mb-60 {
 	margin-bottom: 60px;
 }
 
-body.dashboard-styles .title-heading {
+body.app-styles .title-heading {
 	line-height: 26px;
 }
 
-body.dashboard-styles .title-heading .heading {
+body.app-styles .title-heading .heading {
 	font-size: 40px !important;
 	letter-spacing: 1px;
+}
+
+/* General Application Styles */
+.appContainer {
+	margin-top: 80px; /* Adjust as necessary */
+}
+
+body {
+	font-family: 'Nunito', sans-serif;
+}
+
+h1 {
+	font-size: 2rem;
+	margin-bottom: 20px;
+}
+
+h4 {
+	font-size: 1.5rem;
+	margin-top: 20px;
+}
+
+.text-center {
+	text-align: center;
+}
+
+.flex {
+	display: flex;
+}
+
+.overflow-auto {
+	overflow: auto;
+}
+
+.py-3 {
+	padding-top: 1rem;
+	padding-bottom: 1rem;
+}
+
+:root {
+	--nav-width: 250px;
+}
+
+.standout-header {
+	font-size: 1.5rem;
+	font-weight: bold;
+	color: #333;
+	margin-top: 1.5rem;
+	margin-bottom: 1rem;
+	border-bottom: 2px solid #007bff;
+	padding-bottom: 0.5rem;
 }

@@ -1,99 +1,87 @@
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Nav } from 'react-bootstrap';
-import { FaAnglesLeft, FaAnglesRight } from 'react-icons/fa6';
+import { FiChevronsLeft, FiChevronsRight } from 'react-icons/fi';
 import {
 	SlBag,
 	SlPeople,
 	SlNote,
 	SlDocs,
-	SlFolder,
 	SlDrawer,
-	SlDoc,
 	SlCalculator,
+	SlNotebook,
 } from 'react-icons/sl';
-
+import styles from '@/styles/SideNavigation.module.css';
 import logo from '@/../public/logo.png';
+import smallLogo from '@/../public/logo-2.png'; // Assuming you have a smaller logo
 
 interface SideNavigationProps {
 	collapsed: boolean;
 	setCollapsed: (collapsed: boolean) => void;
 }
 
-const SideNavigation: React.FC<SideNavigationProps> = ({ setCollapsed }) => {
-	const [collapsed, setLocalCollapsed] = useState(() => {
-		const savedCollapsedState = localStorage.getItem('sideNavCollapsed');
-		return savedCollapsedState ? JSON.parse(savedCollapsedState) : false;
-	});
-
+const SideNavigation: React.FC<SideNavigationProps> = ({
+	collapsed,
+	setCollapsed,
+}) => {
 	const toggleCollapse = () => {
-		const newCollapsedState = !collapsed;
-		setLocalCollapsed(newCollapsedState);
-		localStorage.setItem('sideNavCollapsed', JSON.stringify(newCollapsedState));
-		setCollapsed(newCollapsedState);
+		setCollapsed(!collapsed);
 	};
 
-	useEffect(() => {
-		const handleStorageChange = (event: StorageEvent) => {
-			if (event.key === 'sideNavCollapsed') {
-				setLocalCollapsed(event.newValue === 'true');
-			}
-		};
-
-		window.addEventListener('storage', handleStorageChange);
-
-		return () => {
-			window.removeEventListener('storage', handleStorageChange);
-		};
-	}, []);
-
-	const iconStyle = collapsed ? { fontSize: '1.5rem' } : { fontSize: '1rem' };
+	const iconStyle = collapsed
+		? { fontSize: '1.5rem' }
+		: { fontSize: '1rem', marginRight: '10px' };
 
 	return (
 		<Nav
-			className='flex-column bg-light'
-			style={{
-				minHeight: '100vh',
-				width: collapsed ? '80px' : '250px',
-				transition: 'width 0.3s',
-				padding: '20px',
-			}}
+			className={`${styles.nav} flex-column ${
+				collapsed ? styles.collapsed : ''
+			}`}
 		>
-			<div className='text-center mb-4'>
-				<Link
-					href='/'
-					passHref
-				>
-					<Image
-						src={logo}
-						alt='logo'
-						width={50}
-						height={50}
-						priority
-					/>
-				</Link>
-				<div>
-					{collapsed ? (
-						<FaAnglesRight
-							onClick={toggleCollapse}
-							style={{ cursor: 'pointer', marginTop: '10px' }}
+			<div className={`${styles.navHeader}`}>
+				<div className={styles.logoContainer}>
+					<Link
+						href='/app/dashboard'
+						passHref
+					>
+						<Image
+							src={collapsed ? smallLogo : logo}
+							alt='logo'
+							width={collapsed ? 50 : 181}
+							height={collapsed ? 50 : 36}
+							priority
 						/>
-					) : (
-						<>
-							<h3>Apparel Quoter</h3>
-							<FaAnglesLeft
+					</Link>
+					<div>
+						{collapsed ? (
+							<FiChevronsRight
 								onClick={toggleCollapse}
-								style={{ cursor: 'pointer' }}
+								className={styles.toggleIcon}
 							/>
-						</>
-					)}
+						) : (
+							<FiChevronsLeft
+								onClick={toggleCollapse}
+								className={styles.toggleIcon}
+							/>
+						)}
+					</div>
 				</div>
 			</div>
 			<Nav.Link
 				as={Link}
-				href='/customers'
+				href='/app/orders-board'
 				passHref
+				className={styles.navLink}
+			>
+				<div style={iconStyle}>
+					<SlNotebook /> {!collapsed && 'Orders Board'}
+				</div>
+			</Nav.Link>
+			<Nav.Link
+				as={Link}
+				href='/app/customers'
+				passHref
+				className={styles.navLink}
 			>
 				<div style={iconStyle}>
 					<SlPeople /> {!collapsed && 'Customers'}
@@ -101,8 +89,9 @@ const SideNavigation: React.FC<SideNavigationProps> = ({ setCollapsed }) => {
 			</Nav.Link>
 			<Nav.Link
 				as={Link}
-				href='/quote'
+				href='/app/quote'
 				passHref
+				className={styles.navLink}
 			>
 				<div style={iconStyle}>
 					<SlCalculator /> {!collapsed && 'Quote'}
@@ -110,8 +99,9 @@ const SideNavigation: React.FC<SideNavigationProps> = ({ setCollapsed }) => {
 			</Nav.Link>
 			<Nav.Link
 				as={Link}
-				href='/saved-quotes'
+				href='/app/saved-quotes'
 				passHref
+				className={styles.navLink}
 			>
 				<div style={iconStyle}>
 					<SlNote /> {!collapsed && 'Saved Quotes'}
@@ -119,8 +109,9 @@ const SideNavigation: React.FC<SideNavigationProps> = ({ setCollapsed }) => {
 			</Nav.Link>
 			<Nav.Link
 				as={Link}
-				href='/open-orders'
+				href='/app/open-orders'
 				passHref
+				className={styles.navLink}
 			>
 				<div style={iconStyle}>
 					<SlDocs /> {!collapsed && 'Open Orders'}
@@ -128,18 +119,19 @@ const SideNavigation: React.FC<SideNavigationProps> = ({ setCollapsed }) => {
 			</Nav.Link>
 			<Nav.Link
 				as={Link}
-				href='/saved-orders'
+				href='/app/saved-orders'
 				passHref
+				className={styles.navLink}
 			>
 				<div style={iconStyle}>
 					<SlBag /> {!collapsed && 'Saved Orders'}
 				</div>
 			</Nav.Link>
-
 			<Nav.Link
 				as={Link}
-				href='/completed-orders'
+				href='/app/completed-orders'
 				passHref
+				className={styles.navLink}
 			>
 				<div style={iconStyle}>
 					<SlDrawer /> {!collapsed && 'Completed Orders'}

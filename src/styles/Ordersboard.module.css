@@ -1,0 +1,95 @@
+.dashboardContainer {
+	padding: 10px;
+	overflow-x: hidden; /* Remove double scrollbars */
+}
+
+.board {
+	display: flex;
+	gap: 20px;
+	overflow-x: auto;
+	padding: 10px;
+	flex-wrap: wrap; /* Allow columns to wrap on smaller screens */
+}
+
+.column {
+	background-color: #f8f9fa;
+	border-radius: 8px;
+	padding: 10px 20px;
+	min-width: 300px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* More pronounced drop shadow */
+	margin-bottom: 20px; /* Add margin at the bottom for spacing on wrap */
+}
+
+.columnHeader {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 5px; /* Reduce space between column header and cards */
+}
+
+.columnHeader h4 {
+	margin: 0;
+	font-size: 1.25rem;
+	color: #333;
+}
+
+.card {
+	background-color: #fff;
+	border-radius: 8px;
+	margin-bottom: 10px; /* Reduce space between cards */
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* More pronounced drop shadow */
+	padding-top: 1px;
+	transition: box-shadow 0.2s;
+}
+
+.card:hover {
+	box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* More pronounced hover shadow */
+}
+
+.cardBody {
+	padding: 10px; /* Reduced padding for card body */
+}
+
+.cardTitle {
+	font-size: 1rem;
+	margin-bottom: 5px;
+}
+
+.cardText {
+	font-size: 0.875rem;
+	color: #666;
+}
+
+.cardDate {
+	font-size: 0.875rem;
+	color: #999;
+}
+
+/* Responsive Styles */
+@media (max-width: 1200px) {
+	.column {
+		min-width: 250px;
+	}
+}
+
+@media (max-width: 992px) {
+	.column {
+		min-width: 200px;
+	}
+}
+
+@media (max-width: 768px) {
+	.board {
+		flex-direction: column; /* Stack columns vertically on small screens */
+	}
+
+	.column {
+		width: 100%;
+		min-width: unset;
+		margin-bottom: 15px; /* Add some space between stacked columns */
+	}
+
+	.card {
+		margin-bottom: 15px;
+	}
+}

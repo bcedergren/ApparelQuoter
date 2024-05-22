@@ -1,5 +1,6 @@
-import React, { FC, useState } from 'react';
+import React, { FC } from 'react';
 import { Form, Row, Col } from 'react-bootstrap';
+
 import { PrintingDetails as PrintingDetailsType } from '@/types/Quote';
 
 interface PrintingDetailsProps {
@@ -13,12 +14,13 @@ const PrintingDetails: FC<PrintingDetailsProps> = ({
 		inkType: '',
 		artworkNeeded: false,
 		deliveryDueDays: 0,
+		deliveryDueDate: new Date(),
 	},
 	onDetailsChange,
 }) => {
 	const handleChange = (
 		field: keyof PrintingDetailsType,
-		value: string | number | boolean
+		value: string | number | boolean | Date
 	) => {
 		onDetailsChange({
 			...details,
@@ -28,7 +30,7 @@ const PrintingDetails: FC<PrintingDetailsProps> = ({
 
 	return (
 		<div>
-			<h6>PRINTING DETAILS</h6>
+			<h6 className='standout-header'>Printing Details</h6>
 			<Form>
 				<Row>
 					<Col
@@ -40,7 +42,9 @@ const PrintingDetails: FC<PrintingDetailsProps> = ({
 							<Form.Control
 								type='number'
 								value={details.colorMatches}
-								onChange={(e) => handleChange('colorMatches', e.target.value)}
+								onChange={(e) =>
+									handleChange('colorMatches', parseInt(e.target.value))
+								}
 							/>
 						</Form.Group>
 					</Col>
@@ -67,26 +71,13 @@ const PrintingDetails: FC<PrintingDetailsProps> = ({
 							<Form.Label>Artwork Needed?</Form.Label>
 							<Form.Select
 								value={details.artworkNeeded ? 'Yes' : 'No'}
-								onChange={(e) => handleChange('artworkNeeded', e.target.value)}
+								onChange={(e) =>
+									handleChange('artworkNeeded', e.target.value === 'Yes')
+								}
 							>
 								<option value='No'>No</option>
 								<option value='Yes'>Yes</option>
 							</Form.Select>
-						</Form.Group>
-					</Col>
-					<Col
-						xs={6}
-						md={3}
-					>
-						<Form.Group controlId='deliveryDueDays'>
-							<Form.Label>Delivery Due (In Days)</Form.Label>
-							<Form.Control
-								type='number'
-								value={details.deliveryDueDays}
-								onChange={(e) =>
-									handleChange('deliveryDueDays', e.target.value)
-								}
-							/>
 						</Form.Group>
 					</Col>
 				</Row>

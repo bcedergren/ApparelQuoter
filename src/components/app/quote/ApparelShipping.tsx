@@ -1,100 +1,108 @@
-import React, { FC } from 'react';
-import { Form, Row, Col } from 'react-bootstrap';
-import { ApparelAndShipping as ApparelAndShippingType } from '@/types/Quote';
+import React from 'react';
+import { Form, InputGroup, Row, Col } from 'react-bootstrap';
 
 interface ApparelAndShippingProps {
-	data: ApparelAndShippingType;
+	data: {
+		customerProvidesApparel: boolean;
+		creditCardCharge: boolean;
+		shippingAndHandling: number;
+		shippingAndHandlingTaxed: boolean;
+	};
 	onChange: (name: string, value: string | number | boolean) => void;
 }
 
-const ApparelAndShipping: FC<ApparelAndShippingProps> = ({
-	data = {
-		customerProvidesApparel: false,
-		creditCardCharge: false,
-		shippingAndHandling: 0,
-		shippingAndHandlingTaxed: false,
-	},
+const ApparelAndShipping: React.FC<ApparelAndShippingProps> = ({
+	data,
 	onChange,
 }) => {
-	const handleSelectChange = (name: string, value: string) => {
-		// Convert 'Yes'/'No' to boolean, otherwise keep as string
-		const isBooleanValue = value === 'Yes' || value === 'No';
-		onChange(name, isBooleanValue ? value === 'Yes' : value);
+	type FormControlElement =
+		| HTMLInputElement
+		| HTMLSelectElement
+		| HTMLTextAreaElement;
+
+	const isHTMLInputElement = (element: any): element is HTMLInputElement => {
+		return element && element.type !== undefined && element.tagName === 'INPUT';
 	};
 
-	const handleNumberChange = (name: string, value: string) => {
-		// Convert string to number; use 0 as fallback
-		const numberValue = parseFloat(value) || 0;
-		onChange(name, numberValue);
+	const isHTMLSelectElement = (element: any): element is HTMLSelectElement => {
+		return element && element.tagName === 'SELECT';
+	};
+
+	const handleChange = (event: React.ChangeEvent<FormControlElement>) => {
+		const { name, value } = event.target;
+		let updatedValue: string | number | boolean = value;
+
+		if (isHTMLInputElement(event.target)) {
+			updatedValue =
+				event.target.type === 'checkbox'
+					? event.target.checked
+					: event.target.value;
+		} else if (isHTMLSelectElement(event.target)) {
+			updatedValue = event.target.value;
+		}
+
+		onChange(name, updatedValue);
 	};
 
 	return (
-		<>
-			<h6>APPAREL & SHIPPING</h6>
-			<Form>
-				<Row>
-					<Col>
-						<Form.Group controlId='customerProvidesApparel'>
-							<Form.Label>Customer Provides Apparel</Form.Label>
-							<Form.Select
-								value={data.customerProvidesApparel ? 'Yes' : 'No'}
-								onChange={(e) =>
-									handleSelectChange('customerProvidesApparel', e.target.value)
-								}
-							>
-								<option value='No'>No</option>
-								<option value='Yes'>Yes</option>
-							</Form.Select>
-						</Form.Group>
-					</Col>
-					<Col>
-						<Form.Group controlId='creditCardCharge'>
-							<Form.Label>Credit Card Charge</Form.Label>
-							<Form.Select
-								value={data.creditCardCharge ? 'Yes' : 'No'}
-								onChange={(e) =>
-									handleSelectChange('creditCardCharge', e.target.value)
-								}
-							>
-								<option value='No'>No</option>
-								<option value='Yes'>Yes</option>
-							</Form.Select>
-						</Form.Group>
-					</Col>
-					<Col>
-						<Form.Group controlId='shippingAndHandling'>
-							<Form.Label>Shipping & Handling</Form.Label>
-							<div className='currency-input'>
-								<span className='currency-symbol'>$</span>
-								<Form.Control
-									type='number'
-									step='0.01'
-									min={0}
-									value={data.shippingAndHandling}
-									onChange={(e) =>
-										handleNumberChange('shippingAndHandling', e.target.value)
-									}
-								/>
-							</div>
-						</Form.Group>
-					</Col>
-					<Col>
-						<Form.Group controlId='shippingAndHandlingTaxed'>
-							<Form.Label>S&H Taxed?</Form.Label>
-							<Form.Select
-								value={data.shippingAndHandlingTaxed ? 'Yes' : 'No'}
-								onChange={(e) =>
-									handleSelectChange('shippingAndHandlingTaxed', e.target.value)
-								}
-							>
-								<option value='No'>No</option>
-								<option value='Yes'>Yes</option>
-							</Form.Select>
-						</Form.Group>
-					</Col>
-				</Row>
-			</Form>
-		</>
+		<Row className='mt-3'>
+			<Col md={3}>
+				<Form.Group controlId='customerProvidesApparel'>
+					<Form.Label>Customer Provides Apparel</Form.Label>
+					<Form.Control
+						as='select'
+						name='customerProvidesApparel'
+						value={data.customerProvidesApparel ? 'yes' : 'no'}
+						onChange={handleChange}
+					>
+						<option value='yes'>Yes</option>
+						<option value='no'>No</option>
+					</Form.Control>
+				</Form.Group>
+			</Col>
+			<Col md={3}>
+				<Form.Group controlId='creditCardCharge'>
+					<Form.Label>Credit Card Charge</Form.Label>
+					<Form.Control
+						as='select'
+						name='creditCardCharge'
+						value={data.creditCardCharge ? 'yes' : 'no'}
+						onChange={handleChange}
+					>
+						<option value='yes'>Yes</option>
+						<option value='no'>No</option>
+					</Form.Control>
+				</Form.Group>
+			</Col>
+			<Col md={3}>
+				<Form.Group controlId='shippingAndHandling'>
+					<Form.Label>Shipping & Handling</Form.Label>
+					<InputGroup>
+						<InputGroup.Text>$</InputGroup.Text>
+						<Form.Control
+							type='number'
+							name='shippingAndHandling'
+							value={data.shippingAndHandling}
+							onChange={handleChange}
+						/>
+					</InputGroup>
+				</Form.Group>
+			</Col>
+			<Col md={3}>
+				<Form.Group controlId='shippingAndHandlingTaxed'>
+					<Form.Label>S&H Taxed?</Form.Label>
+					<Form.Control
+						as='select'
+						name='shippingAndHandlingTaxed'
+						value={data.shippingAndHandlingTaxed ? 'yes' : 'no'}
+						onChange={handleChange}
+					>
+						<option value='yes'>Yes</option>
+						<option value='no'>No</option>
+					</Form.Control>
+				</Form.Group>
+			</Col>
+		</Row>
 	);
 };
 

@@ -2,6 +2,8 @@ import { AppProps } from 'next/app';
 import { SessionProvider } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
+import { SidebarProvider } from '@/context/SidebarContext';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import '@/styles/global.css';
 import '@/styles/app-styles.css';
 
@@ -37,7 +39,9 @@ function MyApp({ Component, pageProps }: AppProps) {
 
 	return (
 		<SessionProvider session={pageProps.session}>
-			<Component {...pageProps} />
+			<SidebarProvider>
+				<Component {...pageProps} />
+			</SidebarProvider>
 		</SessionProvider>
 	);
 }

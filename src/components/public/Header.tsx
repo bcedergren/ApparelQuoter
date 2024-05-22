@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Link as ScrollLink } from 'react-scroll';
 import { useState, useEffect, useRef } from 'react';
 import styles from '@/styles/Header.module.css';
+import Image from 'next/image';
 
 const Header = () => {
 	const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -46,7 +47,14 @@ const Header = () => {
 		<header className={styles.header}>
 			<div className={styles.container}>
 				<div className={styles.logo}>
-					<Link href='/'>ApparelQuoter</Link>
+					<Link href='/'>
+						<Image
+							src='/logo.png'
+							alt='logo'
+							width={181}
+							height={36}
+						/>
+					</Link>
 				</div>
 				<div
 					className={styles.hamburger}

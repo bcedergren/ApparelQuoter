@@ -174,9 +174,11 @@ const CompanyPage: NextPage = () => {
 
 								{/* URL (optional) */}
 								<Form.Group className='mb-3'>
-									<Form.Label style={{ fontWeight: 'bold' }}>URL</Form.Label>
+									<Form.Label style={{ fontWeight: 'bold' }}>
+										Website
+									</Form.Label>
 									<Form.Control
-										type='url'
+										type='text'
 										name='url'
 										value={companyInfo.url || ''}
 										onChange={handleChange}

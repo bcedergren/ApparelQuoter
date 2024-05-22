@@ -99,7 +99,7 @@ const BrandStyleQuantity: FC<BrandStyleQuantityProps> = ({
 
 	return (
 		<>
-			<h6>BRAND & STYLE</h6>
+			<h6 className='standout-header'>Brand & Style</h6>
 			<Table
 				striped
 				bordered
@@ -160,6 +160,7 @@ const BrandStyleQuantity: FC<BrandStyleQuantityProps> = ({
 												onItemsChange([
 													...items,
 													{
+														quoteType: '',
 														brandAndStyle: '',
 														color: '',
 														standardPrice: 0,

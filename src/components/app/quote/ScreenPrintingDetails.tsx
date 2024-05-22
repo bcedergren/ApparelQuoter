@@ -22,8 +22,8 @@ const ScreenPrintingDetails: FC<ScreenPrintingDetailsProps> = ({
 	};
 
 	return (
-		<div>
-			<h6>SCREEN PRINTING SCREENS & COLOR CHANGES</h6>
+		<>
+			<h6 className='standout-header'>Screen Printing Details</h6>
 			<Form>
 				<Row>
 					<Col>
@@ -70,7 +70,7 @@ const ScreenPrintingDetails: FC<ScreenPrintingDetailsProps> = ({
 					</Col>
 				</Row>
 			</Form>
-		</div>
+		</>
 	);
 };
 

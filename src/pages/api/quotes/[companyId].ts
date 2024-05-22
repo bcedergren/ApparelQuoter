@@ -28,8 +28,6 @@ export default async function handler(
 			// Include other fields as needed
 		}));
 
-		console.log(transformedQuotes);
-
 		res.status(200).json({ quotes: transformedQuotes });
 	} catch (error) {
 		console.error('Failed to fetch quotes:', error);

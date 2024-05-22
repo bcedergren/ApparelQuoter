@@ -19,7 +19,7 @@ import BrandStyleQuantity from '@/components/app/quote/BrandStyleQuantity';
 import BrandStylePricing from '@/components/app/quote/BrandStylePricing';
 import ApparelAndShipping from '@/components/app/quote/ApparelShipping';
 import PrintingOptions from '@/components/app/quote/PrintingOptions';
-import VinylDetails from '@/components/app/quote/VinylDetails ';
+import VinylDetails from '@/components/app/quote/VinylDetails';
 import PrintingDetails from '@/components/app/quote/PrintingDetails';
 import ScreenPrintingDetails from '@/components/app/quote/ScreenPrintingDetails';
 import EmbroideryOptions from '@/components/app/quote/EmbroideryOptions';
@@ -52,9 +52,10 @@ interface Prices {
 const initialQuoteState: Quote = {
 	_id: '',
 	customerName: '',
-	quoteType: 'savedQuote',
+	quoteType: 'savedQuotes',
 	items: [
 		{
+			quoteType: '',
 			brandAndStyle: '',
 			color: '',
 			standardPrice: 0,
@@ -121,6 +122,7 @@ const initialQuoteState: Quote = {
 		inkType: '',
 		artworkNeeded: false,
 		deliveryDueDays: 0,
+		deliveryDueDate: new Date(),
 	},
 	summary: {
 		qty: 0,

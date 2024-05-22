@@ -1,5 +1,5 @@
 import React, { FC, useState, useEffect } from 'react';
-import { Form, Table } from 'react-bootstrap';
+import { Form, Table, InputGroup, FormControl } from 'react-bootstrap';
 import { QuoteItem, SizeKey } from '@/types/Quote';
 
 interface BrandStylePricingProps {
@@ -76,8 +76,8 @@ const BrandStylePricing: FC<BrandStylePricingProps> = ({
 		>
 			<thead>
 				<tr>
-					<th style={{ width: '25%' }}>Brand & Style</th>
-					<th style={{ width: '10%' }}>Color</th>
+					<th style={{ width: '25%' }}>&nbsp;</th>
+					<th style={{ width: '10%' }}>&nbsp;</th>
 					<th style={{ width: '10%' }}>XS-XL</th>
 					{extendedSizeColumns.map((size) => (
 						<th key={size}>{size}</th>
@@ -90,32 +90,38 @@ const BrandStylePricing: FC<BrandStylePricingProps> = ({
 						<td>{item.brandAndStyle}</td>
 						<td>{item.color}</td>
 						<td>
-							<Form.Control
-								type='number'
-								step='0.01'
-								min='0.00'
-								value={item.standardPrice.toString()} // Ensure the value is a string
-								onChange={(e) =>
-									handleStandardPricingChange(index, e.target.value)
-								}
-							/>
+							<InputGroup>
+								<InputGroup.Text>$</InputGroup.Text>
+								<FormControl
+									type='number'
+									step='0.01'
+									min='0.00'
+									value={item.standardPrice.toString()} // Ensure the value is a string
+									onChange={(e) =>
+										handleStandardPricingChange(index, e.target.value)
+									}
+								/>
+							</InputGroup>
 						</td>
 						{extendedSizeColumns.map((size) => (
 							<td key={`${index}-${size}`}>
-								<Form.Control
-									type='number'
-									step='0.01'
-									min='0'
-									name={`${size}-${index}`}
-									value={(localPrices[`${size}-${index}`] ?? 0).toString()}
-									onChange={(e) =>
-										handleExtendedPricingChange(
-											index,
-											size as SizeKey,
-											e.target.value
-										)
-									}
-								/>
+								<InputGroup>
+									<InputGroup.Text>$</InputGroup.Text>
+									<FormControl
+										type='number'
+										step='0.01'
+										min='0'
+										name={`${size}-${index}`}
+										value={(localPrices[`${size}-${index}`] ?? 0).toString()}
+										onChange={(e) =>
+											handleExtendedPricingChange(
+												index,
+												size as SizeKey,
+												e.target.value
+											)
+										}
+									/>
+								</InputGroup>
 							</td>
 						))}
 					</tr>

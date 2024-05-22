@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
 import { Table } from 'react-bootstrap';
+import styles from '@/styles/SummaryComponent.module.css';
 
 interface SummaryProps {
 	// Properties for each cost item, for example:
@@ -26,6 +27,7 @@ const SummaryComponent: FC<SummaryProps> = ({
 			striped
 			bordered
 			hover
+			className={styles.summaryMarginTop}
 		>
 			<thead>
 				<tr>

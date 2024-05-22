@@ -31,7 +31,7 @@ const VinylDetails: FC<VinylDetailsProps> = ({
 
 	return (
 		<div>
-			<h6># OF VINYL NAMES & NUMBERS ON EACH PIECE</h6>
+			<h6 className='standout-header'>Vinyl</h6>
 			<Form>
 				<Row>
 					<Col>

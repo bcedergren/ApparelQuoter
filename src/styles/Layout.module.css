@@ -1,0 +1,52 @@
+.layoutContainer {
+	display: flex;
+	flex-direction: row;
+	height: 100vh;
+	overflow: hidden;
+}
+
+.sideNav {
+	height: 100%;
+	transition: width 0.3s;
+	position: fixed;
+	z-index: 1000;
+	top: 0;
+	left: 0;
+}
+
+.sideNav.collapsed {
+	width: 95px;
+}
+
+.sideNav:not(.collapsed) {
+	width: 285px;
+}
+
+.mainContent {
+	flex-grow: 1;
+	margin-left: 285px;
+	transition: margin-left 0.3s;
+	display: flex;
+	flex-direction: column;
+}
+
+.mainContent.expanded {
+	margin-left: 95px;
+}
+
+.content {
+	padding-top: 65px;
+	overflow-y: auto;
+	height: calc(100vh - 60px);
+}
+
+@media (max-width: 768px) {
+	.sideNav {
+		display: none;
+	}
+
+	.mainContent {
+		width: 100%;
+		margin-left: 0;
+	}
+}

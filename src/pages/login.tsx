@@ -25,13 +25,13 @@ const LoginPage = () => {
 			email,
 			password,
 			rememberMe: rememberMe.toString(),
-			callbackUrl: `${window.location.origin}/dashboard`,
+			callbackUrl: `${window.location.origin}/app/dashboard`,
 		});
 
 		if (result?.error) {
 			setError(result.error);
 		} else if (result && result.ok) {
-			router.push(result.url || '/dashboard');
+			router.push(result.url || '/app/dashboard');
 		}
 	};
 

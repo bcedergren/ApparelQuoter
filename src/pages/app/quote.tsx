@@ -1,6 +1,4 @@
-'use client';
-
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
@@ -12,14 +10,16 @@ import {
 	Spinner,
 	Alert,
 	Modal,
+	Form,
 } from 'react-bootstrap';
 import Layout from '@/components/app/Layout';
 import CustomerDropdown from '@/components/app/quote/CustomerDropdown';
+import DeliveryDueDate from '@/components/app/quote/DeliveryDueDate';
 import BrandStyleQuantity from '@/components/app/quote/BrandStyleQuantity';
 import BrandStylePricing from '@/components/app/quote/BrandStylePricing';
 import ApparelAndShipping from '@/components/app/quote/ApparelShipping';
 import PrintingOptions from '@/components/app/quote/PrintingOptions';
-import VinylDetails from '@/components/app/quote/VinylDetails ';
+import VinylDetails from '@/components/app/quote/VinylDetails';
 import PrintingDetails from '@/components/app/quote/PrintingDetails';
 import ScreenPrintingDetails from '@/components/app/quote/ScreenPrintingDetails';
 import EmbroideryOptions from '@/components/app/quote/EmbroideryOptions';
@@ -43,9 +43,10 @@ interface ScreenPrintingDetails {
 const initialQuoteState: Quote = {
 	_id: '',
 	customerName: '',
-	quoteType: 'savedQuote',
+	quoteType: 'savedQuotes',
 	items: [
 		{
+			quoteType: '',
 			brandAndStyle: '',
 			color: '',
 			standardPrice: 0,
@@ -112,6 +113,7 @@ const initialQuoteState: Quote = {
 		inkType: '',
 		artworkNeeded: false,
 		deliveryDueDays: 0,
+		deliveryDueDate: new Date(),
 	},
 	summary: {
 		qty: 0,
@@ -124,7 +126,6 @@ const initialQuoteState: Quote = {
 	},
 };
 
-// Define default values for the quote summary to prevent undefined errors
 const defaultSummary = {
 	qty: 0,
 	avgCost: 0,
@@ -147,11 +148,9 @@ const QuotePage: NextPage = () => {
 	const [selectedCustomerId, setSelectedCustomerId] = useState('');
 	const [showSuccessModal, setShowSuccessModal] = useState(false);
 	const [isQuoteModified, setIsQuoteModified] = useState(false);
-
 	const [items, setItems] = useState<QuoteItem[]>();
 
 	useEffect(() => {
-		// Combined customer and prices fetching
 		const fetchData = async () => {
 			if (session) {
 				try {
@@ -180,7 +179,7 @@ const QuotePage: NextPage = () => {
 
 							setSelectedCustomerId(quoteData.selectedCustomerId);
 							setQuote(quoteData);
-							setIsQuoteModified(true); // Indicate that this quote is being modified
+							setIsQuoteModified(true);
 						} catch (err) {
 							console.error(err);
 							setError('Failed to load quote');
@@ -207,12 +206,9 @@ const QuotePage: NextPage = () => {
 			(customer) => customer._id === customerId
 		);
 
-		// Update the quote state with the selected customer's name
 		setQuote((prevQuote) => {
-			// If prevQuote is null, return null immediately
 			if (!prevQuote) return null;
 
-			// Now we know prevQuote is a Quote object, so we can safely spread it
 			return {
 				...prevQuote,
 				customerName: selectedCustomer
@@ -222,17 +218,28 @@ const QuotePage: NextPage = () => {
 		});
 	};
 
+	const handleDateChange = (date: Date) => {
+		setQuote((prevQuote) => {
+			if (!prevQuote) return null;
+			return {
+				...prevQuote,
+				printingDetails: {
+					...prevQuote.printingDetails,
+					deliveryDueDate: date,
+				},
+			};
+		});
+	};
+
 	const handleBrandStyleQuantityChange = (updatedItems: QuoteItem[]) => {
 		setQuote((prevQuote) => {
-			// If prevQuote is null, initialize it with default values
 			if (!prevQuote) {
 				return {
-					...initialQuoteState, // Use your initial state as a baseline
-					items: updatedItems, // Set the updated items
+					...initialQuoteState,
+					items: updatedItems,
 				};
 			}
 
-			// If prevQuote is not null, update it as needed
 			return {
 				...prevQuote,
 				items: updatedItems,
@@ -244,17 +251,13 @@ const QuotePage: NextPage = () => {
 		setQuote((prevQuote) => {
 			if (!prevQuote) return null;
 
-			// Update the items with the new pricing information
 			const updatedQuote: Quote = {
 				...prevQuote,
 				items: updatedItems.map((updatedItem, index) => {
 					const existingItem = prevQuote.items[index];
-
-					// Update the standardPrice for each item, preserve sizePrices unless explicitly updated
 					return {
 						...existingItem,
 						standardPrice: updatedItem.standardPrice,
-						// Only update sizePrices if they are explicitly provided in updatedItem
 						sizePrices: updatedItem.sizePrices
 							? { ...existingItem.sizePrices, ...updatedItem.sizePrices }
 							: existingItem.sizePrices,
@@ -271,15 +274,13 @@ const QuotePage: NextPage = () => {
 		value: string | number | boolean
 	) => {
 		setQuote((prevQuote) => {
-			if (!prevQuote) return null; // If there's no previous quote, return null
+			if (!prevQuote) return null;
 
-			// Update the apparelAndShipping part of the quote
 			const updatedApparelAndShipping = {
-				...prevQuote.apparelAndShipping, // Preserve other properties of apparelAndShipping
-				[name]: value, // Update the specific property with the new value
+				...prevQuote.apparelAndShipping,
+				[name]: value,
 			};
 
-			// Return the updated quote, preserving all other properties of the quote
 			return {
 				...prevQuote,
 				apparelAndShipping: updatedApparelAndShipping,
@@ -291,10 +292,8 @@ const QuotePage: NextPage = () => {
 		updatedPrintingOptions: typeof initialQuoteState.printingOptions
 	) => {
 		setQuote((prevQuote) => {
-			if (!prevQuote) return null; // If there's no previous quote, return null
+			if (!prevQuote) return null;
 
-			// Return the updated quote with the new printingOptions
-			// while preserving all other properties of the quote
 			return {
 				...prevQuote,
 				printingOptions: updatedPrintingOptions,
@@ -306,14 +305,12 @@ const QuotePage: NextPage = () => {
 		updatedVinylDetails: typeof initialQuoteState.vinylDetails
 	) => {
 		setQuote((prevQuote) => {
-			if (!prevQuote) return null; // Handle the case where there is no previous quote
+			if (!prevQuote) return null;
 
-			// Return the updated quote with the new vinylDetails
-			// and ensure all required properties are correctly defined
 			return {
 				...prevQuote,
 				vinylDetails: updatedVinylDetails,
-				customerName: prevQuote.customerName || '', // Provide a default value or preserve the existing one
+				customerName: prevQuote.customerName || '',
 			};
 		});
 	};
@@ -322,7 +319,7 @@ const QuotePage: NextPage = () => {
 		updatedPrintingDetails: typeof initialQuoteState.printingDetails
 	) => {
 		setQuote((prevQuote) => {
-			if (!prevQuote) return null; // Handle the case where prevQuote is null
+			if (!prevQuote) return null;
 
 			return {
 				...prevQuote,
@@ -336,10 +333,8 @@ const QuotePage: NextPage = () => {
 		updatedScreenPrintingDetails: ScreenPrintingDetails
 	) => {
 		setQuote((prevQuote) => {
-			// Early return null if prevQuote is null to avoid further processing
 			if (prevQuote === null) return null;
 
-			// Ensure prevQuote has all required properties of Quote, providing default values as necessary
 			const updatedQuote: Quote = {
 				...prevQuote,
 				screenPrintingDetails: updatedScreenPrintingDetails,
@@ -354,11 +349,9 @@ const QuotePage: NextPage = () => {
 	) => {
 		setQuote((prevQuote) => {
 			if (prevQuote === null) {
-				// If there's no previous quote, just return null
 				return null;
 			}
 
-			// Construct a new quote object, ensuring all required fields are properly populated
 			const updatedQuote: Quote = {
 				...prevQuote,
 				embroideryDetails: updatedEmbroideryDetails,
@@ -372,7 +365,6 @@ const QuotePage: NextPage = () => {
 		(quote: Quote, prices: Price): number => {
 			let totalPrintingCost = 0;
 
-			// Ensure quote and its properties are defined before proceeding
 			if (!quote || !quote.printingOptions) {
 				return 0;
 			}
@@ -382,7 +374,6 @@ const QuotePage: NextPage = () => {
 				return totalPrintingCost;
 			}
 
-			// Loop through each printing option (Front, Back, Left Sleeve, Right Sleeve)
 			(
 				[
 					'colorsFront',
@@ -398,7 +389,6 @@ const QuotePage: NextPage = () => {
 					}` as keyof typeof prices.screenPrinting;
 					const priceRanges = prices.screenPrinting[colorKey];
 
-					// If priceRanges is undefined, log an error and skip this option
 					if (!priceRanges) {
 						console.error(
 							`No pricing found for '${colorKey}'. Check your pricing structure.`
@@ -406,13 +396,11 @@ const QuotePage: NextPage = () => {
 						return;
 					}
 
-					// Assume first value in priceRanges array is the cost per piece for simplicity
 					const costPerColorPerPiece = parseFloat(priceRanges[0]);
 					totalPrintingCost += costPerColorPerPiece * colorCount;
 				}
 			});
 
-			// Multiply by total quantity of items
 			const totalQty = quote.items.reduce(
 				(acc, item) =>
 					acc + Object.values(item.sizes).reduce((sum, qty) => sum + qty, 0),
@@ -429,9 +417,8 @@ const QuotePage: NextPage = () => {
 		(screenPrintingDetails: ScreenPrintingDetails, prices: Price) => {
 			let totalCost = 0;
 
-			// Convert string values to numbers for calculation
-			const newScreenCost = parseFloat(prices.screenPrinting.perScreenNew); // Cost for each new screen
-			const colorChangeCost = parseFloat(prices.artCost.inkColorChanges); // Cost for each ink color change
+			const newScreenCost = parseFloat(prices.screenPrinting.perScreenNew);
+			const colorChangeCost = parseFloat(prices.artCost.inkColorChanges);
 
 			if (screenPrintingDetails?.newScreensNeeded) {
 				totalCost +=
@@ -446,7 +433,7 @@ const QuotePage: NextPage = () => {
 	);
 
 	const calculateQuote = useCallback(() => {
-		if (!prices || !quote) return; // Ensure prices and quote are defined
+		if (!prices || !quote) return;
 
 		let totalApparelCost = (quote.items ?? []).reduce((acc, item) => {
 			const itemCost =
@@ -460,7 +447,6 @@ const QuotePage: NextPage = () => {
 		let markupRate = 0;
 		let additionalCharge = 0;
 
-		// Apply markup based on the total apparel cost
 		if (totalApparelCost < parseFloat(prices.wholesaleMarkup.lessThan)) {
 			markupRate = parseFloat(prices.wholesaleMarkup.markupLessThan) / 100;
 			additionalCharge = parseFloat(prices.wholesaleMarkup.andOrLessThan);
@@ -494,7 +480,7 @@ const QuotePage: NextPage = () => {
 			totalApparelCost = 0;
 		} else if (quote.apparelAndShipping?.customerProvidesApparel) {
 			totalApparelCost = 0;
-			printingCost *= 1.5; // Increase printing cost if customer provides apparel
+			printingCost *= 1.5;
 		}
 
 		let screenAndColorChangeCost = calculateScreenAndColorChangeCost(
@@ -506,7 +492,6 @@ const QuotePage: NextPage = () => {
 		let totalCost = totalApparelCost + printingCost + shippingCost;
 		const avgCost = totalQty > 0 ? totalCost / totalQty : 0;
 
-		// Check if there's a need to update the summary to avoid unnecessary re-renders
 		const summaryNeedsUpdate =
 			totalQty !== quote.summary?.qty ||
 			avgCost !== quote.summary?.avgCost ||
@@ -526,7 +511,7 @@ const QuotePage: NextPage = () => {
 								apparelCost: totalApparelCost,
 								printingCost,
 								shippingCost,
-								taxCost: 0, // Adjust as necessary for tax calculation
+								taxCost: 0,
 								totalCost,
 							},
 					  }
@@ -535,14 +520,13 @@ const QuotePage: NextPage = () => {
 		}
 	}, [prices, calculatePrintingCost, quote, calculateScreenAndColorChangeCost]);
 
-	// useEffect to watch for changes in the items, printing options, and apparel/shipping details
 	useEffect(() => {
 		calculateQuote();
 	}, [calculateQuote]);
 
 	const handleSubmit = async () => {
 		try {
-			setIsLoading(true); // Use the existing isLoading state to indicate loading
+			setIsLoading(true);
 			if (session?.user?.companyId && quote) {
 				quote.companyId = session.user.companyId.toString();
 				quote.selectedCustomerId = selectedCustomerId;
@@ -554,7 +538,6 @@ const QuotePage: NextPage = () => {
 					quote.ModifiedAt = new Date();
 				}
 
-				// Clone the quote object to avoid directly mutating the state
 				const quoteWithMetadata = {
 					...quote,
 				};
@@ -575,10 +558,8 @@ const QuotePage: NextPage = () => {
 					throw new Error(data.message || 'Something went wrong!');
 				}
 
-				// Handle success by showing the success modal
 				setShowSuccessModal(true);
 				if (!isQuoteModified) {
-					// Only reset the quote if it's not being modified
 					setQuote(initialQuoteState);
 				}
 			}
@@ -634,13 +615,26 @@ const QuotePage: NextPage = () => {
 				<Container fluid>
 					<Row>
 						<Col>
-							<h1>{quoteId ? 'Modify Quote' : 'Create Quote'}</h1>
-							<CustomerDropdown
-								customers={customers}
-								selectedCustomerId={selectedCustomerId}
-								onCustomerSelect={handleCustomerSelect}
-							/>
-							{/* Conditional rendering based on quote state */}
+							<h1 className='standout-header'>
+								{quoteId ? 'Modify Quote' : 'Create Quote'}
+							</h1>
+							<Row className='align-items-center mb-3'>
+								<Col md={6}>
+									<CustomerDropdown
+										customers={customers}
+										selectedCustomerId={selectedCustomerId}
+										onCustomerSelect={handleCustomerSelect}
+									/>
+								</Col>
+								<Col md={6}>
+									<DeliveryDueDate
+										selectedDate={
+											quote?.printingDetails?.deliveryDueDate ?? null
+										}
+										onDateChange={handleDateChange}
+									/>
+								</Col>
+							</Row>
 							{quote && (
 								<>
 									<BrandStyleQuantity
@@ -651,6 +645,10 @@ const QuotePage: NextPage = () => {
 										items={quote.items}
 										onItemsChange={handleBrandStylePricingChange}
 									/>
+									<PrintingDetails
+										details={quote.printingDetails}
+										onDetailsChange={handlePrintingDetailsChange}
+									/>
 									<ApparelAndShipping
 										data={quote.apparelAndShipping}
 										onChange={handleApparelAndShippingChange}
@@ -659,17 +657,13 @@ const QuotePage: NextPage = () => {
 										options={quote.printingOptions}
 										onOptionsChange={handlePrintingOptionsChange}
 									/>
-									<VinylDetails
-										details={quote.vinylDetails}
-										onDetailsChange={handleVinylDetailsChange}
-									/>
-									<PrintingDetails
-										details={quote.printingDetails}
-										onDetailsChange={handlePrintingDetailsChange}
-									/>
 									<ScreenPrintingDetails
 										details={quote.screenPrintingDetails}
 										onDetailsChange={handleScreenPrintingDetailsChange}
+									/>
+									<VinylDetails
+										details={quote.vinylDetails}
+										onDetailsChange={handleVinylDetailsChange}
 									/>
 									<EmbroideryOptions
 										embroideryDetails={quote.embroideryDetails}

@@ -1,10 +1,10 @@
-import React, { FC, useState } from 'react';
+import React, { FC } from 'react';
 import { Form, Row, Col, InputGroup, FormControl } from 'react-bootstrap';
-import { PrintingOptions } from '@/types/Quote';
+import { PrintingOptions as PrintingOptionsType } from '@/types/Quote';
 
 interface PrintingOptionsProps {
-	options: PrintingOptions;
-	onOptionsChange: (options: PrintingOptions) => void;
+	options: PrintingOptionsType;
+	onOptionsChange: (options: PrintingOptionsType) => void;
 }
 
 const PrintingOptions: FC<PrintingOptionsProps> = ({
@@ -25,7 +25,7 @@ const PrintingOptions: FC<PrintingOptionsProps> = ({
 	onOptionsChange,
 }) => {
 	const handleChange = (
-		field: keyof PrintingOptions,
+		field: keyof PrintingOptionsType,
 		value: number | boolean
 	) => {
 		onOptionsChange({
@@ -36,7 +36,7 @@ const PrintingOptions: FC<PrintingOptionsProps> = ({
 
 	return (
 		<div>
-			<h6>SCREEN PRINTING, DTG & SUBLIMATION</h6>
+			<h6 className='standout-header'>Screen Printing Colors</h6>
 			<Form>
 				<Row>
 					<Col>
@@ -49,12 +49,6 @@ const PrintingOptions: FC<PrintingOptionsProps> = ({
 									handleChange('colorsFront', parseInt(e.target.value, 10))
 								}
 							/>
-						</InputGroup>
-					</Col>
-				</Row>
-				<Row>
-					<Col>
-						<InputGroup>
 							<InputGroup.Checkbox
 								checked={options.flashFront}
 								onChange={(e) => handleChange('flashFront', e.target.checked)}
@@ -95,6 +89,8 @@ const PrintingOptions: FC<PrintingOptionsProps> = ({
 							<InputGroup.Text>DTG Dark</InputGroup.Text>
 						</InputGroup>
 					</Col>
+				</Row>
+				<Row>
 					<Col>
 						<InputGroup>
 							<InputGroup.Text>Print Colors - Left Sleeve</InputGroup.Text>
@@ -123,6 +119,8 @@ const PrintingOptions: FC<PrintingOptionsProps> = ({
 							<InputGroup.Text>DTG Dark</InputGroup.Text>
 						</InputGroup>
 					</Col>
+				</Row>
+				<Row>
 					<Col>
 						<InputGroup>
 							<InputGroup.Text>Print Colors - Right Sleeve</InputGroup.Text>

@@ -1,0 +1,35 @@
+.card {
+	background: #fff;
+	border-radius: 8px;
+	box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+	padding: 20px;
+	margin-bottom: 20px;
+	border: 1px solid #e0e0e0;
+}
+
+.header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 10px;
+}
+
+.iconWrapper {
+	background: #fff3e0;
+	padding: 10px;
+	border-radius: 50%;
+}
+
+.chartWrapper {
+	margin-top: 20px;
+}
+
+.title {
+	font-size: 1.1rem;
+	color: #424242;
+}
+
+.subtitle {
+	font-size: 0.9rem;
+	color: #757575;
+}
