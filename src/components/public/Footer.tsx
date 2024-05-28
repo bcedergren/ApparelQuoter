@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Link as ScrollLink } from 'react-scroll';
 import styles from '@/styles/Footer.module.css';
+import Image from 'next/image';
 
 const Footer = () => (
 	<footer className={styles.footer}>
@@ -12,6 +13,12 @@ const Footer = () => (
 		>
 			<i className='fa fa-arrow-up'></i>
 		</ScrollLink>
+		<Image
+			src='/logo_footer.png'
+			alt='logo'
+			height={50}
+			width={175}
+		/>
 		<nav className={styles.nav}>
 			<Link href='/privacy'>
 				<span className={styles.navLink}>Privacy Policy</span>

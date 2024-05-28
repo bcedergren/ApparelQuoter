@@ -57,8 +57,8 @@ const Embroidery: React.FC<EmbroideryProps> = ({
 				<tr>
 					<td>Cost per 1,000 stitches after first 5,000</td>
 					<td>
-						<div className='currency-input'>
-							<span className='currency-symbol'>$</span>
+						<div className='input-group'>
+							<span className='input-group-text'>$</span>
 							<Form.Control
 								type='number'
 								step='0.01'
@@ -74,8 +74,8 @@ const Embroidery: React.FC<EmbroideryProps> = ({
 				<tr>
 					<td>Hooping Fee/Piece</td>
 					<td>
-						<div className='currency-input'>
-							<span className='currency-symbol'>$</span>
+						<div className='input-group'>
+							<span className='input-group-text'>$</span>
 							<Form.Control
 								type='number'
 								step='0.01'
@@ -89,8 +89,8 @@ const Embroidery: React.FC<EmbroideryProps> = ({
 				<tr>
 					<td>Cost for first 5,000 stitches</td>
 					<td>
-						<div className='currency-input'>
-							<span className='currency-symbol'>$</span>
+						<div className='input-group'>
+							<span className='input-group-text'>$</span>
 							<Form.Control
 								type='number'
 								step='0.01'

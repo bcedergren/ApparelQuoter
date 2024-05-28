@@ -1,67 +1,63 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-import bcrypt from 'bcryptjs';
+import { NextApiRequest, NextApiResponse } from 'next';
+import { hashPassword } from '@/lib/password';
 import { connectToDatabase } from '@/utils/dbConnect';
+import stripe from '@/lib/stripe';
 
-type UserData = {
-	companyName: string;
-	firstName: string;
-	lastName: string;
-	email: string;
-	password: string;
-	plan: string; // Added plan to UserData
-	[key: string]: any;
-};
-
-async function handler(req: NextApiRequest, res: NextApiResponse) {
-	if (req.method !== 'POST') {
-		res.setHeader('Allow', ['POST']);
-		return res.status(405).end(`Method ${req.method} Not Allowed`);
-	}
-
-	const {
-		companyName,
-		firstName,
-		lastName,
-		email,
-		password,
-		plan, // Added plan to the destructured object
-		...companyDetails
-	}: UserData = req.body;
-	const { db } = await connectToDatabase();
-
-	// Check for existing user
-	const existingUser = await db.collection('User').findOne({ email });
-	if (existingUser) {
-		return res.status(422).json({ message: 'User already exists!' });
-	}
-
-	const hashedPassword = await bcrypt.hash(password, 12);
+export default async function handler(
+	req: NextApiRequest,
+	res: NextApiResponse
+) {
+	const { email, password, firstName, lastName, companyName, planId } =
+		req.body;
 
 	try {
-		// Insert company
-		const companyResult = await db
-			.collection('Company')
-			.insertOne({ companyName, ...companyDetails });
-		const companyId = companyResult.insertedId;
+		const { db } = await connectToDatabase();
 
-		// Insert user linked to company
-		await db.collection('User').insertOne({
-			companyId,
+		const existingUser = await db.collection('users').findOne({ email });
+		if (existingUser) {
+			return res.status(409).json({ error: 'User already exists' });
+		}
+
+		const hashedPassword = await hashPassword(password);
+
+		const customer = await stripe.customers.create({
 			email,
-			firstName,
-			lastName,
-			password: hashedPassword,
-			role: 'admin',
-			createdAt: new Date(),
-			updatedAt: new Date(),
-			plan, // Store the selected plan for the user
+			name: `${firstName} ${lastName}`,
 		});
 
-		res.status(201).json({ message: 'User and company created!' });
+		const subscription = await stripe.subscriptions.create({
+			customer: customer.id,
+			items: [{ price: planId }],
+			trial_period_days: 7,
+		});
+
+		console.log(subscription);
+
+		const newUser = {
+			email,
+			password: hashedPassword,
+			firstName,
+			lastName,
+			companyId: companyName,
+			stripeCustomerId: customer.id,
+			subscriptionId: subscription.id,
+			isActive: true,
+		};
+
+		console.log(newUser);
+
+		const result = await db.collection('users').insertOne(newUser);
+
+		console.log(result);
+
+		res.status(201).json({
+			userId: result.insertedId,
+			stripeCustomerId: customer.id,
+			subscriptionId: subscription.id,
+		});
 	} catch (error) {
-		console.error('Registration failed:', error);
-		res.status(500).json({ message: 'Registration failed' });
+		const errorMessage =
+			error instanceof Error ? error.message : 'An unknown error occurred';
+		res.status(500).json({ error: errorMessage });
 	}
 }
-
-export default handler;

@@ -2,133 +2,121 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	min-height: 100vh;
-	background: #eceff4;
-	width: 100%;
+	height: 100vh;
+	background-color: #f8f9fa;
 }
 
-.centerContent {
+.formImageWrapper {
 	display: flex;
-	justify-content: center;
 	align-items: center;
+	justify-content: space-between;
 	width: 100%;
 }
 
 .card {
-	background: #fff;
-	padding: 40px;
-	border-radius: 10px;
-	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-	width: 100%;
-	max-width: 400px;
+	flex: 1;
+	max-width: 450px;
+	margin: 0 auto;
 }
 
 .textCenter {
-	text-align: center !important;
+	text-align: center;
 }
 
-.loginForm {
-	margin-top: 20px;
+.bgWhite {
+	background-color: #fff;
 }
 
-.formLabel {
-	font-weight: bold !important;
+.shadowLg {
+	box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
 }
 
-.formControl {
-	border-radius: 5px !important;
-	border: 1px solid #ccc !important;
-	width: 100% !important;
+.rounded {
+	border-radius: 0.5rem;
 }
 
-.btnPrimary {
-	background-color: #007bff !important;
-	border: none !important;
-	color: white !important;
-	width: 100% !important;
-	margin-top: 10px !important;
+.p4 {
+	padding: 1.5rem;
 }
 
-.btnPrimary:hover {
-	background-color: #0056b3 !important;
+.mt4 {
+	margin-top: 1.5rem;
 }
 
-.socialButton {
-	display: flex !important;
-	justify-content: center !important;
-	align-items: center !important;
-	border: 1px solid #ccc !important;
-	background: white !important;
-	padding: 10px !important;
-	border-radius: 5px !important;
-	margin-top: 10px !important;
-	width: 100% !important;
-}
-
-.socialIcon {
-	margin-right: 8px !important;
-}
-
-.textDark {
-	color: #333 !important;
-}
-
-.boldText {
-	font-weight: bold !important;
-}
-
-.marginBottom {
-	margin-bottom: 1rem !important;
-}
-
-.marginTop {
-	margin-top: 1.5rem !important;
-}
-
-.textCenter {
-	text-align: center !important;
-}
-
-.rememberMeContainer {
-	display: flex !important;
-	justify-content: space-between !important;
-	align-items: center !important;
-	margin: 20px 0 !important;
-}
-
-.orLoginWith {
-	text-align: center !important;
-	margin-top: 20px !important;
-}
-
-.homeButton {
-	margin-top: 20px !important;
-	text-align: center !important;
+.positionRelative {
+	position: relative;
 }
 
 .imageCol {
-	display: flex !important;
-	justify-content: center !important;
-	align-items: center !important;
+	flex: 1;
+	max-width: 600px;
 }
 
 .signInImage {
-	max-width: 100% !important;
-	height: auto !important;
+	max-width: 100%;
+	height: auto;
 }
 
-/* Media query for small screens */
-@media (max-width: 768px) {
-	.card,
-	.loginForm {
-		width: 100%;
-	}
+.marginBottom {
+	margin-bottom: 1rem;
+}
 
-	.centerContent {
-		padding: 10px;
-	}
+.formLabel {
+	font-weight: 500;
+	color: #495057;
+}
 
-	.signInImage {
-		display: none;
-	}
+.formControl {
+	border-radius: 0.25rem;
+	border: 1px solid #ced4da;
+}
+
+.formCheck {
+	font-weight: 400;
+	color: #495057;
+}
+
+.btnPrimary {
+	background-color: #007bff;
+	border-color: #007bff;
+	width: 100%;
+	padding: 0.5rem;
+	font-size: 1rem;
+	display: block;
+	text-align: center;
+}
+
+.textCenter {
+	text-align: center;
+}
+
+.socialLogin {
+	display: flex;
+	justify-content: space-between;
+	margin-top: 1rem;
+}
+
+.socialButton {
+	display: flex;
+	align-items: center;
+	padding: 0.5rem 1rem;
+	font-size: 1rem;
+}
+
+.socialIcon {
+	margin-right: 0.5rem;
+}
+
+.boldText {
+	font-weight: 700;
+	color: #007bff;
+}
+
+.marginTop {
+	margin-top: 1rem;
+}
+
+.homeButton {
+	margin-top: 1.5rem;
+	text-align: center;
 }

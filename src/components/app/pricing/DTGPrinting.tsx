@@ -27,8 +27,8 @@ const DTGPrintingComponent: React.FC<DTGPrintingProps> = ({
 			<td>{size.charAt(0).toUpperCase() + size.slice(1)}</td>
 			{dtgPrintingData[size].map((price: string, index: number) => (
 				<td key={index}>
-					<div className='currency-input'>
-						<span className='currency-symbol'>$</span>
+					<div className='input-group'>
+						<span className='input-group-text'>$</span>
 						<Form.Control
 							type='number'
 							step='0.01'

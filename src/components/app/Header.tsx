@@ -11,7 +11,7 @@ import {
 } from 'react-icons/sl';
 import { FaCaretDown } from 'react-icons/fa6';
 
-import { CustomSession } from '@/types/CustomSession';
+import { CustomSession } from '@/types/CustomUser';
 import styles from '@/styles/AppHeader.module.css';
 
 const Header = () => {

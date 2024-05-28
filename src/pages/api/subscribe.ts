@@ -1,49 +1,44 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-import Stripe from 'stripe';
+import { NextApiRequest, NextApiResponse } from 'next';
+import { getSession } from 'next-auth/react';
+import { connectToDatabase } from '@/utils/dbConnect';
+import stripe from '@/lib/stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-	apiVersion: '2023-10-16',
-});
-
-const handleSubscription = async (
+export default async function handler(
 	req: NextApiRequest,
 	res: NextApiResponse
-) => {
-	if (req.method === 'POST') {
-		try {
-			const { email, selectedPlan } = req.body;
+) {
+	const session = await getSession({ req });
 
-			// Create a new customer in Stripe
-			const customer = await stripe.customers.create({ email });
-
-			// Configure trial period for the trial plan
-			let subscriptionParams: Stripe.SubscriptionCreateParams = {
-				customer: customer.id,
-				items: [{ price: selectedPlan }],
-				expand: ['latest_invoice.payment_intent'],
-			};
-
-			if (selectedPlan === 'trial') {
-				const trialEnd = Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60; // 7 days from now
-				subscriptionParams.trial_end = trialEnd;
-			}
-
-			// Create the subscription with the specified parameters
-			const subscription = await stripe.subscriptions.create(
-				subscriptionParams
-			);
-
-			res.status(200).json({ subscriptionId: subscription.id });
-		} catch (error) {
-			console.error('Subscription creation failed:', error);
-			res
-				.status(400)
-				.json({ error: 'An error occurred, unable to create subscription' });
-		}
-	} else {
-		res.setHeader('Allow', ['POST']);
-		res.status(405).end(`Method ${req.method} Not Allowed`);
+	if (!session) {
+		return res.status(401).json({ error: 'Unauthorized' });
 	}
-};
 
-export default handleSubscription;
+	const { email, paymentMethodId } = req.body;
+
+	try {
+		const customer = await stripe.customers.create({
+			payment_method: paymentMethodId,
+			email: email,
+			invoice_settings: {
+				default_payment_method: paymentMethodId,
+			},
+		});
+
+		const subscription = await stripe.subscriptions.create({
+			customer: customer.id,
+			items: [{ price: process.env.STRIPE_PRICE_ID as string }],
+			expand: ['latest_invoice.payment_intent'],
+		});
+
+		const { db } = await connectToDatabase();
+		await db
+			.collection('users')
+			.updateOne({ email: email }, { $set: { stripeCustomerId: customer.id } });
+
+		res.status(200).json({ subscription });
+	} catch (error) {
+		const errorMessage =
+			error instanceof Error ? error.message : 'An unknown error occurred';
+		res.status(500).json({ error: errorMessage });
+	}
+}

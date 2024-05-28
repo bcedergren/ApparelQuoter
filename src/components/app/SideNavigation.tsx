@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Nav } from 'react-bootstrap';
-import { FiChevronsLeft, FiChevronsRight } from 'react-icons/fi';
+import { FiChevronsLeft, FiChevronsRight, FiMenu } from 'react-icons/fi';
 import {
 	SlBag,
 	SlPeople,
@@ -18,14 +18,22 @@ import smallLogo from '@/../public/logo-2.png'; // Assuming you have a smaller l
 interface SideNavigationProps {
 	collapsed: boolean;
 	setCollapsed: (collapsed: boolean) => void;
+	isMobile: boolean;
+	setShowSidebar: (showSidebar: boolean) => void;
 }
 
 const SideNavigation: React.FC<SideNavigationProps> = ({
 	collapsed,
 	setCollapsed,
+	isMobile,
+	setShowSidebar,
 }) => {
 	const toggleCollapse = () => {
-		setCollapsed(!collapsed);
+		if (isMobile) {
+			setShowSidebar(false);
+		} else {
+			setCollapsed(!collapsed);
+		}
 	};
 
 	const iconStyle = collapsed
@@ -36,7 +44,7 @@ const SideNavigation: React.FC<SideNavigationProps> = ({
 		<Nav
 			className={`${styles.nav} flex-column ${
 				collapsed ? styles.collapsed : ''
-			}`}
+			} ${isMobile ? styles.mobileNav : ''}`}
 		>
 			<div className={`${styles.navHeader}`}>
 				<div className={styles.logoContainer}>
@@ -53,7 +61,12 @@ const SideNavigation: React.FC<SideNavigationProps> = ({
 						/>
 					</Link>
 					<div>
-						{collapsed ? (
+						{isMobile ? (
+							<FiMenu
+								onClick={() => setShowSidebar(false)}
+								className={styles.toggleIcon}
+							/>
+						) : collapsed ? (
 							<FiChevronsRight
 								onClick={toggleCollapse}
 								className={styles.toggleIcon}

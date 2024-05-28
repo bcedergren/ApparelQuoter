@@ -1,3 +1,4 @@
+/* Full sidebar styles */
 .nav {
 	background-color: #f8f9fa;
 	height: 100vh;
@@ -6,7 +7,7 @@
 	width: 210px;
 }
 
-.nav.collapsed {
+.collapsed {
 	width: 50px;
 }
 
@@ -42,4 +43,39 @@
 .navLink:hover {
 	color: #0666db;
 	text-decoration: none;
+}
+
+/* Mobile-specific styles */
+@media (max-width: 768px) {
+	.sideNav {
+		position: fixed;
+		top: 0;
+		left: 0;
+		height: 100vh;
+		width: 250px;
+		background-color: #f8f9fa;
+		transform: translateX(-100%);
+		transition: transform 0.3s ease-in-out;
+		z-index: 1000;
+	}
+
+	.mobileOpen {
+		transform: translateX(0);
+	}
+
+	.overlay {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background-color: rgba(0, 0, 0, 0.5);
+		z-index: 999;
+	}
+
+	.mobileNav .navHeader {
+		flex-direction: row;
+		justify-content: space-between;
+		padding: 10px;
+	}
 }

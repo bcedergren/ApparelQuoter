@@ -9,4 +9,7 @@ export interface User {
 	rememberMe: boolean;
 	resetToken?: string;
 	resetTokenExpiry?: number;
+	stripeCustomerId: string;
+	isActive: boolean;
+	subscriptionId: string;
 }

@@ -1,6 +1,5 @@
 import { ChangeEvent } from 'react';
 import { Table, Form, Spinner } from 'react-bootstrap';
-import CurrencyInput from 'react-currency-input-field';
 import styles from '@/styles/Pricing.module.css';
 import { ArtCost } from '@/types/Price';
 
@@ -52,7 +51,7 @@ const ArtCostComponent: React.FC<ArtCostProps> = ({
 		>
 			<thead>
 				<tr>
-					<th colSpan={9}>Art Cost</th>
+					<th colSpan={7}>Art Cost</th>
 				</tr>
 				<tr>
 					<th>First Color</th>
@@ -67,8 +66,8 @@ const ArtCostComponent: React.FC<ArtCostProps> = ({
 			<tbody>
 				<tr>
 					<td>
-						<div className='currency-input'>
-							<span className='currency-symbol'>$</span>
+						<div className='input-group'>
+							<span className='input-group-text'>$</span>
 							<Form.Control
 								type='number'
 								step='0.01'
@@ -84,8 +83,8 @@ const ArtCostComponent: React.FC<ArtCostProps> = ({
 						</div>
 					</td>
 					<td>
-						<div className='currency-input'>
-							<span className='currency-symbol'>$</span>
+						<div className='input-group'>
+							<span className='input-group-text'>$</span>
 							<Form.Control
 								type='number'
 								step='0.01'
@@ -101,8 +100,8 @@ const ArtCostComponent: React.FC<ArtCostProps> = ({
 						</div>
 					</td>
 					<td>
-						<div className='currency-input'>
-							<span className='currency-symbol'>$</span>
+						<div className='input-group'>
+							<span className='input-group-text'>$</span>
 							<Form.Control
 								type='number'
 								step='0.01'
@@ -118,7 +117,7 @@ const ArtCostComponent: React.FC<ArtCostProps> = ({
 						</div>
 					</td>
 					<td>
-						<div className='percentage-input'>
+						<div className='input-group'>
 							<Form.Control
 								type='number'
 								step='0.01'
@@ -131,12 +130,12 @@ const ArtCostComponent: React.FC<ArtCostProps> = ({
 									)
 								}
 							/>
-							<span className='percentage-symbol'>%</span>
+							<span className='input-group-text'>%</span>
 						</div>
 					</td>
 					<td>
-						<div className='currency-input'>
-							<span className='currency-symbol'>$</span>
+						<div className='input-group'>
+							<span className='input-group-text'>$</span>
 							<Form.Control
 								type='number'
 								step='0.01'
@@ -152,8 +151,8 @@ const ArtCostComponent: React.FC<ArtCostProps> = ({
 						</div>
 					</td>
 					<td>
-						<div className='currency-input'>
-							<span className='currency-symbol'>$</span>
+						<div className='input-group'>
+							<span className='input-group-text'>$</span>
 							<Form.Control
 								type='number'
 								step='0.01'
@@ -169,8 +168,8 @@ const ArtCostComponent: React.FC<ArtCostProps> = ({
 						</div>
 					</td>
 					<td>
-						<div className='currency-input'>
-							<span className='currency-symbol'>$</span>
+						<div className='input-group'>
+							<span className='input-group-text'>$</span>
 							<Form.Control
 								type='number'
 								step='0.01'

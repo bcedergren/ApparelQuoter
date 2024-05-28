@@ -1,7 +1,6 @@
 import React, { ChangeEvent } from 'react';
 import { Form, Table } from 'react-bootstrap';
 import styles from '@/styles/Pricing.module.css';
-
 import { DTGDarkGarmentMarkup } from '@/types/Price';
 
 interface DTGDarkGarmentMarkupProps {
@@ -19,9 +18,7 @@ const DTGDarkGarmentMarkupComponent: React.FC<DTGDarkGarmentMarkupProps> = ({
 	) => {
 		const updatedMarkup = {
 			...dtgDarkGarmentMarkup,
-			[size]: event.target.value
-				.split(',')
-				.map((value: string) => value.trim()),
+			[size]: event.target.value,
 		};
 		setDTGDarkGarmentMarkup(updatedMarkup);
 	};
@@ -34,7 +31,7 @@ const DTGDarkGarmentMarkupComponent: React.FC<DTGDarkGarmentMarkupProps> = ({
 		>
 			<thead>
 				<tr>
-					<th colSpan={9}>DTG Dark Garment</th>
+					<th colSpan={3}>DTG Dark Garment</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -42,8 +39,8 @@ const DTGDarkGarmentMarkupComponent: React.FC<DTGDarkGarmentMarkupProps> = ({
 					<td>
 						<Form.Group controlId='dtgDarkGarmentMarkupSmall'>
 							<Form.Label>Small</Form.Label>
-							<div className='currency-input'>
-								<span className='currency-symbol'>$</span>
+							<div className='input-group'>
+								<span className='input-group-text'>$</span>
 								<Form.Control
 									type='number'
 									step='0.01'
@@ -57,8 +54,8 @@ const DTGDarkGarmentMarkupComponent: React.FC<DTGDarkGarmentMarkupProps> = ({
 					<td>
 						<Form.Group controlId='dtgDarkGarmentMarkupMedium'>
 							<Form.Label>Medium</Form.Label>
-							<div className='currency-input'>
-								<span className='currency-symbol'>$</span>
+							<div className='input-group'>
+								<span className='input-group-text'>$</span>
 								<Form.Control
 									type='number'
 									step='0.01'
@@ -72,8 +69,8 @@ const DTGDarkGarmentMarkupComponent: React.FC<DTGDarkGarmentMarkupProps> = ({
 					<td>
 						<Form.Group controlId='dtgDarkGarmentMarkupLarge'>
 							<Form.Label>Large</Form.Label>
-							<div className='currency-input'>
-								<span className='currency-symbol'>$</span>
+							<div className='input-group'>
+								<span className='input-group-text'>$</span>
 								<Form.Control
 									type='number'
 									step='0.01'

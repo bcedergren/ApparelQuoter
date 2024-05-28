@@ -1,0 +1,29 @@
+.paymentContainer {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 20px;
+}
+
+.paymentForm {
+	width: 100%;
+	max-width: 500px;
+	padding: 20px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	background-color: #fff;
+}
+
+.paymentButton {
+	width: 100%;
+	padding: 10px;
+	background-color: #0070f3;
+	color: #fff;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+.paymentButton:hover {
+	background-color: #005bb5;
+}

@@ -46,7 +46,18 @@ const plans = [
 	},
 ];
 
-const Pricing = () => {
+interface PricingProps {
+	selectedPlan: {
+		plan: string;
+		setPlan: React.Dispatch<React.SetStateAction<string>>;
+	};
+	selectedType: {
+		type: string;
+		setType: React.Dispatch<React.SetStateAction<string>>;
+	};
+}
+
+const Pricing: React.FC<PricingProps> = ({ selectedPlan, selectedType }) => {
 	return (
 		<section
 			className={styles.pricingSection}
@@ -58,6 +69,7 @@ const Pricing = () => {
 					<PricingCard
 						key={index}
 						plan={plan}
+						className={styles.pricingCard}
 					/>
 				))}
 			</div>

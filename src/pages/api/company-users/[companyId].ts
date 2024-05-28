@@ -31,6 +31,9 @@ export default async function handler(
 			lastName: doc.lastName,
 			email: doc.email,
 			role: doc.role,
+			stripeCustomerId: doc.stripeCustomerId,
+			isActive: doc.isActive,
+			subscriptionId: doc.subscriptionId,
 		}));
 
 		res.status(200).json(transformedUsers);

@@ -63,8 +63,8 @@ const ScreenPrintingComponent: React.FC<ScreenPrintingProps> = ({
 						<td>{color}</td>
 						{screenPrintingData[color].map((price, columnIndex) => (
 							<td key={columnIndex}>
-								<div className='currency-input'>
-									<span className='currency-symbol'>$</span>
+								<div className='input-group'>
+									<span className='input-group-text'>$</span>
 									<Form.Control
 										type='number'
 										step='0.01'
@@ -79,9 +79,9 @@ const ScreenPrintingComponent: React.FC<ScreenPrintingProps> = ({
 				))}
 				<tr>
 					<td>Per Screen New</td>
-					<td colSpan={7}>
-						<div className='currency-input'>
-							<span className='currency-symbol'>$</span>
+					<td colSpan={3}>
+						<div className='input-group'>
+							<span className='input-group-text'>$</span>
 							<Form.Control
 								type='number'
 								step='0.01'
@@ -91,12 +91,11 @@ const ScreenPrintingComponent: React.FC<ScreenPrintingProps> = ({
 							/>
 						</div>
 					</td>
-				</tr>
-				<tr>
+
 					<td>Per Screen Existing</td>
-					<td colSpan={7}>
-						<div className='currency-input'>
-							<span className='currency-symbol'>$</span>
+					<td colSpan={3}>
+						<div className='input-group'>
+							<span className='input-group-text'>$</span>
 							<Form.Control
 								type='number'
 								step='0.01'

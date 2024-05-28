@@ -1,0 +1,103 @@
+.pageTitle {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 20px;
+}
+
+.pageTitle h1 {
+	font-size: 2rem;
+	color: #333;
+}
+
+.pageTitle .btn {
+	font-size: 1rem;
+	padding: 0.5rem 1rem;
+	display: flex;
+	align-items: center;
+}
+
+.addUserButton {
+	margin-right: 200px;
+}
+
+.pageTitle .btn .icon {
+	margin-right: 0.5rem;
+}
+
+.table {
+	width: 100%;
+	margin-top: 20px;
+	background-color: #fff;
+	border: 1px solid #dee2e6;
+	border-radius: 5px;
+}
+
+.table th,
+.table td {
+	padding: 0.75rem;
+	vertical-align: middle;
+	border-top: 1px solid #dee2e6;
+}
+
+.table thead th {
+	background-color: #e9ecef;
+	color: #495057;
+}
+
+.spinner-border {
+	display: block;
+	margin: 0 auto;
+	margin-top: 20px;
+}
+
+.modalHeader {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.modalHeader .close {
+	background: none;
+	border: none;
+	font-size: 1.5rem;
+	line-height: 1;
+}
+
+.modalFooter {
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	padding: 0.75rem;
+	border-top: 1px solid #dee2e6;
+}
+
+.editIcon {
+	cursor: pointer;
+	color: #ffc107;
+	font-size: 1.5rem;
+	margin-right: 10px;
+	background: none;
+	border: none;
+}
+
+.editIcon:hover {
+	color: #e0a800;
+}
+
+.deleteIcon {
+	cursor: pointer;
+	color: #dc3545;
+	font-size: 1.5rem;
+	background: none;
+	border: none;
+}
+
+.deleteIcon:hover {
+	color: #800d18;
+}
+
+.badge {
+	color: #817c7d;
+	font-size: 1.25rem;
+}

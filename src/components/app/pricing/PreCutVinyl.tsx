@@ -60,8 +60,8 @@ const PreCutVinyl: React.FC<PreCutVinylProps> = ({
 					<td>Names</td>
 					{preCutVinylData.names.map((price, index) => (
 						<td key={`name-${index}`}>
-							<div className='currency-input'>
-								<span className='currency-symbol'>$</span>
+							<div className='input-group'>
+								<span className='input-group-text'>$</span>
 								<Form.Control
 									type='number'
 									step='0.01'
@@ -77,8 +77,8 @@ const PreCutVinyl: React.FC<PreCutVinylProps> = ({
 					<td>Numbers</td>
 					{preCutVinylData.numbers.map((price, index) => (
 						<td key={`number-${index}`}>
-							<div className='currency-input'>
-								<span className='currency-symbol'>$</span>
+							<div className='input-group'>
+								<span className='input-group-text'>$</span>
 								<Form.Control
 									type='number'
 									step='0.01'

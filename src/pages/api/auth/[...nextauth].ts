@@ -1,9 +1,13 @@
 import NextAuth from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
+import FacebookProvider from 'next-auth/providers/facebook';
 import CredentialsProvider from 'next-auth/providers/credentials';
+import clientPromise from '@/lib/mongodb';
 import { verifyPassword } from '@/lib/password';
 import { connectToDatabase } from '@/utils/dbConnect';
-import { User as CustomUser } from '@/types/User';
+import { CustomUser, CustomJWT, CustomSession } from '@/types/CustomUser';
+import stripe from '@/lib/stripe';
+import Stripe from 'stripe';
 
 export default NextAuth({
 	providers: [
@@ -17,6 +21,10 @@ export default NextAuth({
 					response_type: 'code',
 				},
 			},
+		}),
+		FacebookProvider({
+			clientId: process.env.FACEBOOK_CLIENT_ID as string,
+			clientSecret: process.env.FACEBOOK_CLIENT_SECRET as string,
 		}),
 		CredentialsProvider({
 			name: 'Credentials',
@@ -35,9 +43,8 @@ export default NextAuth({
 				}
 
 				const { db } = await connectToDatabase();
-
 				const userDocument = (await db
-					.collection('User')
+					.collection('users')
 					.findOne({ email: credentials.email })) as CustomUser | null;
 
 				if (!userDocument) {
@@ -46,7 +53,7 @@ export default NextAuth({
 
 				const isValid = await verifyPassword(
 					credentials.password,
-					userDocument.password
+					userDocument.password!
 				);
 				if (!isValid) {
 					throw new Error('Password is incorrect');
@@ -54,44 +61,52 @@ export default NextAuth({
 
 				return {
 					id: userDocument._id.toString(),
+					_id: userDocument._id.toString(),
 					email: userDocument.email,
 					firstName: userDocument.firstName,
 					lastName: userDocument.lastName,
 					companyId: userDocument.companyId.toString(),
 					role: userDocument.role,
-					rememberMe: credentials.rememberMe === 'true', // Ensure correct type for rememberMe
-				};
+					rememberMe: credentials.rememberMe === 'true',
+					stripeCustomerId: userDocument.stripeCustomerId,
+					isActive: userDocument.isActive,
+					subscriptionId: userDocument.subscriptionId,
+				} as CustomUser;
 			},
 		}),
 	],
 	callbacks: {
+		async session({ session, token }) {
+			const customSession = session as CustomSession;
+			customSession.user.id = token.id as string;
+			customSession.user.firstName = token.firstName as string;
+			customSession.user.lastName = token.lastName as string;
+			customSession.user.companyId = token.companyId as string;
+			customSession.user.role = token.role as string;
+			customSession.user.rememberMe = token.rememberMe as boolean;
+			customSession.user.stripeCustomerId = token.stripeCustomerId as string;
+			customSession.user.subscriptionId = token.subscriptionId as string;
+			customSession.user.isActive = token.isActive as boolean;
+			return customSession;
+		},
 		async jwt({ token, user }) {
 			if (user) {
-				token.id = user.id;
-				token.email = user.email;
-				token.firstName = user.firstName;
-				token.lastName = user.lastName;
-				token.companyId = user.companyId;
-				token.role = user.role;
-				token.rememberMe = user.rememberMe;
-				token.expiration = user.rememberMe
+				const customUser = user as CustomUser;
+				token.id = customUser.id;
+				token.email = customUser.email;
+				token.firstName = customUser.firstName;
+				token.lastName = customUser.lastName;
+				token.companyId = customUser.companyId;
+				token.role = customUser.role;
+				token.rememberMe = customUser.rememberMe;
+				token.stripeCustomerId = customUser.stripeCustomerId;
+				token.subscriptionId = customUser.subscriptionId;
+				token.isActive = customUser.isActive;
+				token.expiration = customUser.rememberMe
 					? Date.now() + 30 * 24 * 60 * 60 * 1000
 					: Date.now() + 2 * 60 * 60 * 1000;
 			}
-			return token;
-		},
-		async session({ session, token }) {
-			session.user = {
-				...session.user,
-				id: token.id as string,
-				firstName: token.firstName as string,
-				lastName: token.lastName as string,
-				companyId: token.companyId as string,
-				role: token.role as string,
-				rememberMe: token.rememberMe as boolean,
-			};
-			session.expires = new Date(token.expiration!).toISOString();
-			return session;
+			return token as CustomJWT;
 		},
 	},
 	pages: {
