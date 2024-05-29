@@ -119,7 +119,7 @@ const generatePDF = ({
 
 	// Company Information and Quote Title
 	doc.setFontSize(10);
-	doc.text(company.companyName, 20, 20);
+	doc.text(company.name, 20, 20);
 	doc.text(company.streetAddress, 20, 25);
 	doc.text(`${company.city}, ${company.state} ${company.zip}`, 20, 30);
 	doc.text(`Phone: ${company.phone}`, 20, 35);
