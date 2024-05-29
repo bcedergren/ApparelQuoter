@@ -9,7 +9,12 @@ export default async function handler(
 	if (req.method === 'POST') {
 		const { client, db } = await connectToDatabase();
 		try {
-			const { _id, ...updateData } = req.body;
+			const { _id, updatedBy, ...updateData } = req.body;
+
+			// Add updatedAt and updatedBy fields to the update data
+			updateData.updatedAt = new Date().toISOString();
+			updateData.updatedBy = updatedBy;
+
 			const updatedCompany = await db
 				.collection('Company')
 				.updateOne({ _id: new ObjectId(_id) }, { $set: updateData });
@@ -29,8 +34,6 @@ export default async function handler(
 					success: false,
 					message: 'Failed to update company information',
 				});
-		} finally {
-			await client.close();
 		}
 	} else {
 		res.setHeader('Allow', ['POST']);

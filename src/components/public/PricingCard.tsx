@@ -8,6 +8,7 @@ interface Plan {
 	price: string;
 	target: string;
 	features: string[];
+	id: string; // Ensure planId is part of the Plan interface
 }
 
 interface PricingCardProps {
@@ -19,7 +20,10 @@ const PricingCard: React.FC<PricingCardProps> = ({ plan, className }) => {
 	const router = useRouter();
 
 	const handleRegisterClick = () => {
-		router.push('/register');
+		router.push({
+			pathname: '/register',
+			query: { planId: plan.id },
+		});
 	};
 
 	return (

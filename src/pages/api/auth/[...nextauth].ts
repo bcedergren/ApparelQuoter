@@ -2,12 +2,9 @@ import NextAuth from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import FacebookProvider from 'next-auth/providers/facebook';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import clientPromise from '@/lib/mongodb';
-import { verifyPassword } from '@/lib/password';
 import { connectToDatabase } from '@/utils/dbConnect';
+import { verifyPassword } from '@/lib/password';
 import { CustomUser, CustomJWT, CustomSession } from '@/types/CustomUser';
-import stripe from '@/lib/stripe';
-import Stripe from 'stripe';
 
 export default NextAuth({
 	providers: [
@@ -44,7 +41,7 @@ export default NextAuth({
 
 				const { db } = await connectToDatabase();
 				const userDocument = (await db
-					.collection('users')
+					.collection('User')
 					.findOne({ email: credentials.email })) as CustomUser | null;
 
 				if (!userDocument) {

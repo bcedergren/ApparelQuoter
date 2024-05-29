@@ -1,6 +1,6 @@
 export interface Company {
 	_id: string;
-	companyName: string;
+	name: string;
 	streetAddress: string;
 	city: string;
 	state: string;
@@ -12,4 +12,5 @@ export interface Company {
 	paymentMethods: string[];
 	salesTax: string;
 	creditCardCharge: string;
+	offerings: string[];
 }

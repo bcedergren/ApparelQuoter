@@ -26,7 +26,7 @@ const LoginForm = () => {
 		if (result?.error) {
 			setError(result.error);
 		} else {
-			router.push('/dashboard');
+			router.push('/app/dashboard');
 		}
 	};
 
@@ -63,6 +63,16 @@ const LoginForm = () => {
 					onChange={(e) => setRememberMe(e.target.checked)}
 					className={styles.formCheck}
 				/>
+			</Form.Group>
+			<Form.Group
+				className={`d-flex justify-content-end ${styles.marginBottom}`}
+			>
+				<Link
+					href='/forgot-password'
+					className={styles.linkText}
+				>
+					Forgot password?
+				</Link>
 			</Form.Group>
 			<Button
 				type='submit'

@@ -6,12 +6,19 @@ export default async function handler(
 	req: NextApiRequest,
 	res: NextApiResponse
 ): Promise<void> {
-	const { method, query } = req;
+	const { method } = req;
 
 	if (method === 'GET') {
 		const { client, db } = await connectToDatabase();
 		try {
-			const companyId = query.CompanyId as string;
+			const { companyId } = req.query;
+
+			if (typeof companyId !== 'string' || !ObjectId.isValid(companyId)) {
+				return res
+					.status(400)
+					.json({ success: false, message: 'Invalid company ID' });
+			}
+
 			const objectId = new ObjectId(companyId);
 			const company = await db.collection('Company').findOne({ _id: objectId });
 
@@ -21,7 +28,7 @@ export default async function handler(
 				res.status(404).json({ success: false, message: 'Company not found' });
 			}
 		} catch (error) {
-			console.error(error);
+			console.error('Error fetching company:', error);
 			res.status(500).json({
 				success: false,
 				message: 'Failed to fetch company information',
@@ -29,5 +36,7 @@ export default async function handler(
 		} finally {
 			await client.close();
 		}
+	} else {
+		res.status(405).json({ success: false, message: 'Method not allowed' });
 	}
 }

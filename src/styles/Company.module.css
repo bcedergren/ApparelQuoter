@@ -1,23 +1,49 @@
-/* Company.module.css */
-.header {
-	color: green;
+.updateButton {
+	width: 100%;
+	margin-bottom: 50px;
 }
 
-.customTable {
-	margin-top: 20px;
+.paymentMethods {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
 }
 
-.tableHeader {
-	background-color: green;
-	color: white;
+.paymentMethod {
+	display: flex;
+	align-items: center;
 }
 
-.tableHeader th {
-	text-align: center;
+.paymentMethodImage {
+	margin-right: 8px;
 }
 
-.companyTable th {
-	text-align: left;
-	background-color: #4caf50;
-	color: white;
+.offerings {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+}
+
+.offering {
+	display: flex;
+	align-items: center;
+}
+
+@media (max-width: 767.98px) {
+	.paymentMethods,
+	.offerings {
+		flex-direction: column;
+	}
+
+	/* Make inputs full width on mobile */
+	.form-control {
+		width: 100%;
+	}
+}
+
+@media (min-width: 768px) {
+	/* Make inputs smaller than 100% width on desktop */
+	.form-control {
+		width: calc(100% - 15px);
+	}
 }

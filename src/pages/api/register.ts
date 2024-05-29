@@ -11,51 +11,65 @@ export default async function handler(
 		req.body;
 
 	try {
+		console.log('Connecting to database...');
 		const { db } = await connectToDatabase();
 
-		const existingUser = await db.collection('users').findOne({ email });
+		console.log('Checking for existing user...');
+		const existingUser = await db.collection('User').findOne({ email });
 		if (existingUser) {
+			console.log('User already exists');
 			return res.status(409).json({ error: 'User already exists' });
 		}
 
+		console.log('Hashing password...');
 		const hashedPassword = await hashPassword(password);
 
+		console.log('Creating Stripe customer...');
 		const customer = await stripe.customers.create({
 			email,
 			name: `${firstName} ${lastName}`,
 		});
 
+		console.log('Creating Stripe subscription...');
 		const subscription = await stripe.subscriptions.create({
 			customer: customer.id,
 			items: [{ price: planId }],
 			trial_period_days: 7,
 		});
 
-		console.log(subscription);
+		console.log('Creating company...');
+		const newCompany = {
+			name: companyName,
+			createdBy: email,
+			createdAt: new Date(),
+		};
 
+		const companyResult = await db.collection('Company').insertOne(newCompany);
+		const companyId = companyResult.insertedId;
+
+		console.log('Creating user...');
 		const newUser = {
 			email,
 			password: hashedPassword,
 			firstName,
 			lastName,
-			companyId: companyName,
+			companyId: companyId.toString(),
 			stripeCustomerId: customer.id,
 			subscriptionId: subscription.id,
 			isActive: true,
+			role: 'admin',
 		};
 
-		console.log(newUser);
+		const userResult = await db.collection('User').insertOne(newUser);
 
-		const result = await db.collection('users').insertOne(newUser);
-
-		console.log(result);
-
+		console.log('User created successfully');
 		res.status(201).json({
-			userId: result.insertedId,
+			userId: userResult.insertedId,
 			stripeCustomerId: customer.id,
 			subscriptionId: subscription.id,
 		});
 	} catch (error) {
+		console.error('Error occurred:', error);
 		const errorMessage =
 			error instanceof Error ? error.message : 'An unknown error occurred';
 		res.status(500).json({ error: errorMessage });

@@ -1,4 +1,4 @@
-import { useState, FormEvent } from 'react';
+import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { Form, Button, Row, Col, Alert } from 'react-bootstrap';
@@ -10,11 +10,13 @@ import { getStripe } from '@/lib/stripe';
 import styles from '@/styles/Register.module.css';
 
 const RegistrationForm = () => {
-	const [name, setName] = useState('');
+	const [firstName, setFirstName] = useState('');
+	const [lastName, setLastName] = useState('');
 	const [companyName, setCompanyName] = useState('');
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [confirmPassword, setConfirmPassword] = useState('');
+	const [planId, setPlanId] = useState('');
 	const [termsAccepted, setTermsAccepted] = useState(false);
 	const [error, setError] = useState('');
 	const [loading, setLoading] = useState(false);
@@ -22,6 +24,14 @@ const RegistrationForm = () => {
 	const stripe = useStripe();
 	const elements = useElements();
 	const router = useRouter();
+
+	useEffect(() => {
+		// Extract planId from query parameters
+		const { planId } = router.query;
+		if (planId) {
+			setPlanId(planId as string);
+		}
+	}, [router.query]);
 
 	const isPasswordStrong = (password: string) => {
 		const strongPasswordPattern =
@@ -32,7 +42,15 @@ const RegistrationForm = () => {
 	const handleSubmit = async (e: FormEvent) => {
 		e.preventDefault();
 
-		if (!name || !companyName || !email || !password || !confirmPassword) {
+		if (
+			!firstName ||
+			!lastName ||
+			!companyName ||
+			!email ||
+			!password ||
+			!confirmPassword ||
+			!planId
+		) {
 			setError('All fields are required.');
 			return;
 		}
@@ -58,19 +76,27 @@ const RegistrationForm = () => {
 
 		try {
 			const response = await axios.post('/api/register', {
-				name,
+				firstName,
+				lastName,
 				companyName,
 				email,
 				password,
+				planId,
 			});
 
 			if (response.data.error) {
 				setError(response.data.error);
 			} else {
-				router.push('/dashboard');
+				router.push('/app/dashboard');
 			}
 		} catch (err) {
-			setError('An unexpected error occurred.');
+			if (axios.isAxiosError(err)) {
+				setError(err.response?.data?.error || 'An unexpected error occurred.');
+			} else if (err instanceof Error) {
+				setError(err.message);
+			} else {
+				setError('An unexpected error occurred.');
+			}
 		} finally {
 			setLoading(false);
 		}
@@ -81,15 +107,28 @@ const RegistrationForm = () => {
 			{error && <Alert variant='danger'>{error}</Alert>}
 			<Form onSubmit={handleSubmit}>
 				<Row>
-					<Col xs={12}>
+					<Col md={6}>
 						<Form.Group className={styles.marginBottom}>
-							<Form.Label className={styles.formLabel}>Your Name*</Form.Label>
+							<Form.Label className={styles.formLabel}>First Name*</Form.Label>
 							<Form.Control
 								type='text'
-								value={name}
-								onChange={(e) => setName(e.target.value)}
+								value={firstName}
+								onChange={(e) => setFirstName(e.target.value)}
 								required
-								placeholder='Name'
+								placeholder='First Name'
+								className={styles.formControl}
+							/>
+						</Form.Group>
+					</Col>
+					<Col md={6}>
+						<Form.Group className={styles.marginBottom}>
+							<Form.Label className={styles.formLabel}>Last Name*</Form.Label>
+							<Form.Control
+								type='text'
+								value={lastName}
+								onChange={(e) => setLastName(e.target.value)}
+								required
+								placeholder='Last Name'
 								className={styles.formControl}
 							/>
 						</Form.Group>
@@ -150,6 +189,17 @@ const RegistrationForm = () => {
 							/>
 						</Form.Group>
 					</Col>
+					{/* <Col xs={12}>
+						<Form.Group className={styles.marginBottom}>
+							<Form.Label className={styles.formLabel}>Plan ID*</Form.Label>
+							<Form.Control
+								type='text'
+								value={planId}
+								readOnly
+								className={styles.formControl}
+							/>
+						</Form.Group>
+					</Col> */}
 					<Col xs={12}>
 						<Form.Group className={styles.marginBottom}>
 							<Form.Check

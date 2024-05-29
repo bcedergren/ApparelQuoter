@@ -1,16 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { signIn, signOut, useSession } from 'next-auth/react';
-import Link from 'next/link';
-import { Modal, Button } from 'react-bootstrap';
-import {
-	SlSettings,
-	SlTag,
-	SlBriefcase,
-	SlUser,
-	SlArrowDown,
-} from 'react-icons/sl';
-import { FaCaretDown } from 'react-icons/fa6';
-
+import { useRouter } from 'next/router';
+import { Navbar, Nav, NavDropdown, Modal, Button } from 'react-bootstrap';
+import { SlSettings, SlTag, SlBriefcase, SlUser } from 'react-icons/sl';
 import { CustomSession } from '@/types/CustomUser';
 import styles from '@/styles/AppHeader.module.css';
 
@@ -18,6 +10,7 @@ const Header = () => {
 	const { data: sessionData, status } = useSession();
 	const session = sessionData as CustomSession; // Use the extended session with type assertion
 	const loading = status === 'loading';
+	const router = useRouter();
 
 	const [showDropdown, setShowDropdown] = useState(false);
 	const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -34,105 +27,95 @@ const Header = () => {
 		setShowLogoutModal(true);
 	};
 
-	const confirmLogout = () => {
-		signOut();
+	const confirmLogout = async () => {
+		await signOut();
 		setShowLogoutModal(false);
+		router.push('/login');
 	};
 
 	const cancelLogout = () => {
 		setShowLogoutModal(false);
 	};
 
+	useEffect(() => {
+		// Redirect to login if session is null
+		if (status === 'unauthenticated') {
+			router.push('/login');
+		}
+	}, [status, router]);
+
 	return (
 		<>
-			<header className={styles.header}>
-				<div className={styles.container}>
-					<div className={styles.welcome}>
+			<Navbar
+				bg='light'
+				expand='lg'
+				className={styles.header}
+			>
+				<Navbar.Toggle aria-controls='basic-navbar-nav' />
+				<Navbar.Collapse id='basic-navbar-nav'>
+					<Nav className={styles.welcome}>
+						<Nav.Item>
+							{session ? (
+								<>
+									<span>
+										Welcome, {session.user?.firstName} {session.user?.lastName}!
+									</span>
+									{session.user?.email && <span> ({session.user.email})</span>}
+								</>
+							) : (
+								<span>Please log in</span>
+							)}
+						</Nav.Item>
+					</Nav>
+					<Nav className={styles.headerButtons}>
 						{session ? (
 							<>
-								<span>
-									Welcome, {session.user?.firstName} {session.user?.lastName}!
-								</span>
-								{session.user?.email && <span> ({session.user.email})</span>}
+								{session.user.role === 'admin' && (
+									<NavDropdown
+										title={
+											<span>
+												<SlSettings /> Settings
+											</span>
+										}
+										id='basic-nav-dropdown'
+										show={showDropdown}
+										onMouseEnter={toggleDropdown}
+										onMouseLeave={toggleDropdown}
+										className={styles.navLink}
+									>
+										<NavDropdown.Item href='/app/company'>
+											<SlBriefcase /> <span>Company</span>
+										</NavDropdown.Item>
+										<NavDropdown.Item href='/app/prices'>
+											<SlTag /> <span>Prices</span>
+										</NavDropdown.Item>
+										<NavDropdown.Item href='/app/users'>
+											<SlUser /> <span>Users</span>
+										</NavDropdown.Item>
+									</NavDropdown>
+								)}
+								<Nav.Item className='ml-3'>
+									<Button
+										onClick={handleLogout}
+										className={styles.navLink}
+									>
+										Logout
+									</Button>
+								</Nav.Item>
 							</>
 						) : (
-							<span>Please log in</span>
-						)}
-					</div>
-
-					<div className={styles.nav}>
-						{session && session.user.role === 'admin' && (
-							<div
-								className={styles.dropdownContainer}
-								onClick={handleDropdownClick}
-							>
-								<Button
-									variant='secondary'
-									id='dropdown-basic'
-									className={styles.navLink}
-									onClick={toggleDropdown}
-								>
-									<SlSettings /> Settings <FaCaretDown />
-								</Button>
-								{showDropdown && (
-									<ul className={styles.dropdownMenu}>
-										<li>
-											<Link
-												href='/app/company'
-												legacyBehavior
-												passHref
-											>
-												<a onClick={() => setShowDropdown(false)}>
-													<SlBriefcase /> <span>Company</span>
-												</a>
-											</Link>
-										</li>
-										<li>
-											<Link
-												href='/app/prices'
-												legacyBehavior
-												passHref
-											>
-												<a onClick={() => setShowDropdown(false)}>
-													<SlTag /> <span>Prices</span>
-												</a>
-											</Link>
-										</li>
-										<li>
-											<Link
-												href='/app/users'
-												legacyBehavior
-												passHref
-											>
-												<a onClick={() => setShowDropdown(false)}>
-													<SlUser /> <span>Users</span>
-												</a>
-											</Link>
-										</li>
-									</ul>
-								)}
-							</div>
-						)}
-
-						{!loading &&
-							(session ? (
-								<Button
-									onClick={handleLogout}
-									className={styles.navLink}
-								>
-									Logout
-								</Button>
-							) : (
+							<Nav.Item className='ml-auto'>
 								<Button
 									onClick={() => signIn()}
 									className={styles.navLink}
 								>
 									Login
 								</Button>
-							))}
-					</div>
-				</div>
-			</header>
+							</Nav.Item>
+						)}
+					</Nav>
+				</Navbar.Collapse>
+			</Navbar>
 
 			<Modal
 				show={showLogoutModal}

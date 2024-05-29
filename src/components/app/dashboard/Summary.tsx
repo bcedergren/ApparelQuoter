@@ -19,6 +19,10 @@ interface SummaryProps {
 }
 
 const Summary: React.FC<SummaryProps> = ({ data }) => {
+	if (!data || !Array.isArray(data)) {
+		return <p>No data available</p>;
+	}
+
 	const chartData = {
 		labels: data.map((quote) =>
 			quote.CreatedAt ? new Date(quote.CreatedAt).toLocaleDateString() : ''

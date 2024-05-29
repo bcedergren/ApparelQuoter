@@ -107,7 +107,7 @@ const SideNavigation: React.FC<SideNavigationProps> = ({
 				className={styles.navLink}
 			>
 				<div style={iconStyle}>
-					<SlCalculator /> {!collapsed && 'Quote'}
+					<SlCalculator /> {!collapsed && 'New Quote'}
 				</div>
 			</Nav.Link>
 			<Nav.Link

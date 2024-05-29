@@ -3,6 +3,7 @@ import styles from '@/styles/Pricing.module.css';
 
 const plans = [
 	{
+		id: 'price_1Ov16JLifuqhaGkV8cjqx4Gd',
 		name: 'Starter Plan',
 		price: '$9.99 /mo',
 		target:
@@ -15,6 +16,7 @@ const plans = [
 		],
 	},
 	{
+		id: 'price_1Ov160LifuqhaGkVZ7VNwASh',
 		name: 'Standard Plan',
 		price: '$19.99 /mo',
 		target:
@@ -29,6 +31,7 @@ const plans = [
 		],
 	},
 	{
+		id: 'price_1PJR5iLifuqhaGkVkngdP981',
 		name: 'Professional Plan',
 		price: '$49.99 /mo',
 		target:

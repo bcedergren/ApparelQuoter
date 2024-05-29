@@ -1,103 +1,33 @@
-/* App Header Styles */
 .header {
-	position: fixed;
-	top: 0;
-	width: 100%;
-	height: 75px;
-	background: #fff;
-	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-	z-index: 1000;
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	padding: 10px 20px;
-	box-sizing: border-box;
-}
-
-.container {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	max-width: 1200px;
-	margin: 0 auto;
-	width: 100%;
-}
-
-.welcome {
-	font-size: 16px;
-	color: #333;
-}
-
-.nav {
-	display: flex;
-	gap: 20px;
+	padding: 1rem 2rem;
+	background-color: #f8f9fa;
 }
 
 .navLink {
-	cursor: pointer;
-	font-size: 18px;
-	color: #fff;
-	text-decoration: none;
-	transition: color 0.3s;
+	margin-left: 1rem;
 }
 
-.navLink:hover {
-	background: #454444;
+.welcome {
+	margin-right: auto;
 }
 
-.dropdownContainer {
-	position: relative;
-}
-
-.dropdownMenu {
-	position: absolute;
-	top: 50px;
-	right: 0;
-	background-color: #fff;
-	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-	z-index: 1001;
-	list-style: none;
-	padding: 10px 0;
-	margin: 0;
-	border-radius: 4px;
-}
-
-.dropdownMenu li {
-	padding: 10px 20px;
-}
-
-.dropdownMenu li:hover {
-	background-color: #f1f1f1;
-}
-
-.dropdownMenu a {
-	color: #333;
-	text-decoration: none;
+.headerButtons {
 	display: flex;
 	align-items: center;
+	justify-content: flex-end;
 }
 
-.dropdownMenu a:hover {
-	color: #0666db;
-}
-
-.dropdownMenu a span {
-	margin-left: 5px;
-}
-
-/* Media query for small screens */
-@media (max-width: 768px) {
-	.nav {
-		display: none;
-	}
-
-	.dropdownMenu {
-		width: 100%;
-		right: 0;
-	}
-
-	.dropdownMenu a {
+@media (max-width: 767px) {
+	.welcome {
+		flex: 1 0 100%;
 		text-align: center;
+		margin-bottom: 1rem;
+	}
+	.headerButtons {
+		width: 100%;
 		justify-content: center;
 	}
 }
