@@ -50,7 +50,13 @@ const ForgotPasswordPage = () => {
 					>
 						<div>
 							<div className={styles.textCenter}>
-								<h1>ApparelQuoter</h1>
+								<Image
+									src='/logo.png'
+									alt='logo'
+									className={styles.logo}
+									height={50}
+									width={200}
+								/>
 							</div>
 							<div className={`${styles.title} ${styles.mt4}`}>
 								<h4>Forgot Password</h4>

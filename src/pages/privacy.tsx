@@ -1,6 +1,6 @@
 import { Container } from 'react-bootstrap';
 import Head from 'next/head';
-import Header from '@/components/public/Header';
+import GenericHeader from '@/components/public/GenericHeader';
 import Footer from '@/components/public/Footer';
 import styles from '@/styles/Privacy.module.css';
 
@@ -10,7 +10,7 @@ const Privacy = () => {
 			<Head>
 				<title>Privacy Policy - ApparelQuoter</title>
 			</Head>
-			<Header />
+			<GenericHeader />
 			<Container className={styles.privacyContainer}>
 				<h1>Privacy Policy</h1>
 				<p>Last updated: 6/1/2024</p>

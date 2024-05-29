@@ -207,7 +207,10 @@ const RegistrationForm = () => {
 								label={
 									<>
 										I Accept the{' '}
-										<Link href='/terms'>
+										<Link
+											href='/terms'
+											target='_blank'
+										>
 											<span className={styles.linkText}>
 												Terms And Conditions
 											</span>

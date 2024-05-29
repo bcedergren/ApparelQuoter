@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Container, Form, Button } from 'react-bootstrap';
 import Head from 'next/head';
-import Header from '@/components/public/Header';
+import GenericHeader from '@/components/public/GenericHeader';
 import Footer from '@/components/public/Footer';
 import styles from '@/styles/ContactUs.module.css';
 import ContactForm from '@/components/public/ContactForm';
@@ -40,7 +40,7 @@ const Contact = () => {
 			<Head>
 				<title>Contact Us - ApparelQuoter</title>
 			</Head>
-			<Header />
+			<GenericHeader />
 			<Container className={styles.contactContainer}>
 				<h1>Contact Us</h1>
 				<p>
