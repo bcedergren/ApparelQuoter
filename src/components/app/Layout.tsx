@@ -1,6 +1,7 @@
 import { ReactNode, useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import Header from '@/components/app/Header';
+import { useRouter } from 'next/router';
 import SideNavigation from './SideNavigation';
 import styles from '@/styles/Layout.module.css';
 import Footer from './Footer';
@@ -10,10 +11,19 @@ type LayoutProps = {
 };
 
 const Layout = ({ children }: LayoutProps) => {
-	const { data: session } = useSession();
+	const { data: session, status } = useSession();
 	const [collapsed, setCollapsed] = useState(false);
 	const [isMobile, setIsMobile] = useState(false);
 	const [showSidebar, setShowSidebar] = useState(false);
+
+	const router = useRouter();
+
+	useEffect(() => {
+		// Redirect to login if session is null
+		if (status === 'unauthenticated') {
+			router.push('/login');
+		}
+	}, [status, router]);
 
 	useEffect(() => {
 		const handleResize = () => {
