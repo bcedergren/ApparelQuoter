@@ -1,11 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import sgMail from '@sendgrid/mail';
 
 export default async function handler(
 	req: NextApiRequest,
 	res: NextApiResponse
 ) {
 	if (req.method !== 'POST') {
+		console.log(`Method ${req.method} Not Allowed`);
 		res.setHeader('Allow', ['POST']);
 		return res.status(405).end(`Method ${req.method} Not Allowed`);
 	}
@@ -13,28 +13,64 @@ export default async function handler(
 	const { name, email, message } = req.body;
 
 	if (!name || !email || !message) {
+		console.log('Missing required fields:', { name, email, message });
 		return res.status(400).json({ message: 'All fields are required' });
 	}
 
 	try {
-		// Set SendGrid API key
-		sgMail.setApiKey(process.env.SENDGRID_API_KEY as string);
+		// Verify environment variables
+		console.log('Environment Variables:', {
+			NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
+			EMAIL_FROM: process.env.CONTACT_EMAIL,
+			CONTACT_EMAIL: process.env.CONTACT_EMAIL,
+		});
 
-		const msg = {
-			to: process.env.CONTACT_EMAIL,
-			from: process.env.SENDGRID_FROM_EMAIL as string,
-			subject: `Contact Form Submission from ${name}`,
-			html: `<p><strong>Name:</strong> ${name}</p>
-				   <p><strong>Email:</strong> ${email}</p>
-				   <p><strong>Message:</strong> ${message}</p>`,
-		};
+		// Use absolute URL for the mailer API
+		const mailerUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/mailer`;
 
-		// Send the email
-		await sgMail.send(msg);
+		console.log('Sending request to mailer API:', {
+			mailerUrl,
+			payload: {
+				from: process.env.CONTACT_EMAIL,
+				to: process.env.CONTACT_EMAIL,
+				subject: `Contact Form Submission from ${name}`,
+				html: `<p><strong>Name:</strong> ${name}</p>
+					   <p><strong>Email:</strong> ${email}</p>
+					   <p><strong>Message:</strong> ${message}</p>`,
+			},
+		});
 
+		// Send a request to the generic mailer API
+		const response = await fetch(mailerUrl, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				from: process.env.CONTACT_EMAIL,
+				to: process.env.CONTACT_EMAIL,
+				subject: `Contact Form Submission from ${name}`,
+				html: `<p><strong>Name:</strong> ${name}</p>
+					   <p><strong>Email:</strong> ${email}</p>
+					   <p><strong>Message:</strong> ${message}</p>`,
+			}),
+		});
+
+		if (!response.ok) {
+			const errorText = await response.text();
+			console.error(
+				'Failed to send message:',
+				response.status,
+				response.statusText,
+				errorText
+			);
+			throw new Error(`Failed to send message: ${response.statusText}`);
+		}
+
+		console.log('Message sent successfully');
 		res.status(200).json({ message: 'Message sent successfully' });
 	} catch (error) {
-		console.error(`Error sending message: ${error}`);
+		console.error('Error sending message:', error);
 		res.status(500).json({ message: 'Internal server error' });
 	}
 }

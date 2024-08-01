@@ -11,13 +11,6 @@ export default NextAuth({
 		GoogleProvider({
 			clientId: process.env.GOOGLE_CLIENT_ID as string,
 			clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-			authorization: {
-				params: {
-					prompt: 'consent',
-					access_type: 'offline',
-					response_type: 'code',
-				},
-			},
 		}),
 		FacebookProvider({
 			clientId: process.env.FACEBOOK_CLIENT_ID as string,
@@ -35,23 +28,33 @@ export default NextAuth({
 				rememberMe: { label: 'Remember me', type: 'checkbox' },
 			},
 			async authorize(credentials) {
+				console.log('Authorize credentials:', credentials);
+
 				if (!credentials || !credentials.email || !credentials.password) {
 					throw new Error('Credentials must be provided');
 				}
 
 				const { db } = await connectToDatabase();
 				const userDocument = (await db
-					.collection('User')
+					.collection('users')
 					.findOne({ email: credentials.email })) as CustomUser | null;
 
 				if (!userDocument) {
 					throw new Error('No user found with the email');
 				}
 
+				console.log('User Document:', userDocument);
+
+				if (!userDocument.password) {
+					throw new Error('User does not have a password set');
+				}
+
 				const isValid = await verifyPassword(
 					credentials.password,
-					userDocument.password!
+					userDocument.password
 				);
+				console.log('Password valid:', isValid);
+
 				if (!isValid) {
 					throw new Error('Password is incorrect');
 				}
@@ -60,32 +63,20 @@ export default NextAuth({
 					id: userDocument._id.toString(),
 					_id: userDocument._id.toString(),
 					email: userDocument.email,
-					firstName: userDocument.firstName,
-					lastName: userDocument.lastName,
-					companyId: userDocument.companyId.toString(),
-					role: userDocument.role,
+					firstName: userDocument.firstName || '',
+					lastName: userDocument.lastName || '',
+					companyId: userDocument.companyId?.toString() || '',
+					role: userDocument.role || '',
 					rememberMe: credentials.rememberMe === 'true',
-					stripeCustomerId: userDocument.stripeCustomerId,
-					isActive: userDocument.isActive,
-					subscriptionId: userDocument.subscriptionId,
+					stripeCustomerId: userDocument.stripeCustomerId || '',
+					isActive:
+						userDocument.isActive !== null ? userDocument.isActive : false,
+					subscriptionId: userDocument.subscriptionId || '',
 				} as CustomUser;
 			},
 		}),
 	],
 	callbacks: {
-		async session({ session, token }) {
-			const customSession = session as CustomSession;
-			customSession.user.id = token.id as string;
-			customSession.user.firstName = token.firstName as string;
-			customSession.user.lastName = token.lastName as string;
-			customSession.user.companyId = token.companyId as string;
-			customSession.user.role = token.role as string;
-			customSession.user.rememberMe = token.rememberMe as boolean;
-			customSession.user.stripeCustomerId = token.stripeCustomerId as string;
-			customSession.user.subscriptionId = token.subscriptionId as string;
-			customSession.user.isActive = token.isActive as boolean;
-			return customSession;
-		},
 		async jwt({ token, user }) {
 			if (user) {
 				const customUser = user as CustomUser;
@@ -102,8 +93,40 @@ export default NextAuth({
 				token.expiration = customUser.rememberMe
 					? Date.now() + 30 * 24 * 60 * 60 * 1000
 					: Date.now() + 2 * 60 * 60 * 1000;
+
+				const { db } = await connectToDatabase();
+				const existingUser = await db
+					.collection('users')
+					.findOne({ email: customUser.email });
+
+				if (!existingUser) {
+					await db.collection('users').insertOne({
+						email: customUser.email,
+						firstName: customUser.firstName,
+						lastName: customUser.lastName,
+						companyId: customUser.companyId,
+						role: customUser.role,
+						stripeCustomerId: customUser.stripeCustomerId,
+						isActive: customUser.isActive,
+						subscriptionId: customUser.subscriptionId,
+						createdAt: new Date(),
+					});
+				}
 			}
 			return token as CustomJWT;
+		},
+		async session({ session, token }) {
+			const customSession = session as CustomSession;
+			customSession.user.id = token.id as string;
+			customSession.user.firstName = token.firstName as string;
+			customSession.user.lastName = token.lastName as string;
+			customSession.user.companyId = token.companyId as string;
+			customSession.user.role = token.role as string;
+			customSession.user.rememberMe = token.rememberMe as boolean;
+			customSession.user.stripeCustomerId = token.stripeCustomerId as string;
+			customSession.user.subscriptionId = token.subscriptionId as string;
+			customSession.user.isActive = token.isActive as boolean;
+			return customSession;
 		},
 	},
 	pages: {

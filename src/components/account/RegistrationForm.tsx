@@ -1,10 +1,11 @@
-import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
+import { useState, useEffect, FormEvent } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { Form, Button, Row, Col, Alert } from 'react-bootstrap';
 import Icon from '@mdi/react';
 import { mdiFacebook, mdiGoogle, mdiHome } from '@mdi/js';
 import { Elements, useStripe, useElements } from '@stripe/react-stripe-js';
+import { signIn, useSession } from 'next-auth/react';
 import axios from 'axios';
 import { getStripe } from '@/lib/stripe';
 import styles from '@/styles/Register.module.css';
@@ -20,10 +21,12 @@ const RegistrationForm = () => {
 	const [termsAccepted, setTermsAccepted] = useState(false);
 	const [error, setError] = useState('');
 	const [loading, setLoading] = useState(false);
+	const [isGoogleAuthenticated, setIsGoogleAuthenticated] = useState(false);
 
 	const stripe = useStripe();
 	const elements = useElements();
 	const router = useRouter();
+	const { data: session, status } = useSession();
 
 	useEffect(() => {
 		// Extract planId from query parameters
@@ -31,7 +34,35 @@ const RegistrationForm = () => {
 		if (planId) {
 			setPlanId(planId as string);
 		}
-	}, [router.query]);
+
+		// Handle Google sign-in and capture the session data
+		if (status === 'authenticated' && session?.user?.email) {
+			setIsGoogleAuthenticated(true);
+			setEmail(session.user.email);
+			const nameParts = session.user.name ? session.user.name.split(' ') : [];
+			setFirstName(nameParts[0] || '');
+			setLastName(nameParts[1] || '');
+		}
+	}, [router.query, status, session]);
+
+	const handleGoogleSignIn = async (session: any) => {
+		setLoading(true);
+
+		try {
+			console.log(session.user);
+			// Wait for additional form submission to capture company name
+		} catch (err) {
+			if (axios.isAxiosError(err)) {
+				setError(err.response?.data?.error || 'An unexpected error occurred.');
+			} else if (err instanceof Error) {
+				setError(err.message);
+			} else {
+				setError('An unexpected error occurred.');
+			}
+		} finally {
+			setLoading(false);
+		}
+	};
 
 	const isPasswordStrong = (password: string) => {
 		const strongPasswordPattern =
@@ -47,22 +78,22 @@ const RegistrationForm = () => {
 			!lastName ||
 			!companyName ||
 			!email ||
-			!password ||
-			!confirmPassword ||
+			(!password && !isGoogleAuthenticated) ||
+			(!confirmPassword && !isGoogleAuthenticated) ||
 			!planId
 		) {
 			setError('All fields are required.');
 			return;
 		}
 
-		if (!isPasswordStrong(password)) {
+		if (!isGoogleAuthenticated && !isPasswordStrong(password)) {
 			setError(
 				'Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.'
 			);
 			return;
 		}
 
-		if (password !== confirmPassword) {
+		if (!isGoogleAuthenticated && password !== confirmPassword) {
 			setError('Passwords do not match');
 			return;
 		}
@@ -80,7 +111,7 @@ const RegistrationForm = () => {
 				lastName,
 				companyName,
 				email,
-				password,
+				password: isGoogleAuthenticated ? undefined : password,
 				planId,
 			});
 
@@ -107,32 +138,40 @@ const RegistrationForm = () => {
 			{error && <Alert variant='danger'>{error}</Alert>}
 			<Form onSubmit={handleSubmit}>
 				<Row>
-					<Col md={6}>
-						<Form.Group className={styles.marginBottom}>
-							<Form.Label className={styles.formLabel}>First Name*</Form.Label>
-							<Form.Control
-								type='text'
-								value={firstName}
-								onChange={(e) => setFirstName(e.target.value)}
-								required
-								placeholder='First Name'
-								className={styles.formControl}
-							/>
-						</Form.Group>
-					</Col>
-					<Col md={6}>
-						<Form.Group className={styles.marginBottom}>
-							<Form.Label className={styles.formLabel}>Last Name*</Form.Label>
-							<Form.Control
-								type='text'
-								value={lastName}
-								onChange={(e) => setLastName(e.target.value)}
-								required
-								placeholder='Last Name'
-								className={styles.formControl}
-							/>
-						</Form.Group>
-					</Col>
+					{!isGoogleAuthenticated && (
+						<>
+							<Col md={6}>
+								<Form.Group className={styles.marginBottom}>
+									<Form.Label className={styles.formLabel}>
+										First Name*
+									</Form.Label>
+									<Form.Control
+										type='text'
+										value={firstName}
+										onChange={(e) => setFirstName(e.target.value)}
+										required
+										placeholder='First Name'
+										className={styles.formControl}
+									/>
+								</Form.Group>
+							</Col>
+							<Col md={6}>
+								<Form.Group className={styles.marginBottom}>
+									<Form.Label className={styles.formLabel}>
+										Last Name*
+									</Form.Label>
+									<Form.Control
+										type='text'
+										value={lastName}
+										onChange={(e) => setLastName(e.target.value)}
+										required
+										placeholder='Last Name'
+										className={styles.formControl}
+									/>
+								</Form.Group>
+							</Col>
+						</>
+					)}
 					<Col xs={12}>
 						<Form.Group className={styles.marginBottom}>
 							<Form.Label className={styles.formLabel}>
@@ -148,58 +187,55 @@ const RegistrationForm = () => {
 							/>
 						</Form.Group>
 					</Col>
-					<Col xs={12}>
-						<Form.Group className={styles.marginBottom}>
-							<Form.Label className={styles.formLabel}>Your Email*</Form.Label>
-							<Form.Control
-								type='email'
-								value={email}
-								onChange={(e) => setEmail(e.target.value)}
-								required
-								placeholder='Email'
-								className={styles.formControl}
-							/>
-						</Form.Group>
-					</Col>
-					<Col xs={12}>
-						<Form.Group className={styles.marginBottom}>
-							<Form.Label className={styles.formLabel}>Password*</Form.Label>
-							<Form.Control
-								type='password'
-								value={password}
-								onChange={(e) => setPassword(e.target.value)}
-								required
-								placeholder='Password'
-								className={styles.formControl}
-							/>
-						</Form.Group>
-					</Col>
-					<Col xs={12}>
-						<Form.Group className={styles.marginBottom}>
-							<Form.Label className={styles.formLabel}>
-								Confirm Password*
-							</Form.Label>
-							<Form.Control
-								type='password'
-								value={confirmPassword}
-								onChange={(e) => setConfirmPassword(e.target.value)}
-								required
-								placeholder='Confirm Password'
-								className={styles.formControl}
-							/>
-						</Form.Group>
-					</Col>
-					{/* <Col xs={12}>
-						<Form.Group className={styles.marginBottom}>
-							<Form.Label className={styles.formLabel}>Plan ID*</Form.Label>
-							<Form.Control
-								type='text'
-								value={planId}
-								readOnly
-								className={styles.formControl}
-							/>
-						</Form.Group>
-					</Col> */}
+					{!isGoogleAuthenticated && (
+						<>
+							<Col xs={12}>
+								<Form.Group className={styles.marginBottom}>
+									<Form.Label className={styles.formLabel}>
+										Your Email*
+									</Form.Label>
+									<Form.Control
+										type='email'
+										value={email}
+										onChange={(e) => setEmail(e.target.value)}
+										required
+										placeholder='Email'
+										className={styles.formControl}
+									/>
+								</Form.Group>
+							</Col>
+							<Col xs={12}>
+								<Form.Group className={styles.marginBottom}>
+									<Form.Label className={styles.formLabel}>
+										Password*
+									</Form.Label>
+									<Form.Control
+										type='password'
+										value={password}
+										onChange={(e) => setPassword(e.target.value)}
+										required
+										placeholder='Password'
+										className={styles.formControl}
+									/>
+								</Form.Group>
+							</Col>
+							<Col xs={12}>
+								<Form.Group className={styles.marginBottom}>
+									<Form.Label className={styles.formLabel}>
+										Confirm Password*
+									</Form.Label>
+									<Form.Control
+										type='password'
+										value={confirmPassword}
+										onChange={(e) => setConfirmPassword(e.target.value)}
+										required
+										placeholder='Confirm Password'
+										className={styles.formControl}
+									/>
+								</Form.Group>
+							</Col>
+						</>
+					)}
 					<Col xs={12}>
 						<Form.Group className={styles.marginBottom}>
 							<Form.Check
@@ -234,56 +270,60 @@ const RegistrationForm = () => {
 						</Button>
 					</Col>
 				</Row>
-				<div className={`${styles.orRegisterWith} ${styles.marginTop}`}>
-					<h4>Or Register With</h4>
-				</div>
-				<Row className={styles.marginTop}>
-					<Col
-						sm={6}
-						className={styles.marginBottom}
-					>
-						<Button
-							variant='light'
-							className={styles.socialButton}
-						>
-							<Icon
-								path={mdiFacebook}
-								size={1}
-								color='blue'
-								className={styles.socialIcon}
-							/>{' '}
-							Facebook
-						</Button>
-					</Col>
-					<Col
-						sm={6}
-						className={styles.marginBottom}
-					>
-						<Button
-							variant='light'
-							className={styles.socialButton}
-						>
-							<Icon
-								path={mdiGoogle}
-								size={1}
-								color='red'
-								className={styles.socialIcon}
-							/>{' '}
-							Google
-						</Button>
-					</Col>
-				</Row>
-				<Row>
-					<Col className='text-center'>
-						<small className='text-dark me-2'>Already have an account?</small>
-						<Link
-							href='/login'
-							className={styles.boldText}
-						>
-							Login
-						</Link>
-					</Col>
-				</Row>
+				{!isGoogleAuthenticated && (
+					<div className={`${styles.orRegisterWith} ${styles.marginTop}`}>
+						<h4>Or Register With</h4>
+						<Row className={styles.marginTop}>
+							<Col
+								sm={6}
+								className={styles.marginBottom}
+							>
+								<Button
+									variant='light'
+									className={styles.socialButton}
+									onClick={() => signIn('facebook')}
+								>
+									<Icon
+										path={mdiFacebook}
+										size={1}
+										color='blue'
+										className={styles.socialIcon}
+									/>{' '}
+									Facebook
+								</Button>
+							</Col>
+							<Col
+								sm={6}
+								className={styles.marginBottom}
+							>
+								<Button
+									variant='light'
+									className={styles.socialButton}
+									onClick={() => signIn('google')}
+								>
+									<Icon
+										path={mdiGoogle}
+										size={1}
+										color='red'
+										className={styles.socialIcon}
+									/>{' '}
+									Google
+								</Button>
+							</Col>
+							<Col className='text-center'>
+								<small className='text-dark me-2'>
+									Already have an account?
+								</small>
+								<Link
+									href='/login'
+									className={styles.boldText}
+								>
+									Login
+								</Link>
+							</Col>
+						</Row>
+					</div>
+				)}
 				<div className={`${styles.homeButton} ${styles.marginTop}`}>
 					<Link
 						href='/'

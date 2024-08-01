@@ -17,10 +17,13 @@ const LoginForm = () => {
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 
+		console.log('Login credentials:', { email, password, rememberMe });
+
 		const result = await signIn('credentials', {
 			redirect: false,
 			email,
 			password,
+			rememberMe: rememberMe.toString(),
 		});
 
 		if (result?.error) {
@@ -86,6 +89,7 @@ const LoginForm = () => {
 					<Button
 						variant='light'
 						className={styles.socialButton}
+						onClick={() => signIn('facebook')}
 					>
 						<Icon
 							path={mdiFacebook}
@@ -98,6 +102,7 @@ const LoginForm = () => {
 					<Button
 						variant='light'
 						className={styles.socialButton}
+						onClick={() => signIn('google')}
 					>
 						<Icon
 							path={mdiGoogle}

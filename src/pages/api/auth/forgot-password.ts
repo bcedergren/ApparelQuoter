@@ -57,7 +57,7 @@ export default async function handler(
 	try {
 		const { db } = await connectToDatabase();
 		const user = await db
-			.collection('User')
+			.collection('users')
 			.findOne({ email: { $regex: new RegExp(`^${email}$`, 'i') } });
 
 		if (!user) {

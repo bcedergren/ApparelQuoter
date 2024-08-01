@@ -10,19 +10,26 @@ export default async function handler(
 	const { email, password, firstName, lastName, companyName, planId } =
 		req.body;
 
+	if (!planId) {
+		return res.status(400).json({ error: 'Plan ID is required' });
+	}
+
 	try {
 		console.log('Connecting to database...');
 		const { db } = await connectToDatabase();
 
 		console.log('Checking for existing user...');
-		const existingUser = await db.collection('User').findOne({ email });
+		const existingUser = await db.collection('Users').findOne({ email });
 		if (existingUser) {
 			console.log('User already exists');
 			return res.status(409).json({ error: 'User already exists' });
 		}
 
-		console.log('Hashing password...');
-		const hashedPassword = await hashPassword(password);
+		let hashedPassword = password;
+		if (password) {
+			console.log('Hashing password...');
+			hashedPassword = await hashPassword(password);
+		}
 
 		console.log('Creating Stripe customer...');
 		const customer = await stripe.customers.create({
@@ -60,7 +67,7 @@ export default async function handler(
 			role: 'admin',
 		};
 
-		const userResult = await db.collection('User').insertOne(newUser);
+		const userResult = await db.collection('Users').insertOne(newUser);
 
 		console.log('User created successfully');
 		res.status(201).json({

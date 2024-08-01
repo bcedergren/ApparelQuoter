@@ -2,7 +2,7 @@ import { getServerSession } from 'next-auth';
 import { NextRequest, NextResponse } from 'next/server';
 import authOptions from '@/pages/api/auth/[...nextauth]';
 import Stripe from 'stripe';
-import { CustomSession } from '@/types/CustomUser'; // Ensure this is the correct path
+import { CustomSession } from '@/types/CustomUser';
 
 export async function POST(req: NextRequest) {
 	const body = await req.json();

@@ -1,24 +1,15 @@
-// src/lib/password.ts
+import bcrypt from 'bcryptjs';
 
-let bcrypt: typeof import('bcrypt');
-if (typeof window === 'undefined') {
-	bcrypt = require('bcrypt');
-}
-
+// Function to hash the password
 export const hashPassword = async (password: string): Promise<string> => {
-	if (!bcrypt) {
-		throw new Error('bcrypt is not available on the client side');
-	}
 	const salt = await bcrypt.genSalt(10);
 	return await bcrypt.hash(password, salt);
 };
 
-export const verifyPassword = async (
+// Function to verify the password against the hashed password
+export async function verifyPassword(
 	password: string,
 	hashedPassword: string
-): Promise<boolean> => {
-	if (!bcrypt) {
-		throw new Error('bcrypt is not available on the client side');
-	}
-	return await bcrypt.compare(password, hashedPassword);
-};
+): Promise<boolean> {
+	return bcrypt.compare(password, hashedPassword);
+}
