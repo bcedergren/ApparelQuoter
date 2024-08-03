@@ -36,7 +36,7 @@ export default NextAuth({
 
 				const { db } = await connectToDatabase();
 				const userDocument = (await db
-					.collection('users')
+					.collection('Users')
 					.findOne({ email: credentials.email })) as CustomUser | null;
 
 				if (!userDocument) {

@@ -66,8 +66,6 @@ export default async function handler(
 			);
 			throw new Error(`Failed to send message: ${response.statusText}`);
 		}
-
-		console.log('Message sent successfully');
 		res.status(200).json({ message: 'Message sent successfully' });
 	} catch (error) {
 		console.error('Error sending message:', error);

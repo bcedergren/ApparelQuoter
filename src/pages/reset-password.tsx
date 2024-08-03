@@ -1,5 +1,5 @@
-// src/pages/forgot-password.tsx
 import { useState, FormEvent } from 'react';
+import { useRouter } from 'next/router';
 import { Form, Button, Container, Row, Col, Alert } from 'react-bootstrap';
 import Link from 'next/link';
 import styles from '@/styles/ForgotPassword.module.css';
@@ -7,43 +7,62 @@ import Icon from '@mdi/react';
 import { mdiHome } from '@mdi/js';
 import AccountLayout from '@/components/account/AccountLayout';
 import Image from 'next/image';
-import forgotPasswordImage from '../../public/forgotPassword.png';
+import resetPasswordImage from '../../public/resetPassword.png';
 
-const ForgotPasswordPage = () => {
-	const [email, setEmail] = useState('');
+const ResetPasswordPage = () => {
+	const router = useRouter();
+	const { token } = router.query;
+
+	const [password, setPassword] = useState('');
+	const [confirmPassword, setConfirmPassword] = useState('');
 	const [alert, setAlert] = useState<{ type: string; message: string } | null>(
 		null
 	);
+	const [isSuccess, setIsSuccess] = useState(false);
 
 	const handleSubmit = async (e: FormEvent) => {
 		e.preventDefault();
 
+		console.log('Submitting reset password form');
+		if (password !== confirmPassword) {
+			setAlert({ type: 'danger', message: 'Passwords do not match.' });
+			console.error('Passwords do not match');
+			return;
+		}
+
 		// Show the success message immediately
 		setAlert({ type: 'info', message: 'Processing your request...' });
+		console.log('Processing request...');
 
 		try {
-			const res = await fetch('/api/auth/forgot-password', {
+			const res = await fetch('/api/auth/reset-password', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
 				},
-				body: JSON.stringify({ email }),
+				body: JSON.stringify({ token, password }),
 			});
 			const data = await res.json();
 
 			if (!res.ok) {
-				throw new Error(data.message || 'Failed to send reset link.');
+				throw new Error(data.message || 'Failed to reset password.');
 			}
 
+			setIsSuccess(true);
 			setAlert({
 				type: 'success',
-				message: 'Reset link sent! Please check your email.',
+				message:
+					'Password reset successfully. You can now log in with your new password.',
 			});
+			setPassword('');
+			setConfirmPassword('');
+			console.log('Password reset successfully');
 		} catch (err) {
 			setAlert({
 				type: 'danger',
-				message: 'Failed to send reset link. Please try again.',
+				message: 'Failed to reset password. Please try again.',
 			});
+			console.error('Failed to reset password', err);
 		}
 	};
 
@@ -67,32 +86,56 @@ const ForgotPasswordPage = () => {
 								/>
 							</div>
 							<div className={`${styles.title} ${styles.mt4}`}>
-								<h4>Forgot Password</h4>
+								<h4>Reset Password</h4>
 							</div>
 							<p className={styles.description}>
-								Enter your email address to receive a password reset link.
+								Enter your new password below.
 							</p>
 							<Form onSubmit={handleSubmit}>
 								<Form.Group className={styles.formGroup}>
 									<Form.Label className={styles.formLabel}>
-										Email Address
+										New Password
 									</Form.Label>
 									<Form.Control
-										type='email'
-										value={email}
-										onChange={(e) => setEmail(e.target.value)}
+										type='password'
+										value={password}
+										onChange={(e) => setPassword(e.target.value)}
 										required
 										className={styles.formControl}
-										placeholder='Enter your email'
+										placeholder='Enter new password'
+									/>
+								</Form.Group>
+								<Form.Group className={styles.formGroup}>
+									<Form.Label className={styles.formLabel}>
+										Confirm Password
+									</Form.Label>
+									<Form.Control
+										type='password'
+										value={confirmPassword}
+										onChange={(e) => setConfirmPassword(e.target.value)}
+										required
+										className={styles.formControl}
+										placeholder='Confirm new password'
 									/>
 								</Form.Group>
 								<Button
 									type='submit'
 									className={styles.btnPrimary}
 								>
-									Send Reset Link
+									Reset Password
 								</Button>
 								{alert && <Alert variant={alert.type}>{alert.message}</Alert>}
+								{isSuccess && (
+									<div className={styles.textCenter}>
+										<Link
+											href='/login'
+											legacyBehavior
+										>
+											<a>Log in</a>
+										</Link>{' '}
+										with your new password.
+									</div>
+								)}
 							</Form>
 							<div className={`${styles.textCenter} ${styles.mt4}`}>
 								<Link
@@ -114,11 +157,11 @@ const ForgotPasswordPage = () => {
 						className={styles.imageCol}
 					>
 						<Image
-							src={forgotPasswordImage}
-							alt='Forgot Password Image'
+							src={resetPasswordImage}
+							alt='Reset Password Image'
 							className={styles.forgotPasswordImage}
-							width={600}
-							height={600}
+							width={800}
+							height={800}
 						/>
 					</Col>
 				</Row>
@@ -127,4 +170,4 @@ const ForgotPasswordPage = () => {
 	);
 };
 
-export default ForgotPasswordPage;
+export default ResetPasswordPage;

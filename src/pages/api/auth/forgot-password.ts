@@ -1,73 +1,102 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { connectToDatabase } from '@/utils/dbConnect';
-import { v4 as uuidv4 } from 'uuid';
-import sgMail from '@sendgrid/mail';
+import jwt from 'jsonwebtoken';
+import { readFile } from 'fs/promises';
+import { resolve } from 'path';
+import clientPromise from '@/lib/mongodb';
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
-
-const sendEmailWithSendGrid = async (
+const sendEmailViaMailerAPI = async (
 	email: string,
-	resetUrl: string,
-	retries: number = 0
+	resetUrl: string
 ): Promise<void> => {
-	const fromEmail = process.env.SENDGRID_FROM_EMAIL;
+	// Path to the email template file
+	const templatePath = resolve('public/emails/passwordResetTemplate.html');
 
-	if (!fromEmail) {
-		throw new Error('SENDGRID_FROM_EMAIL environment variable is not set');
+	let emailTemplate;
+	try {
+		// Read the email template file
+		emailTemplate = await readFile(templatePath, 'utf8');
+	} catch (error) {
+		console.error('Error reading email template:', error);
+		throw new Error('Failed to read email template.');
 	}
 
-	const msg = {
+	// Insert the reset URL into the email template
+	const emailHtml = emailTemplate.replace('{{resetUrl}}', resetUrl);
+
+	const payload = {
+		from: process.env.EMAIL_FROM,
 		to: email,
-		from: fromEmail,
 		subject: 'Password Reset',
-		html: `<p>You requested a password reset</p><p>Click <a href="${resetUrl}">here</a> to reset your password</p>`,
+		html: emailHtml,
 	};
 
 	try {
-		await sgMail.send(msg);
-	} catch (error) {
-		if (retries < MAX_RETRIES) {
-			console.warn(`Retrying email send (${retries + 1}/${MAX_RETRIES})...`);
-			await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY));
-			await sendEmailWithSendGrid(email, resetUrl, retries + 1);
-		} else {
-			throw error;
+		const response = await fetch(
+			`${process.env.NEXT_PUBLIC_BASE_URL}/api/mailer`,
+			{
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(payload),
+			}
+		);
+
+		if (!response.ok) {
+			const errorText = await response.text();
+			throw new Error(
+				`Failed to send email: ${response.statusText} - ${errorText}`
+			);
 		}
+
+		console.log(`Email sent successfully to ${email}`);
+	} catch (error) {
+		console.error('Error sending email:', error);
+		throw new Error('Failed to send email.');
 	}
 };
 
-const MAX_RETRIES = 3;
-const RETRY_DELAY = 5000; // 5 seconds
-
+// Handler for the password reset request
 export default async function handler(
 	req: NextApiRequest,
 	res: NextApiResponse
 ) {
 	if (req.method !== 'POST') {
 		res.setHeader('Allow', ['POST']);
+		console.log(`Method ${req.method} Not Allowed`);
 		return res.status(405).end(`Method ${req.method} Not Allowed`);
 	}
 
 	const { email } = req.body;
 
 	if (!email) {
+		console.error('Email is required');
 		return res.status(400).json({ message: 'Email is required' });
 	}
 
 	try {
-		const { db } = await connectToDatabase();
-		const user = await db
-			.collection('users')
-			.findOne({ email: { $regex: new RegExp(`^${email}$`, 'i') } });
+		const client = await clientPromise;
+		const db = client.db();
+		console.log('Connected to database');
+
+		const user = await db.collection('Users').findOne({
+			email: { $regex: new RegExp(`^${email}$`, 'i') },
+		});
 
 		if (!user) {
-			return res.status(404).json({ message: 'User not found' });
+			// Return success message even if user is not found to prevent email enumeration
+			console.log(`No user found with email ${email}`);
+			return res
+				.status(200)
+				.json({ message: 'If the email exists, a reset link has been sent' });
 		}
 
-		const resetToken = uuidv4();
+		const resetToken = jwt.sign({ email }, process.env.JWT_SECRET!, {
+			expiresIn: '1h',
+		});
 		const resetTokenExpiry = Date.now() + 3600000; // 1 hour
 
-		await db.collection('User').updateOne(
+		await db.collection('Users').updateOne(
 			{ email: { $regex: new RegExp(`^${email}$`, 'i') } },
 			{
 				$set: {
@@ -77,11 +106,14 @@ export default async function handler(
 			}
 		);
 
-		const resetUrl = `${process.env.NEXTAUTH_URL}/reset-password?token=${resetToken}&email=${email}`;
+		// Generate the correct reset URL
+		const resetUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/reset-password?token=${resetToken}`;
 
-		await sendEmailWithSendGrid(email, resetUrl);
+		await sendEmailViaMailerAPI(email, resetUrl);
 
-		res.status(200).json({ message: 'Reset link sent' });
+		res
+			.status(200)
+			.json({ message: 'If the email exists, a reset link has been sent' });
 	} catch (error) {
 		console.error(`Error during password reset process: ${error}`);
 		res.status(500).json({ message: 'Internal server error' });
