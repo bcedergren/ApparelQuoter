@@ -11,6 +11,7 @@ import {
 	Table,
 } from 'react-bootstrap';
 import { SlPlus, SlPencil, SlTrash } from 'react-icons/sl';
+import { ToastContainer, toast } from 'react-toastify';
 import Layout from '@/components/app/Layout';
 import AddEditCustomerModal from '@/components/app/AddEditCustomerModal';
 import DeleteConfirmationModal from '@/components/app/DeleteConfirmationModal';
@@ -89,12 +90,16 @@ const Customers: NextPage = () => {
 			const responseData = await response.json();
 			if (response.ok) {
 				setSuccessMessage('Customer saved successfully.');
+				toast.success(successMessage);
 				fetchCustomers(); // Refresh the customer list
 			} else {
+				setError(responseData.message || 'Failed to save customer.');
+				toast.error(error);
 				throw new Error(responseData.message || 'Failed to save customer.');
 			}
 		} catch (error) {
 			setError(error instanceof Error ? error.message : 'An error occurred');
+			toast.error('An error occurred');
 		} finally {
 			setIsLoading(false);
 		}

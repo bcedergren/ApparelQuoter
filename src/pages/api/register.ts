@@ -4,6 +4,7 @@ import dbConnect from '@/utils/dbConnect';
 import stripe from '@/lib/stripe';
 import User from '@/models/User';
 import Company from '@/models/Company';
+import Price from '@/models/Price';
 
 export default async function handler(
 	req: NextApiRequest,
@@ -49,6 +50,11 @@ export default async function handler(
 		const newCompany = new Company({
 			name: companyName,
 			createdBy: email,
+		});
+
+		console.log('Creating prices...');
+		const newPrice = new Price({
+			companyId: newCompany._id,
 		});
 
 		const companyResult = await newCompany.save();

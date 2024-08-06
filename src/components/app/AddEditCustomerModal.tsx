@@ -68,126 +68,150 @@ const AddEditCustomerModal: FC<AddEditCustomerModalProps> = ({
 			<Modal.Body>
 				<Form>
 					{/* Company Name */}
-					<Form.Group className='mb-3'>
-						<Form.Label>Company Name</Form.Label>
+					<Form.Group className='form-floating mb-3'>
 						<Form.Control
 							type='text'
+							id='companyName'
 							name='companyName'
+							placeholder='Company Name'
 							value={customerData.companyName}
 							onChange={handleChange}
 							required
 						/>
+						<Form.Label htmlFor='companyName'>Company Name</Form.Label>
 					</Form.Group>
 
 					{/* Contact Name */}
-					<Form.Group className='mb-3'>
-						<Form.Label>Contact Name</Form.Label>
+					<Form.Group className='form-floating mb-3'>
 						<Form.Control
 							type='text'
+							id='contactName'
 							name='contactName'
+							placeholder='Contact Name'
 							value={customerData.contactName}
 							onChange={handleChange}
 							required
 						/>
+						<Form.Label htmlFor='contactName'>Contact Name</Form.Label>
 					</Form.Group>
 
 					{/* Address */}
-					<Form.Group className='mb-3'>
-						<Form.Label>Address</Form.Label>
+					<Form.Group className='form-floating mb-3'>
 						<Form.Control
 							type='text'
+							id='address'
 							name='address'
+							placeholder='Address'
 							value={customerData.address}
 							onChange={handleChange}
 						/>
+						<Form.Label htmlFor='address'>Address</Form.Label>
 					</Form.Group>
 
 					{/* Address 2 */}
-					<Form.Group className='mb-3'>
-						<Form.Label>Address 2</Form.Label>
+					<Form.Group className='form-floating mb-3'>
 						<Form.Control
 							type='text'
+							id='address2'
 							name='address2'
+							placeholder='Address 2'
 							value={customerData.address2}
 							onChange={handleChange}
 						/>
+						<Form.Label htmlFor='address2'>Address 2</Form.Label>
 					</Form.Group>
 
 					{/* City */}
-					<Form.Group className='mb-3'>
-						<Form.Label>City</Form.Label>
+					<Form.Group className='form-floating mb-3'>
 						<Form.Control
 							type='text'
+							id='city'
 							name='city'
+							placeholder='City'
 							value={customerData.city}
 							onChange={handleChange}
 						/>
+						<Form.Label htmlFor='city'>City</Form.Label>
 					</Form.Group>
 
 					{/* State */}
-					<Form.Group className='mb-3'>
-						<Form.Label>State</Form.Label>
+					<Form.Group className='form-floating mb-3'>
 						<Form.Control
 							type='text'
+							id='state'
 							name='state'
+							placeholder='State'
 							value={customerData.state}
 							onChange={handleChange}
 						/>
+						<Form.Label htmlFor='state'>State</Form.Label>
 					</Form.Group>
 
 					{/* Zip Code */}
-					<Form.Group className='mb-3'>
-						<Form.Label>Zip Code</Form.Label>
+					<Form.Group className='form-floating mb-3'>
 						<Form.Control
 							type='text'
+							id='zip'
 							name='zip'
+							placeholder='Zip Code'
 							value={customerData.zip}
 							onChange={handleChange}
 						/>
+						<Form.Label htmlFor='zip'>Zip Code</Form.Label>
 					</Form.Group>
 
 					{/* Phone */}
-					<Form.Group className='mb-3'>
-						<Form.Label>Phone</Form.Label>
+					<Form.Group className='form-floating mb-3'>
 						<Form.Control
 							type='text'
+							id='phone'
 							name='phone'
+							placeholder='Phone'
 							value={customerData.phone}
 							onChange={handleChange}
 						/>
+						<Form.Label htmlFor='phone'>Phone</Form.Label>
 					</Form.Group>
 
 					{/* Email */}
-					<Form.Group className='mb-3'>
-						<Form.Label>Email</Form.Label>
+					<Form.Group className='form-floating mb-3'>
 						<Form.Control
 							type='email'
+							id='email'
 							name='email'
+							placeholder='Email'
 							value={customerData.email}
 							onChange={handleChange}
 						/>
+						<Form.Label htmlFor='email'>Email</Form.Label>
 					</Form.Group>
 
 					{/* Deposit Percentage */}
-					<Form.Group className='mb-3'>
-						<Form.Label>Deposit Percentage</Form.Label>
+					<Form.Group className='form-floating mb-3'>
 						<Form.Control
 							type='number'
+							id='depositPercentage'
 							name='depositPercentage'
+							placeholder='Deposit Percentage'
 							value={customerData.depositPercentage.toString()}
 							onChange={handleChange}
 						/>
+						<Form.Label htmlFor='depositPercentage'>
+							Deposit Percentage
+						</Form.Label>
 					</Form.Group>
 
 					{/* Total Due (in days) */}
-					<Form.Group className='mb-3'>
-						<Form.Label>Total Due (in days)</Form.Label>
+					<Form.Group className='form-floating mb-3'>
 						<Form.Control
 							type='number'
+							id='totalDueDays'
 							name='totalDueDays'
+							placeholder='Total Due (in days)'
 							value={customerData.totalDueDays.toString()}
 							onChange={handleChange}
 						/>
+						<Form.Label htmlFor='totalDueDays'>Total Due (in days)</Form.Label>
 					</Form.Group>
 				</Form>
 			</Modal.Body>

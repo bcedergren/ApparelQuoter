@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { SidebarProvider } from '@/context/SidebarContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'react-toastify/dist/ReactToastify.css';
 import '@/styles/global.css';
 import '@/styles/app-styles.css';
 

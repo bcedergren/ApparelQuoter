@@ -7,6 +7,8 @@ import Image from 'next/image';
 import Layout from '@/components/app/Layout';
 import { Company } from '@/types/Company';
 import styles from '@/styles/Company.module.css';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const paymentMethodsList = [
 	{ name: 'Visa', image: '/images/payment-methods/visa.png' },
@@ -76,6 +78,14 @@ const CompanyPage: NextPage = () => {
 		}
 	}, [session, setValue]);
 
+	const notify = (message: string, type: 'success' | 'error') => {
+		if (type === 'success') {
+			toast.success(message);
+		} else if (type === 'error') {
+			toast.error(message);
+		}
+	};
+
 	const onSubmit = async (data: Company) => {
 		setIsLoading(true);
 		try {
@@ -89,12 +99,16 @@ const CompanyPage: NextPage = () => {
 
 			const result = await response.json();
 			if (result.success) {
-				alert('Company updated successfully!');
+				notify('Company updated successfully!', 'success');
 			} else {
-				console.error('Failed to update company');
+				notify('Failed to update company', 'error');
 			}
 		} catch (error) {
-			console.error('Update error:', error);
+			if (error instanceof Error) {
+				notify('Update error: ' + error.message, 'error');
+			} else {
+				notify('An unknown error occurred.', 'error');
+			}
 		} finally {
 			setIsLoading(false);
 		}
@@ -111,237 +125,158 @@ const CompanyPage: NextPage = () => {
 						) : (
 							<Form onSubmit={handleSubmit(onSubmit)}>
 								{/* Company Name */}
-								<Form.Group
-									as={Row}
-									className='mb-3 align-items-center'
-								>
-									<Form.Label
-										column
-										md={3}
-										style={{ fontWeight: 'bold' }}
-									>
-										Company Name
-									</Form.Label>
-									<Col md={9}>
-										<Controller
-											name='name'
-											control={control}
-											render={({ field }) => (
-												<Form.Control
-													type='text'
-													{...field}
-												/>
-											)}
-										/>
-									</Col>
+								<Form.Group className='form-floating mb-3'>
+									<Controller
+										name='name'
+										control={control}
+										render={({ field }) => (
+											<Form.Control
+												type='text'
+												id='companyName'
+												placeholder='Company Name'
+												{...field}
+											/>
+										)}
+									/>
+									<Form.Label htmlFor='companyName'>Company Name</Form.Label>
 								</Form.Group>
 
 								{/* Street Address */}
-								<Form.Group
-									as={Row}
-									className='mb-3 align-items-center'
-								>
-									<Form.Label
-										column
-										md={3}
-										style={{ fontWeight: 'bold' }}
-									>
+								<Form.Group className='form-floating mb-3'>
+									<Controller
+										name='streetAddress'
+										control={control}
+										render={({ field }) => (
+											<Form.Control
+												type='text'
+												id='streetAddress'
+												placeholder='Street Address'
+												{...field}
+											/>
+										)}
+									/>
+									<Form.Label htmlFor='streetAddress'>
 										Street Address
 									</Form.Label>
-									<Col md={9}>
-										<Controller
-											name='streetAddress'
-											control={control}
-											render={({ field }) => (
-												<Form.Control
-													type='text'
-													{...field}
-												/>
-											)}
-										/>
-									</Col>
 								</Form.Group>
 
 								{/* City */}
-								<Form.Group
-									as={Row}
-									className='mb-3 align-items-center'
-								>
-									<Form.Label
-										column
-										md={3}
-										style={{ fontWeight: 'bold' }}
-									>
-										City
-									</Form.Label>
-									<Col md={9}>
-										<Controller
-											name='city'
-											control={control}
-											render={({ field }) => (
-												<Form.Control
-													type='text'
-													{...field}
-												/>
-											)}
-										/>
-									</Col>
+								<Form.Group className='form-floating mb-3'>
+									<Controller
+										name='city'
+										control={control}
+										render={({ field }) => (
+											<Form.Control
+												type='text'
+												id='city'
+												placeholder='City'
+												{...field}
+											/>
+										)}
+									/>
+									<Form.Label htmlFor='city'>City</Form.Label>
 								</Form.Group>
 
 								{/* State */}
-								<Form.Group
-									as={Row}
-									className='mb-3 align-items-center'
-								>
-									<Form.Label
-										column
-										md={3}
-										style={{ fontWeight: 'bold' }}
-									>
-										State
-									</Form.Label>
-									<Col md={9}>
-										<Controller
-											name='state'
-											control={control}
-											render={({ field }) => (
-												<Form.Control
-													type='text'
-													{...field}
-												/>
-											)}
-										/>
-									</Col>
+								<Form.Group className='form-floating mb-3'>
+									<Controller
+										name='state'
+										control={control}
+										render={({ field }) => (
+											<Form.Control
+												type='text'
+												id='state'
+												placeholder='State'
+												{...field}
+											/>
+										)}
+									/>
+									<Form.Label htmlFor='state'>State</Form.Label>
 								</Form.Group>
 
-								{/* Zip Code */}
-								<Form.Group
-									as={Row}
-									className='mb-3 align-items-center'
-								>
-									<Form.Label
-										column
-										md={3}
-										style={{ fontWeight: 'bold' }}
-									>
-										Zip
-									</Form.Label>
-									<Col md={9}>
-										<Controller
-											name='zip'
-											control={control}
-											render={({ field }) => (
-												<Form.Control
-													type='text'
-													{...field}
-												/>
-											)}
-										/>
-									</Col>
+								{/* Zip */}
+								<Form.Group className='form-floating mb-3'>
+									<Controller
+										name='zip'
+										control={control}
+										render={({ field }) => (
+											<Form.Control
+												type='text'
+												id='zip'
+												placeholder='Zip'
+												{...field}
+											/>
+										)}
+									/>
+									<Form.Label htmlFor='zip'>Zip</Form.Label>
 								</Form.Group>
 
 								{/* Phone */}
-								<Form.Group
-									as={Row}
-									className='mb-3 align-items-center'
-								>
-									<Form.Label
-										column
-										md={3}
-										style={{ fontWeight: 'bold' }}
-									>
-										Phone
-									</Form.Label>
-									<Col md={9}>
-										<Controller
-											name='phone'
-											control={control}
-											render={({ field }) => (
-												<Form.Control
-													type='text'
-													{...field}
-												/>
-											)}
-										/>
-									</Col>
+								<Form.Group className='form-floating mb-3'>
+									<Controller
+										name='phone'
+										control={control}
+										render={({ field }) => (
+											<Form.Control
+												type='text'
+												id='phone'
+												placeholder='Phone'
+												{...field}
+											/>
+										)}
+									/>
+									<Form.Label htmlFor='phone'>Phone</Form.Label>
 								</Form.Group>
 
-								{/* Fax (optional) */}
-								<Form.Group
-									as={Row}
-									className='mb-3 align-items-center'
-								>
-									<Form.Label
-										column
-										md={3}
-										style={{ fontWeight: 'bold' }}
-									>
-										Fax
-									</Form.Label>
-									<Col md={9}>
-										<Controller
-											name='fax'
-											control={control}
-											render={({ field }) => (
-												<Form.Control
-													type='text'
-													{...field}
-												/>
-											)}
-										/>
-									</Col>
+								{/* Fax */}
+								<Form.Group className='form-floating mb-3'>
+									<Controller
+										name='fax'
+										control={control}
+										render={({ field }) => (
+											<Form.Control
+												type='text'
+												id='fax'
+												placeholder='Fax'
+												{...field}
+											/>
+										)}
+									/>
+									<Form.Label htmlFor='fax'>Fax</Form.Label>
 								</Form.Group>
 
 								{/* Email */}
-								<Form.Group
-									as={Row}
-									className='mb-3 align-items-center'
-								>
-									<Form.Label
-										column
-										md={3}
-										style={{ fontWeight: 'bold' }}
-									>
-										Email
-									</Form.Label>
-									<Col md={9}>
-										<Controller
-											name='email'
-											control={control}
-											render={({ field }) => (
-												<Form.Control
-													type='email'
-													{...field}
-												/>
-											)}
-										/>
-									</Col>
+								<Form.Group className='form-floating mb-3'>
+									<Controller
+										name='email'
+										control={control}
+										render={({ field }) => (
+											<Form.Control
+												type='email'
+												id='email'
+												placeholder='Email'
+												{...field}
+											/>
+										)}
+									/>
+									<Form.Label htmlFor='email'>Email</Form.Label>
 								</Form.Group>
 
-								{/* URL (optional) */}
-								<Form.Group
-									as={Row}
-									className='mb-3 align-items-center'
-								>
-									<Form.Label
-										column
-										md={3}
-										style={{ fontWeight: 'bold' }}
-									>
-										Website
-									</Form.Label>
-									<Col md={9}>
-										<Controller
-											name='url'
-											control={control}
-											render={({ field }) => (
-												<Form.Control
-													type='text'
-													{...field}
-												/>
-											)}
-										/>
-									</Col>
+								{/* Website */}
+								<Form.Group className='form-floating mb-3'>
+									<Controller
+										name='url'
+										control={control}
+										render={({ field }) => (
+											<Form.Control
+												type='text'
+												id='url'
+												placeholder='Website'
+												{...field}
+											/>
+										)}
+									/>
+									<Form.Label htmlFor='url'>Website</Form.Label>
 								</Form.Group>
 
 								{/* Payment Methods */}
@@ -403,7 +338,7 @@ const CompanyPage: NextPage = () => {
 									</Col>
 								</Form.Group>
 
-								{/* Sections */}
+								{/* Offerings */}
 								<Form.Group
 									as={Row}
 									className='mb-3 align-items-center'
@@ -463,6 +398,7 @@ const CompanyPage: NextPage = () => {
 					</Col>
 				</Row>
 			</Container>
+			<ToastContainer />
 		</Layout>
 	);
 };

@@ -12,6 +12,7 @@ import {
 	Modal,
 	Form,
 } from 'react-bootstrap';
+import { ToastContainer, toast } from 'react-toastify';
 import Layout from '@/components/app/Layout';
 import CustomerDropdown from '@/components/app/quote/CustomerDropdown';
 import DeliveryDueDate from '@/components/app/quote/DeliveryDueDate';
@@ -159,7 +160,18 @@ const QuotePage: NextPage = () => {
 						fetch(`/api/prices/${session.user.companyId}`),
 					]);
 
+					if (!customersRes) {
+						toast.error('Failed to customer data');
+						throw new Error('Failed to customer data');
+					}
+
+					if (!pricesRes) {
+						toast.error('Failed to fetch prices');
+						throw new Error('Failed to fetch prices');
+					}
+
 					if (!customersRes.ok || !pricesRes.ok) {
+						toast.error('Failed to fetch data');
 						throw new Error('Failed to fetch data');
 					}
 
@@ -173,6 +185,7 @@ const QuotePage: NextPage = () => {
 						try {
 							const quoteRes = await fetch(`/api/quote/${quoteId}`);
 							if (!quoteRes.ok) {
+								toast.error('Failed to fetch quote');
 								throw new Error('Failed to fetch quote');
 							}
 							const quoteData = await quoteRes.json();
@@ -182,13 +195,14 @@ const QuotePage: NextPage = () => {
 							setIsQuoteModified(true);
 						} catch (err) {
 							console.error(err);
+							toast.error('Failed to load quote');
 							setError('Failed to load quote');
 						}
 					} else {
 						setQuote(initialQuoteState);
 					}
 				} catch (error) {
-					console.error(error);
+					toast.error('Failed to load data');
 					setError('Failed to load data');
 				} finally {
 					setIsLoading(false);
