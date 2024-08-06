@@ -3,7 +3,6 @@
 	justify-content: center;
 	align-items: center;
 	height: 100vh;
-	background-color: #f8f9fa;
 }
 
 .formImageWrapper {
@@ -53,8 +52,10 @@
 }
 
 .signInImage {
+	margin-left: -200px;
 	max-width: 100%;
 	height: auto;
+	z-index: 9999;
 }
 
 .marginBottom {

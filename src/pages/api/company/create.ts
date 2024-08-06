@@ -1,23 +1,24 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { connectToDatabase } from '@/utils/dbConnect';
+import dbConnect from '@/utils/dbConnect';
+import Company from '@/models/Company';
 
 export default async function handler(
 	req: NextApiRequest,
 	res: NextApiResponse
 ) {
 	const { method } = req;
-	const { client, db } = await connectToDatabase();
 
 	if (method === 'POST') {
+		await dbConnect();
+
 		try {
-			const result = await db.collection('Company').insertOne(req.body);
+			const company = new Company(req.body);
+			const result = await company.save();
 
 			res.status(201).json({ success: true, data: result });
 		} catch (error) {
 			console.error(error);
 			res.status(400).json({ success: false, message: 'Data creation failed' });
-		} finally {
-			await client.close();
 		}
 	} else {
 		res.setHeader('Allow', ['POST']);

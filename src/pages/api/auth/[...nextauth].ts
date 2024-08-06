@@ -2,7 +2,8 @@ import NextAuth from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import FacebookProvider from 'next-auth/providers/facebook';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { connectToDatabase } from '@/utils/dbConnect';
+import dbConnect from '@/utils/dbConnect';
+import User from '@/models/User';
 import { verifyPassword } from '@/lib/password';
 import { CustomUser, CustomJWT, CustomSession } from '@/types/CustomUser';
 
@@ -28,50 +29,49 @@ export default NextAuth({
 				rememberMe: { label: 'Remember me', type: 'checkbox' },
 			},
 			async authorize(credentials) {
-				console.log('Authorize credentials:', credentials);
-
 				if (!credentials || !credentials.email || !credentials.password) {
+					console.error('Credentials must be provided');
 					throw new Error('Credentials must be provided');
 				}
 
-				const { db } = await connectToDatabase();
-				const userDocument = (await db
-					.collection('Users')
-					.findOne({ email: credentials.email })) as CustomUser | null;
+				await dbConnect();
+				const user = await User.findOne({ email: credentials.email });
 
-				if (!userDocument) {
+				if (!user) {
+					console.error(`No user found with the email ${credentials.email}`);
 					throw new Error('No user found with the email');
 				}
 
-				console.log('User Document:', userDocument);
-
-				if (!userDocument.password) {
+				if (!user.password) {
+					console.error(
+						`User ${credentials.email} does not have a password set`
+					);
 					throw new Error('User does not have a password set');
 				}
 
 				const isValid = await verifyPassword(
 					credentials.password,
-					userDocument.password
+					user.password
 				);
-				console.log('Password valid:', isValid);
-
 				if (!isValid) {
+					console.error('Password is incorrect');
 					throw new Error('Password is incorrect');
 				}
 
+				console.log(`User ${credentials.email} authorized successfully`);
+
 				return {
-					id: userDocument._id.toString(),
-					_id: userDocument._id.toString(),
-					email: userDocument.email,
-					firstName: userDocument.firstName || '',
-					lastName: userDocument.lastName || '',
-					companyId: userDocument.companyId?.toString() || '',
-					role: userDocument.role || '',
+					id: user._id.toString(),
+					_id: user._id.toString(),
+					email: user.email,
+					firstName: user.firstName,
+					lastName: user.lastName,
+					companyId: user.companyId,
+					role: user.role,
 					rememberMe: credentials.rememberMe === 'true',
-					stripeCustomerId: userDocument.stripeCustomerId || '',
-					isActive:
-						userDocument.isActive !== null ? userDocument.isActive : false,
-					subscriptionId: userDocument.subscriptionId || '',
+					stripeCustomerId: user.stripeCustomerId,
+					isActive: user.isActive,
+					subscriptionId: user.subscriptionId,
 				} as CustomUser;
 			},
 		}),
@@ -79,6 +79,7 @@ export default NextAuth({
 	callbacks: {
 		async jwt({ token, user }) {
 			if (user) {
+				console.log('JWT callback: setting token from user');
 				const customUser = user as CustomUser;
 				token.id = customUser.id;
 				token.email = customUser.email;
@@ -94,13 +95,12 @@ export default NextAuth({
 					? Date.now() + 30 * 24 * 60 * 60 * 1000
 					: Date.now() + 2 * 60 * 60 * 1000;
 
-				const { db } = await connectToDatabase();
-				const existingUser = await db
-					.collection('users')
-					.findOne({ email: customUser.email });
+				await dbConnect();
+				const existingUser = await User.findOne({ email: customUser.email });
 
 				if (!existingUser) {
-					await db.collection('users').insertOne({
+					console.log(`Creating new user ${customUser.email}`);
+					await User.create({
 						email: customUser.email,
 						firstName: customUser.firstName,
 						lastName: customUser.lastName,
@@ -109,13 +109,15 @@ export default NextAuth({
 						stripeCustomerId: customUser.stripeCustomerId,
 						isActive: customUser.isActive,
 						subscriptionId: customUser.subscriptionId,
-						createdAt: new Date(),
 					});
+				} else {
+					console.log(`User ${customUser.email} already exists`);
 				}
 			}
 			return token as CustomJWT;
 		},
 		async session({ session, token }) {
+			console.log('Session callback: setting session from token');
 			const customSession = session as CustomSession;
 			customSession.user.id = token.id as string;
 			customSession.user.firstName = token.firstName as string;
@@ -131,5 +133,13 @@ export default NextAuth({
 	},
 	pages: {
 		signIn: '/login',
+	},
+	events: {
+		async signIn(message: any) {
+			console.log('User signed in:', message);
+		},
+		async signOut(message: any) {
+			console.log('User signed out:', message);
+		},
 	},
 });

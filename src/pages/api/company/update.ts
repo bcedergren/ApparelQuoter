@@ -1,13 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { connectToDatabase } from '@/utils/dbConnect';
-import { ObjectId } from 'mongodb';
+import dbConnect from '@/utils/dbConnect';
+import Company from '@/models/Company';
 
 export default async function handler(
 	req: NextApiRequest,
 	res: NextApiResponse
 ): Promise<void> {
 	if (req.method === 'POST') {
-		const { client, db } = await connectToDatabase();
+		await dbConnect();
 		try {
 			const { _id, updatedBy, ...updateData } = req.body;
 
@@ -15,9 +15,10 @@ export default async function handler(
 			updateData.updatedAt = new Date().toISOString();
 			updateData.updatedBy = updatedBy;
 
-			const updatedCompany = await db
-				.collection('Company')
-				.updateOne({ _id: new ObjectId(_id) }, { $set: updateData });
+			const updatedCompany = await Company.updateOne(
+				{ _id: _id },
+				{ $set: updateData }
+			);
 
 			if (updatedCompany.modifiedCount === 1) {
 				res
@@ -28,12 +29,10 @@ export default async function handler(
 			}
 		} catch (error) {
 			console.error(error);
-			res
-				.status(500)
-				.json({
-					success: false,
-					message: 'Failed to update company information',
-				});
+			res.status(500).json({
+				success: false,
+				message: 'Failed to update company information',
+			});
 		}
 	} else {
 		res.setHeader('Allow', ['POST']);

@@ -1,33 +1,33 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import { ObjectId } from 'mongodb';
-import { connectToDatabase } from '@/utils/dbConnect';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import dbConnect from '@/utils/dbConnect';
+import Quote from '@/models/Quote';
 
 export default async function handler(
 	req: NextApiRequest,
 	res: NextApiResponse
 ) {
-	if (req.method !== 'POST') {
+	const { method } = req;
+
+	if (method !== 'POST') {
 		res.setHeader('Allow', ['POST']);
-		return res
-			.status(405)
-			.json({ message: `Method ${req.method} not allowed` });
+		return res.status(405).json({ message: `Method ${method} not allowed` });
 	}
 
-	const { db, client } = await connectToDatabase();
+	await dbConnect();
 
 	try {
 		const quote = req.body;
 
 		if (quote._id && quote._id !== '') {
 			// Handling update for an existing quote
-			const quoteId = new ObjectId(quote._id);
+			const quoteId = quote._id;
 			delete quote._id; // Avoid conflicts during update by removing _id from the payload
 
-			const updateResult = await db
-				.collection('Quotes')
-				.updateOne({ _id: quoteId }, { $set: quote });
+			const updateResult = await Quote.findByIdAndUpdate(quoteId, quote, {
+				new: true,
+			});
 
-			if (updateResult.modifiedCount === 0) {
+			if (!updateResult) {
 				return res
 					.status(404)
 					.json({ message: 'Quote not found with provided ID' });
@@ -35,17 +35,16 @@ export default async function handler(
 
 			return res.status(200).json({
 				message: 'Quote updated successfully',
-				quote: { _id: quoteId, ...quote },
+				quote: updateResult,
 			});
 		} else {
 			// Handling new quote insertion
-			delete quote._id;
-			const insertResult = await db.collection('Quotes').insertOne(quote);
-			const newQuoteId = insertResult.insertedId;
+			const newQuote = new Quote(quote);
+			const savedQuote = await newQuote.save();
 
 			return res.status(201).json({
 				message: 'Quote saved successfully',
-				quote: { _id: newQuoteId, ...quote },
+				quote: savedQuote,
 			});
 		}
 	} catch (error) {
@@ -53,7 +52,5 @@ export default async function handler(
 		return res
 			.status(500)
 			.json({ message: 'Failed to save or update the quote' });
-	} finally {
-		await client.close();
 	}
 }

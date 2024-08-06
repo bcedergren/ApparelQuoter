@@ -1,7 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { connectToDatabase } from '@/utils/dbConnect';
 import { hash } from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import dbConnect from '@/utils/dbConnect';
+import User from '@/models/User';
 
 export default async function handler(
 	req: NextApiRequest,
@@ -24,10 +25,9 @@ export default async function handler(
 		const decoded = jwt.verify(token, secret) as { email: string };
 		const email = decoded.email;
 
-		const { db } = await connectToDatabase();
-		console.log('Connected to database');
+		await dbConnect();
 
-		const user = await db.collection('Users').findOne({
+		const user = await User.findOne({
 			email,
 			resetToken: token,
 			resetTokenExpiry: { $gt: Date.now() },
@@ -41,16 +41,10 @@ export default async function handler(
 		const hashedPassword = await hash(password, 10);
 		console.log('Password hashed successfully');
 
-		await db.collection('Users').updateOne(
-			{ email },
-			{
-				$set: {
-					password: hashedPassword,
-					resetToken: null,
-					resetTokenExpiry: null,
-				},
-			}
-		);
+		user.password = hashedPassword;
+		user.resetToken = undefined;
+		user.resetTokenExpiry = undefined;
+		await user.save();
 
 		console.log('Password updated successfully');
 		res.status(200).json({ message: 'Password reset successfully.' });

@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { ObjectId } from 'mongodb';
-import { connectToDatabase } from '@/utils/dbConnect';
+import mongoose from 'mongoose';
+import dbConnect from '@/utils/dbConnect';
+import Quote from '@/models/Quote';
 
 interface UpdateStatusResponse {
 	message: string;
@@ -11,7 +12,7 @@ export default async function handler(
 	req: NextApiRequest,
 	res: NextApiResponse<UpdateStatusResponse>
 ) {
-	const { db, client } = await connectToDatabase();
+	await dbConnect();
 
 	if (req.method === 'POST') {
 		try {
@@ -24,16 +25,15 @@ export default async function handler(
 				});
 			}
 
-			// Convert orderId to an ObjectId
-			const _id = new ObjectId(orderId);
-
 			// Perform the update operation
-			const result = await db
-				.collection('Quotes')
-				.updateOne({ _id }, { $set: { quoteType: newStatus } });
+			const result = await Quote.findByIdAndUpdate(
+				orderId,
+				{ quoteType: newStatus },
+				{ new: true }
+			);
 
 			// Check if the document was found and updated
-			if (result.matchedCount === 0) {
+			if (!result) {
 				return res
 					.status(404)
 					.json({ message: 'Order not found with provided ID' });
@@ -56,8 +56,6 @@ export default async function handler(
 					error: 'An unknown error occurred',
 				});
 			}
-		} finally {
-			await client.close();
 		}
 	} else {
 		// Method Not Allowed

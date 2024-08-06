@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { verifyPassword } from '@/lib/password';
-import { connectToDatabase } from '@/utils/dbConnect';
+import dbConnect from '@/utils/dbConnect';
+import User from '@/models/User';
 
 export default async function handler(
 	req: NextApiRequest,
@@ -18,8 +19,8 @@ export default async function handler(
 	}
 
 	try {
-		const { db } = await connectToDatabase();
-		const user = await db.collection('users').findOne({ email });
+		await dbConnect();
+		const user = await User.findOne({ email });
 
 		console.log('User:', user);
 

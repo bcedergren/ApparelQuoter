@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { ObjectId } from 'mongodb';
-import { connectToDatabase } from '@/utils/dbConnect';
+import mongoose from 'mongoose';
+import dbConnect from '@/utils/dbConnect';
+import Company from '@/models/Company';
 
 export default async function handler(
 	req: NextApiRequest,
@@ -9,18 +10,20 @@ export default async function handler(
 	const { method } = req;
 
 	if (method === 'GET') {
-		const { client, db } = await connectToDatabase();
+		await dbConnect();
 		try {
 			const { companyId } = req.query;
 
-			if (typeof companyId !== 'string' || !ObjectId.isValid(companyId)) {
+			if (
+				typeof companyId !== 'string' ||
+				!mongoose.Types.ObjectId.isValid(companyId)
+			) {
 				return res
 					.status(400)
 					.json({ success: false, message: 'Invalid company ID' });
 			}
 
-			const objectId = new ObjectId(companyId);
-			const company = await db.collection('Company').findOne({ _id: objectId });
+			const company = await Company.findById(companyId);
 
 			if (company) {
 				res.status(200).json({ success: true, company });
@@ -33,8 +36,6 @@ export default async function handler(
 				success: false,
 				message: 'Failed to fetch company information',
 			});
-		} finally {
-			await client.close();
 		}
 	} else {
 		res.status(405).json({ success: false, message: 'Method not allowed' });

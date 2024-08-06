@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import bcrypt from 'bcryptjs';
-import { connectToDatabase } from '@/utils/dbConnect';
+import dbConnect from '@/utils/dbConnect';
+import User from '@/models/User';
 
 type UserData = {
 	companyId: string;
@@ -26,10 +27,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 		role = 'user', // Default role if not provided
 	}: UserData = req.body;
 
-	const { db } = await connectToDatabase();
+	await dbConnect();
 
 	// Check for existing user
-	const existingUser = await db.collection('User').findOne({ email });
+	const existingUser = await User.findOne({ email });
 	if (existingUser) {
 		return res.status(422).json({ message: 'User already exists!' });
 	}
@@ -38,16 +39,18 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
 	try {
 		// Insert user linked to the specified company
-		await db.collection('User').insertOne({
+		const newUser = new User({
 			companyId,
-			email,
 			firstName,
 			lastName,
+			email,
 			password: hashedPassword,
 			role,
 			createdAt: new Date(),
 			updatedAt: new Date(),
 		});
+
+		await newUser.save();
 
 		res.status(201).json({ message: 'User added successfully!' });
 	} catch (error) {

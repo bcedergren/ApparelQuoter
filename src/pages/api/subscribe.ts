@@ -1,7 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getSession } from 'next-auth/react';
-import { connectToDatabase } from '@/utils/dbConnect';
+import dbConnect from '@/utils/dbConnect';
 import stripe from '@/lib/stripe';
+import User from '@/models/User';
 
 export default async function handler(
 	req: NextApiRequest,
@@ -16,6 +17,9 @@ export default async function handler(
 	const { email, paymentMethodId } = req.body;
 
 	try {
+		await dbConnect();
+
+		// Create Stripe customer
 		const customer = await stripe.customers.create({
 			payment_method: paymentMethodId,
 			email: email,
@@ -24,16 +28,23 @@ export default async function handler(
 			},
 		});
 
+		// Create Stripe subscription
 		const subscription = await stripe.subscriptions.create({
 			customer: customer.id,
 			items: [{ price: process.env.STRIPE_PRICE_ID as string }],
 			expand: ['latest_invoice.payment_intent'],
 		});
 
-		const { db } = await connectToDatabase();
-		await db
-			.collection('users')
-			.updateOne({ email: email }, { $set: { stripeCustomerId: customer.id } });
+		// Update user in MongoDB
+		const updatedUser = await User.findOneAndUpdate(
+			{ email: email },
+			{ stripeCustomerId: customer.id },
+			{ new: true }
+		);
+
+		if (!updatedUser) {
+			return res.status(404).json({ error: 'User not found' });
+		}
 
 		res.status(200).json({ subscription });
 	} catch (error) {

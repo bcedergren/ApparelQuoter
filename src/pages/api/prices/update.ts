@@ -1,39 +1,43 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import { ObjectId } from 'mongodb';
-import { connectToDatabase } from '@/utils/dbConnect';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import mongoose from 'mongoose';
+import dbConnect from '@/utils/dbConnect';
+import Price from '@/models/Price';
 
-async function updatePricing(req: NextApiRequest, res: NextApiResponse) {
-	const { db, client } = await connectToDatabase();
+export default async function updatePricing(
+	req: NextApiRequest,
+	res: NextApiResponse
+) {
+	const { method } = req;
 
-	try {
-		const { _id } = req.body.prices;
-		const objectId = new ObjectId(_id);
-		const prices = db.collection('Prices');
+	if (method === 'POST') {
+		await dbConnect();
 
-		const updateData = {
-			...req.body.prices,
-			UpdatedAt: new Date(),
-		};
+		try {
+			const { _id, ...updateData } = req.body.prices;
 
-		delete updateData._id;
+			if (!_id || !mongoose.Types.ObjectId.isValid(_id)) {
+				return res.status(400).json({ message: 'Invalid or missing _id' });
+			}
 
-		const result = await prices.findOneAndUpdate(
-			{ _id: objectId },
-			{ $set: updateData }
-		);
+			updateData.UpdatedAt = new Date();
 
-		if (!result) {
-			console.error('Document not found with _id:', _id);
-			return res.status(404).json({ error: 'Document not found' });
+			const result = await Price.findByIdAndUpdate(_id, updateData, {
+				new: true,
+			});
+
+			if (!result) {
+				return res.status(404).json({ message: 'Document not found' });
+			}
+
+			res.status(200).json(result);
+		} catch (error) {
+			console.error('Error updating pricing:', error);
+			res
+				.status(500)
+				.json({ message: 'Unable to update pricing', details: error });
 		}
-
-		res.status(200).json(result.value);
-	} catch (error) {
-		console.error('Error updating pricing:', error);
-		res.status(500).json({ error: 'Unable to update pricing', details: error });
-	} finally {
-		await client.close();
+	} else {
+		res.setHeader('Allow', ['POST']);
+		res.status(405).end(`Method ${method} Not Allowed`);
 	}
 }
-
-export default updatePricing;

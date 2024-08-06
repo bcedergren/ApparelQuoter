@@ -1,7 +1,9 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import { hashPassword } from '@/lib/password';
-import { connectToDatabase } from '@/utils/dbConnect';
+import dbConnect from '@/utils/dbConnect';
 import stripe from '@/lib/stripe';
+import User from '@/models/User';
+import Company from '@/models/Company';
 
 export default async function handler(
 	req: NextApiRequest,
@@ -15,17 +17,16 @@ export default async function handler(
 	}
 
 	try {
-		console.log('Connecting to database...');
-		const { db } = await connectToDatabase();
+		await dbConnect();
 
 		console.log('Checking for existing user...');
-		const existingUser = await db.collection('Users').findOne({ email });
+		const existingUser = await User.findOne({ email });
 		if (existingUser) {
 			console.log('User already exists');
 			return res.status(409).json({ error: 'User already exists' });
 		}
 
-		let hashedPassword = password;
+		let hashedPassword = null;
 		if (password) {
 			console.log('Hashing password...');
 			hashedPassword = await hashPassword(password);
@@ -45,33 +46,32 @@ export default async function handler(
 		});
 
 		console.log('Creating company...');
-		const newCompany = {
+		const newCompany = new Company({
 			name: companyName,
 			createdBy: email,
-			createdAt: new Date(),
-		};
+		});
 
-		const companyResult = await db.collection('Company').insertOne(newCompany);
-		const companyId = companyResult.insertedId;
+		const companyResult = await newCompany.save();
+		const companyId = companyResult._id;
 
 		console.log('Creating user...');
-		const newUser = {
+		const newUser = new User({
 			email,
 			password: hashedPassword,
 			firstName,
 			lastName,
-			companyId: companyId.toString(),
+			companyId,
 			stripeCustomerId: customer.id,
 			subscriptionId: subscription.id,
 			isActive: true,
 			role: 'admin',
-		};
+		});
 
-		const userResult = await db.collection('Users').insertOne(newUser);
+		const userResult = await newUser.save();
 
 		console.log('User created successfully');
 		res.status(201).json({
-			userId: userResult.insertedId,
+			userId: userResult._id,
 			stripeCustomerId: customer.id,
 			subscriptionId: subscription.id,
 		});

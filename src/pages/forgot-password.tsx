@@ -1,4 +1,3 @@
-// src/pages/forgot-password.tsx
 import { useState, FormEvent } from 'react';
 import { Form, Button, Container, Row, Col, Alert } from 'react-bootstrap';
 import Link from 'next/link';
@@ -117,8 +116,8 @@ const ForgotPasswordPage = () => {
 							src={forgotPasswordImage}
 							alt='Forgot Password Image'
 							className={styles.forgotPasswordImage}
-							width={600}
-							height={600}
+							width={800}
+							height={800}
 						/>
 					</Col>
 				</Row>

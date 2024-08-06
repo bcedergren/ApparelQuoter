@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { connectToDatabase } from '@/utils/dbConnect';
-import { ObjectId } from 'mongodb';
+import mongoose from 'mongoose';
+import dbConnect from '@/utils/dbConnect';
+import User from '@/models/User';
 
 export default async function handler(
 	req: NextApiRequest,
@@ -8,30 +9,41 @@ export default async function handler(
 ) {
 	const { id } = req.query;
 
-	if (!ObjectId.isValid(id as string)) {
+	if (!mongoose.Types.ObjectId.isValid(id as string)) {
 		return res.status(400).json({ message: 'Invalid user ID' });
 	}
 
-	const { db } = await connectToDatabase();
-	const userId = new ObjectId(id as string);
+	await dbConnect();
+	const userId = new mongoose.Types.ObjectId(id as string);
 
 	if (req.method === 'PUT') {
 		const { firstName, lastName, email, role } = req.body;
 		try {
-			await db.collection('User').updateOne(
-				{ _id: userId },
-				{
-					$set: { firstName, lastName, email, role },
-				}
+			const updatedUser = await User.findByIdAndUpdate(
+				userId,
+				{ firstName, lastName, email, role },
+				{ new: true }
 			);
-			res.status(200).json({ message: 'User updated successfully' });
+
+			if (!updatedUser) {
+				return res.status(404).json({ message: 'User not found' });
+			}
+
+			res
+				.status(200)
+				.json({ message: 'User updated successfully', user: updatedUser });
 		} catch (error) {
 			console.error('Failed to update user:', error);
 			res.status(500).json({ message: 'Failed to update user' });
 		}
 	} else if (req.method === 'DELETE') {
 		try {
-			await db.collection('User').deleteOne({ _id: userId });
+			const deletedUser = await User.findByIdAndDelete(userId);
+
+			if (!deletedUser) {
+				return res.status(404).json({ message: 'User not found' });
+			}
+
 			res.status(200).json({ message: 'User deleted successfully' });
 		} catch (error) {
 			console.error('Failed to delete user:', error);

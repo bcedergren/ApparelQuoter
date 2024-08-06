@@ -2,7 +2,8 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import jwt from 'jsonwebtoken';
 import { readFile } from 'fs/promises';
 import { resolve } from 'path';
-import clientPromise from '@/lib/mongodb';
+import dbConnect from '@/utils/dbConnect';
+import User from '@/models/User';
 
 const sendEmailViaMailerAPI = async (
 	email: string,
@@ -75,11 +76,9 @@ export default async function handler(
 	}
 
 	try {
-		const client = await clientPromise;
-		const db = client.db();
-		console.log('Connected to database');
+		await dbConnect();
 
-		const user = await db.collection('Users').findOne({
+		const user = await User.findOne({
 			email: { $regex: new RegExp(`^${email}$`, 'i') },
 		});
 
@@ -96,15 +95,9 @@ export default async function handler(
 		});
 		const resetTokenExpiry = Date.now() + 3600000; // 1 hour
 
-		await db.collection('Users').updateOne(
-			{ email: { $regex: new RegExp(`^${email}$`, 'i') } },
-			{
-				$set: {
-					resetToken,
-					resetTokenExpiry,
-				},
-			}
-		);
+		user.resetToken = resetToken;
+		user.resetTokenExpiry = resetTokenExpiry;
+		await user.save();
 
 		// Generate the correct reset URL
 		const resetUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/reset-password?token=${resetToken}`;

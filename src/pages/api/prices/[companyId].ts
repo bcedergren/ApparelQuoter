@@ -1,5 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { connectToDatabase } from '@/utils/dbConnect';
+import mongoose from 'mongoose';
+import dbConnect from '@/utils/dbConnect';
+import Price from '@/models/Price';
 
 export default async function handler(
 	req: NextApiRequest,
@@ -10,17 +12,31 @@ export default async function handler(
 	}
 
 	const { companyId } = req.query;
-	const { client, db } = await connectToDatabase();
+
+	console.log('Company ID:', companyId);
+
+	if (!companyId || !mongoose.Types.ObjectId.isValid(companyId as string)) {
+		return res
+			.status(400)
+			.json({ success: false, message: 'Invalid company ID' });
+	}
+
+	await dbConnect();
+
 	try {
-		const prices = await db
-			.collection('Prices')
-			.findOne({ CompanyId: companyId });
+		const prices = await Price.findOne({ CompanyId: companyId });
+
+		console.log('Fetched prices:', prices);
+
+		if (!prices) {
+			return res
+				.status(404)
+				.json({ success: false, message: 'Prices not found' });
+		}
 
 		res.status(200).json({ success: true, prices });
 	} catch (error) {
 		console.error('Failed to fetch prices:', error);
 		res.status(500).json({ success: false, message: 'Failed to fetch prices' });
-	} finally {
-		await client.close();
 	}
 }

@@ -29,10 +29,15 @@ const Prices: NextPage = () => {
 	useEffect(() => {
 		if (session) {
 			setIsLoading(true);
+			/**
+			 * The function `fetchData` is an asynchronous function that fetches price data based on the company
+			 * ID of the current user and handles errors accordingly.
+			 */
 			// Ensure the session is loaded and available
 			const fetchData = async () => {
 				try {
 					const companyId = session.user.companyId;
+					console.log('Company ID:', companyId);
 					if (companyId) {
 						const response = await fetch(`/api/prices/${companyId}`);
 

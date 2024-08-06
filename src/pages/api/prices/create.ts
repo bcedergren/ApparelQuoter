@@ -1,24 +1,25 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { connectToDatabase } from '@/utils/dbConnect';
+import dbConnect from '@/utils/dbConnect';
+import Price from '@/models/Price';
 
 export default async function handler(
 	req: NextApiRequest,
 	res: NextApiResponse
 ) {
 	const { method } = req;
-	const { client, db } = await connectToDatabase();
 
 	if (method === 'POST') {
-		try {
-			// Perform database operations, such as inserting a document
-			const result = await db.collection('Prices').insertOne(req.body);
+		await dbConnect();
+		const priceData = req.body;
 
-			res.status(201).json({ success: true, data: result });
+		try {
+			const price = new Price(priceData);
+			const savedPrice = await price.save();
+
+			res.status(201).json({ success: true, data: savedPrice });
 		} catch (error) {
 			console.error(error);
 			res.status(400).json({ success: false, message: 'Data creation failed' });
-		} finally {
-			await client.close();
 		}
 	} else {
 		res.setHeader('Allow', ['POST']);

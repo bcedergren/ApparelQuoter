@@ -111,7 +111,7 @@ const RegistrationForm = () => {
 				lastName,
 				companyName,
 				email,
-				password: isGoogleAuthenticated ? undefined : password,
+				password: password,
 				planId,
 			});
 
@@ -134,210 +134,189 @@ const RegistrationForm = () => {
 	};
 
 	return (
-		<>
+		<Form onSubmit={handleSubmit}>
 			{error && <Alert variant='danger'>{error}</Alert>}
-			<Form onSubmit={handleSubmit}>
-				<Row>
-					{!isGoogleAuthenticated && (
-						<>
-							<Col md={6}>
-								<Form.Group className={styles.marginBottom}>
-									<Form.Label className={styles.formLabel}>
-										First Name*
-									</Form.Label>
-									<Form.Control
-										type='text'
-										value={firstName}
-										onChange={(e) => setFirstName(e.target.value)}
-										required
-										placeholder='First Name'
-										className={styles.formControl}
-									/>
-								</Form.Group>
-							</Col>
-							<Col md={6}>
-								<Form.Group className={styles.marginBottom}>
-									<Form.Label className={styles.formLabel}>
-										Last Name*
-									</Form.Label>
-									<Form.Control
-										type='text'
-										value={lastName}
-										onChange={(e) => setLastName(e.target.value)}
-										required
-										placeholder='Last Name'
-										className={styles.formControl}
-									/>
-								</Form.Group>
-							</Col>
-						</>
-					)}
-					<Col xs={12}>
-						<Form.Group className={styles.marginBottom}>
-							<Form.Label className={styles.formLabel}>
-								Company Name*
-							</Form.Label>
-							<Form.Control
-								type='text'
-								value={companyName}
-								onChange={(e) => setCompanyName(e.target.value)}
-								required
-								placeholder='Company Name'
-								className={styles.formControl}
-							/>
-						</Form.Group>
-					</Col>
-					{!isGoogleAuthenticated && (
-						<>
-							<Col xs={12}>
-								<Form.Group className={styles.marginBottom}>
-									<Form.Label className={styles.formLabel}>
-										Your Email*
-									</Form.Label>
-									<Form.Control
-										type='email'
-										value={email}
-										onChange={(e) => setEmail(e.target.value)}
-										required
-										placeholder='Email'
-										className={styles.formControl}
-									/>
-								</Form.Group>
-							</Col>
-							<Col xs={12}>
-								<Form.Group className={styles.marginBottom}>
-									<Form.Label className={styles.formLabel}>
-										Password*
-									</Form.Label>
-									<Form.Control
-										type='password'
-										value={password}
-										onChange={(e) => setPassword(e.target.value)}
-										required
-										placeholder='Password'
-										className={styles.formControl}
-									/>
-								</Form.Group>
-							</Col>
-							<Col xs={12}>
-								<Form.Group className={styles.marginBottom}>
-									<Form.Label className={styles.formLabel}>
-										Confirm Password*
-									</Form.Label>
-									<Form.Control
-										type='password'
-										value={confirmPassword}
-										onChange={(e) => setConfirmPassword(e.target.value)}
-										required
-										placeholder='Confirm Password'
-										className={styles.formControl}
-									/>
-								</Form.Group>
-							</Col>
-						</>
-					)}
-					<Col xs={12}>
-						<Form.Group className={styles.marginBottom}>
-							<Form.Check
-								type='checkbox'
-								label={
-									<>
-										I Accept the{' '}
-										<Link
-											href='/terms'
-											target='_blank'
-										>
-											<span className={styles.linkText}>
-												Terms And Conditions
-											</span>
-										</Link>
-									</>
-								}
-								checked={termsAccepted}
-								onChange={(e) => setTermsAccepted(e.target.checked)}
-								className={styles.formCheck}
-								required
-							/>
-						</Form.Group>
-					</Col>
-					<Col xs={12}>
-						<Button
-							type='submit'
-							className={styles.btnPrimary}
-							disabled={loading}
-						>
-							{loading ? 'Processing…' : 'Register'}
-						</Button>
-					</Col>
-				</Row>
-				{!isGoogleAuthenticated && (
-					<div className={`${styles.orRegisterWith} ${styles.marginTop}`}>
-						<h4>Or Register With</h4>
-						<Row className={styles.marginTop}>
-							<Col
-								sm={6}
-								className={styles.marginBottom}
-							>
-								<Button
-									variant='light'
-									className={styles.socialButton}
-									onClick={() => signIn('facebook')}
-								>
-									<Icon
-										path={mdiFacebook}
-										size={1}
-										color='blue'
-										className={styles.socialIcon}
-									/>{' '}
-									Facebook
-								</Button>
-							</Col>
-							<Col
-								sm={6}
-								className={styles.marginBottom}
-							>
-								<Button
-									variant='light'
-									className={styles.socialButton}
-									onClick={() => signIn('google')}
-								>
-									<Icon
-										path={mdiGoogle}
-										size={1}
-										color='red'
-										className={styles.socialIcon}
-									/>{' '}
-									Google
-								</Button>
-							</Col>
-							<Col className='text-center'>
-								<small className='text-dark me-2'>
-									Already have an account?
-								</small>
-								<Link
-									href='/login'
-									className={styles.boldText}
-								>
-									Login
-								</Link>
-							</Col>
-						</Row>
-					</div>
-				)}
-				<div className={`${styles.homeButton} ${styles.marginTop}`}>
-					<Link
-						href='/'
-						className={styles.boldText}
-					>
-						<Icon
-							path={mdiHome}
-							size={1}
-							color='blue'
+			<Row>
+				<Col xs={12}>
+					<Form.Group className={styles.marginBottom}>
+						<Form.Label className={styles.formLabel}>Company Name*</Form.Label>
+						<Form.Control
+							type='text'
+							value={companyName}
+							onChange={(e) => setCompanyName(e.target.value)}
+							required
+							placeholder='Company Name'
+							className={styles.formControl}
 						/>
-					</Link>
+					</Form.Group>
+				</Col>
+				<Col md={6}>
+					<Form.Group className={styles.marginBottom}>
+						<Form.Label className={styles.formLabel}>First Name*</Form.Label>
+						<Form.Control
+							type='text'
+							value={firstName}
+							onChange={(e) => setFirstName(e.target.value)}
+							required
+							placeholder='First Name'
+							className={styles.formControl}
+						/>
+					</Form.Group>
+				</Col>
+				<Col md={6}>
+					<Form.Group className={styles.marginBottom}>
+						<Form.Label className={styles.formLabel}>Last Name*</Form.Label>
+						<Form.Control
+							type='text'
+							value={lastName}
+							onChange={(e) => setLastName(e.target.value)}
+							required
+							placeholder='Last Name'
+							className={styles.formControl}
+						/>
+					</Form.Group>
+				</Col>
+
+				<Col xs={12}>
+					<Form.Group className={styles.marginBottom}>
+						<Form.Label className={styles.formLabel}>Your Email*</Form.Label>
+						<Form.Control
+							type='email'
+							value={email}
+							onChange={(e) => setEmail(e.target.value)}
+							required
+							placeholder='Email'
+							className={styles.formControl}
+						/>
+					</Form.Group>
+				</Col>
+				<Col xs={12}>
+					<Form.Group className={styles.marginBottom}>
+						<Form.Label className={styles.formLabel}>Password*</Form.Label>
+						<Form.Control
+							type='password'
+							value={password}
+							onChange={(e) => setPassword(e.target.value)}
+							required
+							placeholder='Password'
+							className={styles.formControl}
+						/>
+					</Form.Group>
+				</Col>
+				<Col xs={12}>
+					<Form.Group className={styles.marginBottom}>
+						<Form.Label className={styles.formLabel}>
+							Confirm Password*
+						</Form.Label>
+						<Form.Control
+							type='password'
+							value={confirmPassword}
+							onChange={(e) => setConfirmPassword(e.target.value)}
+							required
+							placeholder='Confirm Password'
+							className={styles.formControl}
+						/>
+					</Form.Group>
+				</Col>
+				<Col xs={12}>
+					<Form.Group className={styles.marginBottom}>
+						<Form.Check
+							type='checkbox'
+							label={
+								<>
+									I Accept the{' '}
+									<Link
+										href='/terms'
+										target='_blank'
+									>
+										<span className={styles.linkText}>
+											Terms And Conditions
+										</span>
+									</Link>
+								</>
+							}
+							checked={termsAccepted}
+							onChange={(e) => setTermsAccepted(e.target.checked)}
+							className={styles.formCheck}
+							required
+						/>
+					</Form.Group>
+				</Col>
+				<Col xs={12}>
+					<Button
+						type='submit'
+						className={styles.btnPrimary}
+						disabled={loading}
+					>
+						{loading ? 'Processing…' : 'Register'}
+					</Button>
+				</Col>
+			</Row>
+			{!isGoogleAuthenticated && (
+				<div className={`${styles.orRegisterWith} ${styles.marginTop}`}>
+					<h4>Or Register With</h4>
+					<Row className={styles.marginTop}>
+						<Col
+							sm={6}
+							className={styles.marginBottom}
+						>
+							<Button
+								variant='light'
+								className={styles.socialButton}
+								onClick={() => signIn('facebook')}
+							>
+								<Icon
+									path={mdiFacebook}
+									size={1}
+									color='blue'
+									className={styles.socialIcon}
+								/>{' '}
+								Facebook
+							</Button>
+						</Col>
+						<Col
+							sm={6}
+							className={styles.marginBottom}
+						>
+							<Button
+								variant='light'
+								className={styles.socialButton}
+								onClick={() => signIn('google')}
+							>
+								<Icon
+									path={mdiGoogle}
+									size={1}
+									color='red'
+									className={styles.socialIcon}
+								/>{' '}
+								Google
+							</Button>
+						</Col>
+						<Col className='text-center'>
+							<small className='text-dark me-2'>Already have an account?</small>
+							<Link
+								href='/login'
+								className={styles.boldText}
+							>
+								Login
+							</Link>
+						</Col>
+					</Row>
 				</div>
-			</Form>
-		</>
+			)}
+			<div className={`${styles.homeButton} ${styles.marginTop}`}>
+				<Link
+					href='/'
+					className={styles.boldText}
+				>
+					<Icon
+						path={mdiHome}
+						size={1}
+						color='blue'
+					/>
+				</Link>
+			</div>
+		</Form>
 	);
 };
 

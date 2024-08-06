@@ -1,9 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { connectToDatabase } from '@/utils/dbConnect';
-import { ObjectId } from 'mongodb';
-import { User } from '@/types/User';
+import mongoose from 'mongoose';
+import dbConnect from '@/utils/dbConnect';
+import User from '@/models/User';
+import { User as IUser } from '@/types/User';
 
-type ClientUser = Omit<User, 'password' | 'rememberMe'>;
+type ClientUser = Omit<IUser, 'password' | 'rememberMe'>;
 
 export default async function handler(
 	req: NextApiRequest,
@@ -16,13 +17,16 @@ export default async function handler(
 
 	const { companyId } = req.query;
 
-	const { db } = await connectToDatabase();
+	if (!companyId || !mongoose.Types.ObjectId.isValid(companyId as string)) {
+		return res.status(400).json({ message: 'Invalid company ID' });
+	}
+
+	await dbConnect();
 
 	try {
-		const users = await db
-			.collection('User')
-			.find({ companyId: new ObjectId(companyId as string) })
-			.toArray();
+		const users = await User.find({
+			companyId: new mongoose.Types.ObjectId(companyId as string),
+		});
 
 		const transformedUsers: ClientUser[] = users.map((doc) => ({
 			_id: doc._id.toString(),
