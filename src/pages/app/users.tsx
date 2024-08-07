@@ -1,21 +1,15 @@
 import { useState, useEffect, FC } from 'react';
 import { useSession } from 'next-auth/react';
-import {
-	Container,
-	Row,
-	Col,
-	Table,
-	Modal,
-	Button,
-	Badge,
-} from 'react-bootstrap';
+import { Container, Row, Col, Table, Modal, Button } from 'react-bootstrap';
 import { SlPlus, SlPencil, SlTrash } from 'react-icons/sl';
 import { User } from '@/types/User';
 import { CustomSession } from '@/types/CustomUser';
 import AddUserModal from '@/components/app/AddUserModal';
-import EditUserModal from '@/components/app/EditUserModal';
 import Layout from '@/components/app/Layout';
 import styles from '@/styles/UsersPage.module.css';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import EditUserModal from '@/components/app/EditUserModal';
 
 const UsersPage: FC = () => {
 	const { data: sessionData } = useSession();
@@ -27,75 +21,101 @@ const UsersPage: FC = () => {
 	const [showAddModal, setShowAddModal] = useState(false);
 	const [showEditModal, setShowEditModal] = useState(false);
 	const [showDeleteModal, setShowDeleteModal] = useState(false);
+	const [showWarningModal, setShowWarningModal] = useState(false);
+	const [warningMessage, setWarningMessage] = useState<string>('');
 	const [selectedUser, setSelectedUser] = useState<User | null>(null);
 	const [userLimit, setUserLimit] = useState<number>(0);
+	const [disableRoleEdit, setDisableRoleEdit] = useState<boolean>(false);
 
 	const fetchUsers = async () => {
 		if (session?.user?.companyId) {
 			setLoading(true);
 			try {
 				const res = await fetch(`/api/company-users/${session.user.companyId}`);
+
+				if (!res.ok) {
+					throw new Error('Network response was not ok');
+				}
 				const data: User[] = await res.json();
 				setUsers(data);
+
+				// Fetch subscription and plan data using the subscriptionId from Stripe
+				const subscriptionId = data[0]?.subscriptionId;
+				if (!subscriptionId) {
+					throw new Error('Subscription ID not found');
+				}
+
+				const subscriptionRes = await fetch(
+					`/api/subscription/${subscriptionId}`
+				);
+
+				if (!subscriptionRes.ok) {
+					throw new Error('Failed to fetch subscription data');
+				}
+
+				const subscriptionData = await subscriptionRes.json();
+				const planId = subscriptionData.plan.id;
+				const planRes = await fetch(`/api/plans/${planId}`);
+
+				if (!planRes.ok) {
+					throw new Error('Failed to fetch plan data');
+				}
+				const planData = await planRes.json();
+
+				setUserLimit(planData.users);
 			} catch (error) {
-				console.error('Failed to fetch users:', error);
-				setError('Failed to fetch users');
+				console.error('Failed to fetch users and plan data:', error);
+				setError('Failed to fetch users and plan data');
+				toast.error('Failed to fetch users and plan data');
 			} finally {
 				setLoading(false);
 			}
 		}
 	};
 
-	// const fetchUsers = async () => {
-	// 	if (session?.user?.companyId) {
-	// 		setLoading(true);
-	// 		try {
-	// 			const res = await fetch(`/api/users/${session.user.companyId}`);
-	// 			const data: User[] = await res.json();
-	// 			setUsers(data);
-
-	// 			Fetch plan details to get user limit
-	// 			const planRes = await fetch(`/api/plans/${session.user.companyId}`);
-	// 			const planData = await planRes.json();
-	// 			setUserLimit(planData.userLimit);
-	// 		} catch (error) {
-	// 			console.error('Failed to fetch users or plan details:', error);
-	// 			setError('Failed to fetch users or plan details');
-	// 		} finally {
-	// 			setLoading(false);
-	// 		}
-	// 	}
-	// };
-
 	useEffect(() => {
 		fetchUsers();
 	}, [session]);
 
 	const handleEdit = (user: User) => {
+		const isOnlyAdmin =
+			user.role === 'admin' &&
+			users.filter((u) => u.role === 'admin').length === 1;
+		setDisableRoleEdit(isOnlyAdmin);
 		setSelectedUser(user);
 		setShowEditModal(true);
 	};
 
 	const handleDelete = (user: User) => {
-		setSelectedUser(user);
-		setShowDeleteModal(true);
+		if (users.length === 1) {
+			setWarningMessage('Cannot delete the only admin user.');
+			setShowWarningModal(true);
+		} else {
+			setSelectedUser(user);
+			setShowDeleteModal(true);
+		}
 	};
 
 	const confirmDelete = async () => {
 		if (selectedUser) {
 			try {
-				await fetch(`/api/users/${selectedUser._id}`, { method: 'DELETE' });
+				const res = await fetch(`/api/users/${selectedUser._id}`, {
+					method: 'DELETE',
+				});
+				if (!res.ok) {
+					throw new Error('Failed to delete user');
+				}
 				setUsers(users.filter((user) => user._id !== selectedUser._id));
 				setShowDeleteModal(false);
 				setSelectedUser(null);
+				toast.success('User deleted successfully');
 			} catch (error) {
 				console.error('Failed to delete user:', error);
 				setError('Failed to delete user');
+				toast.error('Failed to delete user');
 			}
 		}
 	};
-
-	if (!session) return <p>You need to be logged in to view this page.</p>;
 
 	return (
 		<Layout>
@@ -112,12 +132,14 @@ const UsersPage: FC = () => {
 								{users.length}/{userLimit}
 							</span>
 						</h1>
-						<Button
-							onClick={() => setShowAddModal(true)}
-							className={styles.addUserButton}
-						>
-							<SlPlus className='icon' /> Add User
-						</Button>
+						{users.length < userLimit && (
+							<Button
+								onClick={() => setShowAddModal(true)}
+								className={styles.addUserButton}
+							>
+								<SlPlus className='icon' /> Add User
+							</Button>
+						)}
 					</Col>
 				</Row>
 				<Row>
@@ -176,6 +198,7 @@ const UsersPage: FC = () => {
 				onHide={() => setShowEditModal(false)}
 				user={selectedUser}
 				onUserUpdated={fetchUsers}
+				disableRoleEdit={disableRoleEdit}
 			/>
 			<Modal
 				show={showDeleteModal}
@@ -203,6 +226,24 @@ const UsersPage: FC = () => {
 					</Button>
 				</Modal.Footer>
 			</Modal>
+			<Modal
+				show={showWarningModal}
+				onHide={() => setShowWarningModal(false)}
+			>
+				<Modal.Header closeButton>
+					<Modal.Title>Warning</Modal.Title>
+				</Modal.Header>
+				<Modal.Body>{warningMessage}</Modal.Body>
+				<Modal.Footer>
+					<Button
+						variant='primary'
+						onClick={() => setShowWarningModal(false)}
+					>
+						OK
+					</Button>
+				</Modal.Footer>
+			</Modal>
+			<ToastContainer />
 		</Layout>
 	);
 };

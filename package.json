@@ -52,7 +52,8 @@
 		"resend": "^3.5.0",
 		"sharp": "^0.33.2",
 		"stripe": "^14.25.0",
-		"text-mask-addons": "^3.8.0"
+		"text-mask-addons": "^3.8.0",
+		"winston": "^3.13.1"
 	},
 	"devDependencies": {
 		"@types/bcryptjs": "^2.4.6",

@@ -1,34 +1,29 @@
-import React, { useState, useEffect, FC } from 'react';
+import { useState, useEffect, FC } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import { User } from '@/types/User';
+import { toast } from 'react-toastify';
 
-interface EditUserModalProps {
+const EditUserModal: FC<{
 	show: boolean;
 	onHide: () => void;
 	user: User | null;
 	onUserUpdated: () => void;
-}
-
-const EditUserModal: FC<EditUserModalProps> = ({
-	show,
-	onHide,
-	user,
-	onUserUpdated,
-}) => {
+	disableRoleEdit: boolean;
+}> = ({ show, onHide, user, onUserUpdated, disableRoleEdit }) => {
 	const [formData, setFormData] = useState<User | null>(user);
 
 	useEffect(() => {
 		setFormData(user);
 	}, [user]);
 
-	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		if (formData) {
-			setFormData({ ...formData, [e.target.name]: e.target.value });
-		}
+	const handleChange = (e: React.ChangeEvent<any>) => {
+		const { name, value } = e.target;
+		setFormData((prevData) =>
+			prevData ? { ...prevData, [name]: value } : null
+		);
 	};
 
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
+	const handleSubmit = async () => {
 		if (formData) {
 			try {
 				const res = await fetch(`/api/users/${formData._id}`, {
@@ -38,11 +33,14 @@ const EditUserModal: FC<EditUserModalProps> = ({
 					},
 					body: JSON.stringify(formData),
 				});
-				if (res.ok) {
-					onUserUpdated();
-					onHide();
+				if (!res.ok) {
+					throw new Error('Failed to update user');
 				}
+				toast.success('User updated successfully');
+				onUserUpdated();
+				onHide();
 			} catch (error) {
+				toast.error('Failed to update user');
 				console.error('Failed to update user:', error);
 			}
 		}
@@ -58,7 +56,7 @@ const EditUserModal: FC<EditUserModalProps> = ({
 			</Modal.Header>
 			<Modal.Body>
 				{formData && (
-					<Form onSubmit={handleSubmit}>
+					<Form>
 						<Form.Group className='mb-3'>
 							<Form.Label>First Name</Form.Label>
 							<Form.Control
@@ -66,7 +64,6 @@ const EditUserModal: FC<EditUserModalProps> = ({
 								name='firstName'
 								value={formData.firstName}
 								onChange={handleChange}
-								required
 							/>
 						</Form.Group>
 						<Form.Group className='mb-3'>
@@ -76,7 +73,6 @@ const EditUserModal: FC<EditUserModalProps> = ({
 								name='lastName'
 								value={formData.lastName}
 								onChange={handleChange}
-								required
 							/>
 						</Form.Group>
 						<Form.Group className='mb-3'>
@@ -86,28 +82,38 @@ const EditUserModal: FC<EditUserModalProps> = ({
 								name='email'
 								value={formData.email}
 								onChange={handleChange}
-								required
 							/>
 						</Form.Group>
 						<Form.Group className='mb-3'>
 							<Form.Label>Role</Form.Label>
 							<Form.Control
-								type='text'
+								as='select'
 								name='role'
 								value={formData.role}
 								onChange={handleChange}
-								required
-							/>
+								disabled={disableRoleEdit}
+							>
+								<option value='admin'>Admin</option>
+								<option value='user'>User</option>
+							</Form.Control>
 						</Form.Group>
-						<Button
-							variant='primary'
-							type='submit'
-						>
-							Save Changes
-						</Button>
 					</Form>
 				)}
 			</Modal.Body>
+			<Modal.Footer>
+				<Button
+					variant='secondary'
+					onClick={onHide}
+				>
+					Cancel
+				</Button>
+				<Button
+					variant='primary'
+					onClick={handleSubmit}
+				>
+					Save Changes
+				</Button>
+			</Modal.Footer>
 		</Modal>
 	);
 };

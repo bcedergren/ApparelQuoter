@@ -42,7 +42,10 @@ const Header = () => {
 		if (status === 'unauthenticated') {
 			router.push('/login');
 		}
-	}, [status, router]);
+		// else if (status === 'authenticated') {
+		// 	console.log(session.user);
+		// }
+	}, [status, router, session]);
 
 	return (
 		<>
