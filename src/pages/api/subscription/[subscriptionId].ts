@@ -10,9 +10,7 @@ type SubscriptionResponse =
 	| {
 			plan: {
 				id: string;
-				// Include other plan details if needed
 			};
-			// Include other subscription details if needed
 	  }
 	| { message: string };
 
@@ -39,7 +37,7 @@ export default async function handler(
 	try {
 		logger.info(`Fetching subscription with ID: ${subscriptionId}`);
 		const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-		logger.info(`Fetched subscription: ${JSON.stringify(subscription)}`);
+		logger.info('Fetched subscription');
 
 		const planId = subscription.items.data[0]?.plan.id;
 		if (!planId) {
@@ -60,11 +58,9 @@ export default async function handler(
 			res.status(500).json({ message: 'Failed to fetch subscription' });
 		} else {
 			logger.error('Failed to fetch subscription due to an unknown error');
-			res
-				.status(500)
-				.json({
-					message: 'Failed to fetch subscription due to an unknown error',
-				});
+			res.status(500).json({
+				message: 'Failed to fetch subscription due to an unknown error',
+			});
 		}
 	}
 }

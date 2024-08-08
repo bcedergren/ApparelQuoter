@@ -1,6 +1,7 @@
 import React, { ChangeEvent } from 'react';
 import { Table, Form } from 'react-bootstrap';
 import styles from '@/styles/Pricing.module.css';
+import { PrintingQuantityRange } from '@/types/Price';
 
 // Define the types for the individual prices and the overall data structure
 type PreCutVinylPrice = string;
@@ -14,11 +15,13 @@ interface PreCutVinylPrices {
 interface PreCutVinylProps {
 	preCutVinylData: PreCutVinylPrices;
 	setPreCutVinylData: (data: PreCutVinylPrices) => void;
+	printingQuantityRanges: PrintingQuantityRange[];
 }
 
 const PreCutVinyl: React.FC<PreCutVinylProps> = ({
 	preCutVinylData,
 	setPreCutVinylData,
+	printingQuantityRanges,
 }) => {
 	// Function to handle price changes
 	const handlePriceChange = (
@@ -45,14 +48,15 @@ const PreCutVinyl: React.FC<PreCutVinylProps> = ({
 		>
 			<thead>
 				<tr>
-					<th>Pre-Cut Vinyl Name & Number Prices</th>
-					<th>1 - 12</th>
-					<th>13 - 24</th>
-					<th>25 - 74</th>
-					<th>75 - 149</th>
-					<th>150 - 299</th>
-					<th>300 - 499</th>
-					<th>500 - 2500</th>
+					<th colSpan={7}>Pre-Cut Vinyl Name & Number Prices</th>
+				</tr>
+				<tr>
+					<th></th>
+					{printingQuantityRanges.map((range, index) => (
+						<th key={index}>
+							{range.start} - {range.end}
+						</th>
+					))}
 				</tr>
 			</thead>
 			<tbody>

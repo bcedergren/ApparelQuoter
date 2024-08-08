@@ -4,7 +4,7 @@ import styles from '@/styles/Pricing.module.css';
 import { DTGDarkGarmentMarkup } from '@/types/Price';
 
 interface DTGDarkGarmentMarkupProps {
-	dtgDarkGarmentMarkup: DTGDarkGarmentMarkup; // Use the same DTGDarkGarmentMarkup type here
+	dtgDarkGarmentMarkup: DTGDarkGarmentMarkup;
 	setDTGDarkGarmentMarkup: (dtgDarkGarmentMarkup: DTGDarkGarmentMarkup) => void;
 }
 
@@ -14,11 +14,12 @@ const DTGDarkGarmentMarkupComponent: React.FC<DTGDarkGarmentMarkupProps> = ({
 }) => {
 	const handleInputChange = (
 		size: keyof DTGDarkGarmentMarkup,
-		event: ChangeEvent<any>
+		event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
 	) => {
+		const value = event.target.value.split(',').map((val) => val.trim());
 		const updatedMarkup = {
 			...dtgDarkGarmentMarkup,
-			[size]: event.target.value,
+			[size]: value,
 		};
 		setDTGDarkGarmentMarkup(updatedMarkup);
 	};
@@ -45,7 +46,7 @@ const DTGDarkGarmentMarkupComponent: React.FC<DTGDarkGarmentMarkupProps> = ({
 									type='number'
 									step='0.01'
 									min='0.00'
-									value={dtgDarkGarmentMarkup.small}
+									value={dtgDarkGarmentMarkup.small.join(', ')}
 									onChange={(e) => handleInputChange('small', e)}
 								/>
 							</div>
@@ -60,7 +61,7 @@ const DTGDarkGarmentMarkupComponent: React.FC<DTGDarkGarmentMarkupProps> = ({
 									type='number'
 									step='0.01'
 									min='0.00'
-									value={dtgDarkGarmentMarkup.medium}
+									value={dtgDarkGarmentMarkup.medium.join(', ')}
 									onChange={(e) => handleInputChange('medium', e)}
 								/>
 							</div>
@@ -75,7 +76,7 @@ const DTGDarkGarmentMarkupComponent: React.FC<DTGDarkGarmentMarkupProps> = ({
 									type='number'
 									step='0.01'
 									min='0.00'
-									value={dtgDarkGarmentMarkup.large}
+									value={dtgDarkGarmentMarkup.large.join(', ')}
 									onChange={(e) => handleInputChange('large', e)}
 								/>
 							</div>

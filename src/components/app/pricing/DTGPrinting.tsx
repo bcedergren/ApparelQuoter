@@ -1,16 +1,18 @@
 import React, { ChangeEvent } from 'react';
-import { Table, Form, Spinner } from 'react-bootstrap';
-import { DTGPrinting } from '@/types/Price'; // Assuming DTGPrinting is properly defined in your types
+import { Table, Form } from 'react-bootstrap';
+import { DTGPrinting, PrintingQuantityRange } from '@/types/Price';
 import styles from '@/styles/Pricing.module.css';
 
 interface DTGPrintingProps {
 	dtgPrintingData: DTGPrinting;
 	setDTGPrintingData: (data: DTGPrinting) => void;
+	printingQuantityRanges: PrintingQuantityRange[];
 }
 
 const DTGPrintingComponent: React.FC<DTGPrintingProps> = ({
 	dtgPrintingData,
 	setDTGPrintingData,
+	printingQuantityRanges,
 }) => {
 	const handleInputChange = (
 		size: keyof DTGPrinting,
@@ -18,7 +20,7 @@ const DTGPrintingComponent: React.FC<DTGPrintingProps> = ({
 		event: ChangeEvent<any>
 	) => {
 		const updatedPrices = [...dtgPrintingData[size]];
-		updatedPrices[index] = event.target.value;
+		updatedPrices[index] = parseFloat(event.target.value).toFixed(2);
 		setDTGPrintingData({ ...dtgPrintingData, [size]: updatedPrices });
 	};
 
@@ -33,7 +35,7 @@ const DTGPrintingComponent: React.FC<DTGPrintingProps> = ({
 							type='number'
 							step='0.01'
 							min='0.00'
-							value={price}
+							value={parseFloat(price).toFixed(2)}
 							onChange={(e) => handleInputChange(size, index, e)}
 						/>
 					</div>
@@ -50,20 +52,16 @@ const DTGPrintingComponent: React.FC<DTGPrintingProps> = ({
 		>
 			<thead>
 				<tr>
-					<th colSpan={8}>DTG Printing Prices</th>
+					<th colSpan={printingQuantityRanges.length + 1}>
+						DTG Printing Prices
+					</th>
 				</tr>
 				<tr>
 					<th>Size</th>
-					{[
-						'1 - 12',
-						'13 - 24',
-						'25 - 74',
-						'75 - 149',
-						'150 - 299',
-						'300 - 499',
-						'500+',
-					].map((header, index) => (
-						<th key={index}>{header}</th>
+					{printingQuantityRanges.map((range, index) => (
+						<th key={index}>
+							{range.start} - {range.end}
+						</th>
 					))}
 				</tr>
 			</thead>

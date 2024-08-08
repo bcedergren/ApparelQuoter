@@ -72,7 +72,7 @@ const ArtCostComponent: React.FC<ArtCostProps> = ({
 								type='number'
 								step='0.01'
 								min='0.00'
-								value={artCostData.firstColor}
+								value={artCostData.firstColor || ''}
 								onChange={(e) =>
 									handleInputChange(
 										e as ChangeEvent<HTMLInputElement>,
@@ -89,7 +89,7 @@ const ArtCostComponent: React.FC<ArtCostProps> = ({
 								type='number'
 								step='0.01'
 								min='0.00'
-								value={artCostData.additionalColor}
+								value={artCostData.additionalColor || ''}
 								onChange={(e) =>
 									handleInputChange(
 										e as ChangeEvent<HTMLInputElement>,
@@ -106,7 +106,7 @@ const ArtCostComponent: React.FC<ArtCostProps> = ({
 								type='number'
 								step='0.01'
 								min='0.00'
-								value={artCostData.flatFee}
+								value={artCostData.flatFee || ''}
 								onChange={(e) =>
 									handleInputChange(
 										e as ChangeEvent<HTMLInputElement>,
@@ -122,7 +122,7 @@ const ArtCostComponent: React.FC<ArtCostProps> = ({
 								type='number'
 								step='0.01'
 								min='0.00'
-								value={artCostData.inkMarkup}
+								value={artCostData.inkMarkup || ''}
 								onChange={(e) =>
 									handleInputChange(
 										e as ChangeEvent<HTMLInputElement>,
@@ -140,7 +140,7 @@ const ArtCostComponent: React.FC<ArtCostProps> = ({
 								type='number'
 								step='0.01'
 								min='0.00'
-								value={artCostData.inkChargesPerPiece}
+								value={artCostData.inkChargesPerPiece || ''}
 								onChange={(e) =>
 									handleInputChange(
 										e as ChangeEvent<HTMLInputElement>,
@@ -157,7 +157,7 @@ const ArtCostComponent: React.FC<ArtCostProps> = ({
 								type='number'
 								step='0.01'
 								min='0.00'
-								value={artCostData.colorMatch ?? ''}
+								value={artCostData.colorMatch || ''}
 								onChange={(e) =>
 									handleInputChange(
 										e as ChangeEvent<HTMLInputElement>,
@@ -174,7 +174,7 @@ const ArtCostComponent: React.FC<ArtCostProps> = ({
 								type='number'
 								step='0.01'
 								min='0.00'
-								value={artCostData.inkColorChanges ?? ''}
+								value={artCostData.inkColorChanges || ''}
 								onChange={(e) =>
 									handleInputChange(
 										e as ChangeEvent<HTMLInputElement>,

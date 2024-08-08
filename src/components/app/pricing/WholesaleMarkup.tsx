@@ -57,6 +57,7 @@ const WholesaleMarkupComponent: React.FC<WholesaleMarkupProps> = ({
 								<span className='input-group-text'>$</span>
 								<Form.Control
 									type='number'
+									step='0.01'
 									min='0.00'
 									value={wholesaleMarkupData.lessThan || ''}
 									onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -111,6 +112,7 @@ const WholesaleMarkupComponent: React.FC<WholesaleMarkupProps> = ({
 								<span className='input-group-text'>$</span>
 								<Form.Control
 									type='number'
+									step='0.01'
 									min='0.00'
 									value={wholesaleMarkupData.betweenStart || ''}
 									onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -127,6 +129,7 @@ const WholesaleMarkupComponent: React.FC<WholesaleMarkupProps> = ({
 								<span className='input-group-text'>$</span>
 								<Form.Control
 									type='number'
+									step='0.01'
 									min='0.00'
 									value={wholesaleMarkupData.betweenEnd || ''}
 									onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -179,6 +182,7 @@ const WholesaleMarkupComponent: React.FC<WholesaleMarkupProps> = ({
 								<span className='input-group-text'>$</span>
 								<Form.Control
 									type='number'
+									step='0.01'
 									min='0.00'
 									value={wholesaleMarkupData.over || ''}
 									onChange={(e: ChangeEvent<HTMLInputElement>) =>

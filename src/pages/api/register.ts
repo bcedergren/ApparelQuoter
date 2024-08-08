@@ -52,9 +52,82 @@ export default async function handler(
 			createdBy: email,
 		});
 
-		console.log('Creating prices...');
-		const newPrice = new Price({
-			companyId: newCompany._id,
+		console.log('Creating default prices...');
+		await Price.create({
+			CompanyId: new mongoose.Types.ObjectId(newCompany._id),
+			artCost: {
+				firstColor: '',
+				additionalColor: '',
+				flatFee: '',
+				inkMarkup: '',
+				inkChargesPerPiece: '',
+				glitterOrPuff: '',
+				colorMatch: '',
+				inkColorChanges: '',
+			},
+			wholesaleMarkup: {
+				lessThan: '',
+				betweenStart: '',
+				betweenEnd: '',
+				over: '',
+				markupLessThan: '',
+				markupBetween: '',
+				markupOver: '',
+				andOrLessThan: '',
+				andOrBetween: '',
+				andOrOver: '',
+			},
+			printingQuantityRanges: [
+				{ start: '', end: '' },
+				{ start: '', end: '' },
+				{ start: '', end: '' },
+				{ start: '', end: '' },
+				{ start: '', end: '' },
+				{ start: '', end: '' },
+				{ start: '', end: '' },
+			],
+			printingLocationNames: ['', '', '', ''],
+			screenPrinting: {
+				'1 color': ['', '', '', '', '', '', ''],
+				'2 colors': ['', '', '', '', '', '', ''],
+				'3 colors': ['', '', '', '', '', '', ''],
+				'4 colors': ['', '', '', '', '', '', ''],
+				'5 colors': ['', '', '', '', '', '', ''],
+				'6 colors': ['', '', '', '', '', '', ''],
+				'7 colors': ['', '', '', '', '', '', ''],
+				'8 colors': ['', '', '', '', '', '', ''],
+				'9 colors': ['', '', '', '', '', '', ''],
+				'10 colors': ['', '', '', '', '', '', ''],
+				'11 colors': ['', '', '', '', '', '', ''],
+				'12 colors': ['', '', '', '', '', '', ''],
+				perScreenNew: '',
+				perScreenExisting: '',
+			},
+			dtgPrinting: {
+				small: ['', '', '', '', '', '', ''],
+				medium: ['', '', '', '', '', '', ''],
+				large: ['', '', '', '', '', '', ''],
+			},
+			dtgDarkGarmentMarkup: {
+				small: ['', '', '', '', '', '', ''],
+				medium: ['', '', '', '', '', '', ''],
+				large: ['', '', '', '', '', '', ''],
+			},
+			dyeSublimation: {
+				small: ['', '', '', '', '', '', ''],
+				medium: ['', '', '', '', '', '', ''],
+				large: ['', '', '', '', '', '', ''],
+			},
+			preCutVinyl: {
+				names: ['', '', '', '', '', '', ''],
+				numbers: ['', '', '', '', '', '', ''],
+			},
+			embroidery: {
+				stitchCount: '',
+				costPerThousandStitches: '',
+				hoopingFee: '',
+				costPerFirst5000Stitches: '',
+			},
 		});
 
 		const companyResult = await newCompany.save();

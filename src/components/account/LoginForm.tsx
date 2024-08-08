@@ -17,8 +17,6 @@ const LoginForm = () => {
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 
-		console.log('Login credentials:', { email, password, rememberMe });
-
 		const result = await signIn('credentials', {
 			redirect: false,
 			email,

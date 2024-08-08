@@ -8,8 +8,8 @@ type QuantityRange = {
 };
 
 interface PrintingQuantityRangesProps {
-	quantityRanges: QuantityRange[]; // Directly use an array of QuantityRange
-	setQuantityRanges: (ranges: QuantityRange[]) => void; // Expect an array of QuantityRange
+	quantityRanges: QuantityRange[];
+	setQuantityRanges: (ranges: QuantityRange[]) => void;
 }
 
 const PrintingQuantityRanges: React.FC<PrintingQuantityRangesProps> = ({
@@ -24,7 +24,7 @@ const PrintingQuantityRanges: React.FC<PrintingQuantityRangesProps> = ({
 		const updatedRanges = quantityRanges.map((range, i) =>
 			i === index ? { ...range, [part]: event.target.value } : range
 		);
-		setQuantityRanges(updatedRanges); // Directly pass the updated array
+		setQuantityRanges(updatedRanges);
 	};
 
 	return (
@@ -46,19 +46,23 @@ const PrintingQuantityRanges: React.FC<PrintingQuantityRangesProps> = ({
 							<Form.Control
 								size='sm'
 								type='number'
-								min='0.00'
-								value={range.start}
+								min='0'
+								value={range.start || ''}
 								onChange={(e) => handleRangeChange(index, 'start', e)}
-								style={{ display: 'inline', width: 'auto' }}
+								style={{
+									display: 'inline',
+									width: 'auto',
+									margin: '0 10px',
+								}}
 							/>
 							to
 							<Form.Control
 								size='sm'
-								min='0.00'
 								type='number'
-								value={range.end}
+								min='0'
+								value={range.end || ''}
 								onChange={(e) => handleRangeChange(index, 'end', e)}
-								style={{ display: 'inline', width: 'auto' }}
+								style={{ display: 'inline', width: 'auto', margin: '0 10px' }}
 							/>
 						</td>
 					</tr>

@@ -1,41 +1,22 @@
-import React, { ChangeEvent } from 'react';
-import { Table, Form } from 'react-bootstrap';
-import { ScreenPrinting } from '@/types/Price';
+import { FC } from 'react';
+import {
+	ScreenPrinting as ScreenPrintingType,
+	PrintingQuantityRange,
+} from '@/types/Price';
+import { Table } from 'react-bootstrap';
 import styles from '@/styles/Pricing.module.css';
 
 interface ScreenPrintingProps {
-	screenPrintingData: ScreenPrinting;
-	setScreenPrintingData: (data: ScreenPrinting) => void;
+	screenPrintingData: ScreenPrintingType;
+	setScreenPrintingData: (data: ScreenPrintingType) => void;
+	printingQuantityRanges: PrintingQuantityRange[];
 }
 
-const ScreenPrintingComponent: React.FC<ScreenPrintingProps> = ({
+const ScreenPrinting: FC<ScreenPrintingProps> = ({
 	screenPrintingData,
 	setScreenPrintingData,
+	printingQuantityRanges,
 }) => {
-	const colors = Object.keys(screenPrintingData).filter(
-		(key) => key !== 'perScreenNew' && key !== 'perScreenExisting'
-	) as Array<keyof Omit<ScreenPrinting, 'perScreenNew' | 'perScreenExisting'>>;
-
-	const handlePriceChange = (
-		color: keyof Omit<ScreenPrinting, 'perScreenNew' | 'perScreenExisting'>,
-		index: number,
-		event: ChangeEvent<any>
-	) => {
-		const updatedPrices = [...screenPrintingData[color]];
-		updatedPrices[index] = event.target.value;
-		setScreenPrintingData({ ...screenPrintingData, [color]: updatedPrices });
-	};
-
-	const handleInputChange = (
-		field: 'perScreenNew' | 'perScreenExisting',
-		event: ChangeEvent<any>
-	) => {
-		setScreenPrintingData({
-			...screenPrintingData,
-			[field]: event.target.value,
-		});
-	};
-
 	return (
 		<Table
 			bordered
@@ -44,71 +25,54 @@ const ScreenPrintingComponent: React.FC<ScreenPrintingProps> = ({
 		>
 			<thead>
 				<tr>
-					<th colSpan={8}>Screen Printing</th>
+					<th colSpan={8}>Screen Printing Prices</th>
 				</tr>
 				<tr>
-					<th>Colors</th>
-					<th>1 - 12</th>
-					<th>13 - 24</th>
-					<th>25 - 74</th>
-					<th>75 - 149</th>
-					<th>150 - 299</th>
-					<th>300 - 499</th>
-					<th>500 - 2500</th>
+					<th>Color</th>
+					{printingQuantityRanges.map((range, index) => (
+						<th key={index}>
+							{range.start} - {range.end}
+						</th>
+					))}
 				</tr>
 			</thead>
 			<tbody>
-				{colors.map((color) => (
-					<tr key={color}>
-						<td>{color}</td>
-						{screenPrintingData[color].map((price, columnIndex) => (
-							<td key={columnIndex}>
-								<div className='input-group'>
-									<span className='input-group-text'>$</span>
-									<Form.Control
-										type='number'
-										step='0.01'
-										min='0.00'
-										value={price || ''}
-										onChange={(e) => handlePriceChange(color, columnIndex, e)}
-									/>
-								</div>
-							</td>
-						))}
-					</tr>
-				))}
-				<tr>
-					<td>Per Screen New</td>
-					<td colSpan={3}>
-						<div className='input-group'>
-							<span className='input-group-text'>$</span>
-							<Form.Control
-								type='number'
-								step='0.01'
-								min='0.00'
-								value={screenPrintingData.perScreenNew || ''}
-								onChange={(e) => handleInputChange('perScreenNew', e)}
-							/>
-						</div>
-					</td>
-
-					<td>Per Screen Existing</td>
-					<td colSpan={3}>
-						<div className='input-group'>
-							<span className='input-group-text'>$</span>
-							<Form.Control
-								type='number'
-								step='0.01'
-								min='0.00'
-								value={screenPrintingData.perScreenExisting || ''}
-								onChange={(e) => handleInputChange('perScreenExisting', e)}
-							/>
-						</div>
-					</td>
-				</tr>
+				{Object.keys(screenPrintingData).map((color) => {
+					const data = screenPrintingData[color as keyof ScreenPrintingType];
+					if (Array.isArray(data)) {
+						return (
+							<tr key={color}>
+								<td>{color}</td>
+								{data.map((price, columnIndex) => (
+									<td key={columnIndex}>
+										<div className='input-group'>
+											<span className='input-group-text'>$</span>
+											<input
+												type='number'
+												step='0.01'
+												min='0.00'
+												className='form-control'
+												value={price}
+												onChange={(e) => {
+													const updatedData = [...data];
+													updatedData[columnIndex] = e.target.value;
+													setScreenPrintingData({
+														...screenPrintingData,
+														[color]: updatedData,
+													});
+												}}
+											/>
+										</div>
+									</td>
+								))}
+							</tr>
+						);
+					}
+					return null; // Skip if it's not an array
+				})}
 			</tbody>
 		</Table>
 	);
 };
 
-export default ScreenPrintingComponent;
+export default ScreenPrinting;

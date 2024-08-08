@@ -55,7 +55,26 @@ const Embroidery: React.FC<EmbroideryProps> = ({
 					</td>
 				</tr>
 				<tr>
-					<td>Cost per 1,000 stitches after first 5,000</td>
+					<td>Cost for first {embroideryData.stitchCount} stitches</td>
+					<td>
+						<div className='input-group'>
+							<span className='input-group-text'>$</span>
+							<Form.Control
+								type='number'
+								step='0.01'
+								min='0.00'
+								value={embroideryData.costPerFirst5000Stitches}
+								onChange={(e) =>
+									handlePriceChange('costPerFirst5000Stitches', e)
+								}
+							/>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Cost per 1,000 stitches after first {embroideryData.stitchCount}
+					</td>
 					<td>
 						<div className='input-group'>
 							<span className='input-group-text'>$</span>
@@ -82,23 +101,6 @@ const Embroidery: React.FC<EmbroideryProps> = ({
 								min='0.00'
 								value={embroideryData.hoopingFee}
 								onChange={(e) => handlePriceChange('hoopingFee', e)}
-							/>
-						</div>
-					</td>
-				</tr>
-				<tr>
-					<td>Cost for first 5,000 stitches</td>
-					<td>
-						<div className='input-group'>
-							<span className='input-group-text'>$</span>
-							<Form.Control
-								type='number'
-								step='0.01'
-								min='0.00'
-								value={embroideryData.costPerFirst5000Stitches}
-								onChange={(e) =>
-									handlePriceChange('costPerFirst5000Stitches', e)
-								}
 							/>
 						</div>
 					</td>

@@ -184,4 +184,4 @@ const PriceSchema = new Schema<IPrice>({
 });
 
 export default mongoose.models.Price ||
-	mongoose.model<IPrice>('Prices', PriceSchema);
+	mongoose.model<IPrice>('Price', PriceSchema);
