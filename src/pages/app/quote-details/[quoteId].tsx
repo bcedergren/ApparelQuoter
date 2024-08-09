@@ -166,7 +166,7 @@ const QuoteDetails = () => {
 					quote.printingOptions.colorsLeftSleeve
 				);
 				decorationDetails.push(
-					`Left Sleeve: ${quote.printingOptions.colorsLeftSleeve} color(s)`
+					`Left: ${quote.printingOptions.colorsLeftSleeve} color(s)`
 				);
 			}
 
@@ -176,7 +176,7 @@ const QuoteDetails = () => {
 					quote.printingOptions.colorsRightSleeve
 				);
 				decorationDetails.push(
-					`Right Sleeve: ${quote.printingOptions.colorsRightSleeve} color(s)`
+					`Right: ${quote.printingOptions.colorsRightSleeve} color(s)`
 				);
 			}
 
@@ -256,11 +256,11 @@ const QuoteDetails = () => {
 				embroideryCost;
 
 			setInvoiceSubtotal(Number(subtotal) || 0);
-			const total = subtotal; // Add other adjustments as necessary
+			const total = subtotal;
 			setInvoiceTotal(Number(total) || 0);
 
-			// Calculate the deposit due based on the customer's deposit percentage or a default value
-			const depositPercentage = customer.depositPercentage;
+			// Calculate the deposit due based on the quote's deposit percentage or a default value
+			const depositPercentage = quote.depositPercentage || 0;
 			const deposit = invoiceTotal * (depositPercentage / 100);
 			setDepositDue(deposit);
 

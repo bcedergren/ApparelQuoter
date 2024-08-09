@@ -72,6 +72,19 @@
 	border-top: 1px solid #dee2e6;
 }
 
+.notesIcon {
+	cursor: pointer;
+	color: #07a64a;
+	font-size: 1.5rem;
+	margin-right: 10px;
+	background: none;
+	border: none;
+}
+
+.notesIcon:hover {
+	color: #045d29;
+}
+
 .editIcon {
 	cursor: pointer;
 	color: #ffc107;

@@ -9,6 +9,7 @@ import { Company } from '@/types/Company';
 import styles from '@/styles/Company.module.css';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { US_STATES } from '@/consts/constants';
 
 const paymentMethodsList = [
 	{ name: 'Visa', image: '/images/payment-methods/visa.png' },
@@ -183,12 +184,20 @@ const CompanyPage: NextPage = () => {
 										name='state'
 										control={control}
 										render={({ field }) => (
-											<Form.Control
-												type='text'
+											<Form.Select
 												id='state'
-												placeholder='State'
 												{...field}
-											/>
+											>
+												<option value=''>Select State</option>
+												{US_STATES.map((state) => (
+													<option
+														key={state.abbreviation}
+														value={state.abbreviation}
+													>
+														{state.name}
+													</option>
+												))}
+											</Form.Select>
 										)}
 									/>
 									<Form.Label htmlFor='state'>State</Form.Label>

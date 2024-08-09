@@ -8,7 +8,12 @@ interface ScreenPrintingDetailsProps {
 }
 
 const ScreenPrintingDetails: FC<ScreenPrintingDetailsProps> = ({
-	details = { newScreensNeeded: false, additionalScreens: 0, colorChanges: 0 },
+	details = {
+		newScreensNeeded: false,
+		additionalScreens: 0,
+		colorChanges: 0,
+		inkType: 'None',
+	},
 	onDetailsChange,
 }) => {
 	const handleChange = (
@@ -66,6 +71,19 @@ const ScreenPrintingDetails: FC<ScreenPrintingDetailsProps> = ({
 									handleChange('colorChanges', parseInt(e.target.value, 10))
 								}
 							/>
+						</Form.Group>
+					</Col>
+					<Col>
+						<Form.Group controlId='inkType'>
+							<Form.Label>Ink Type</Form.Label>
+							<Form.Select
+								value={details.inkType}
+								onChange={(e) => handleChange('inkType', e.target.value)}
+							>
+								<option value=''></option>
+								<option value='Puff'>Puff</option>
+								<option value='Glitter'>Glitter</option>
+							</Form.Select>
 						</Form.Group>
 					</Col>
 				</Row>

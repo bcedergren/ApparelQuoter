@@ -35,7 +35,7 @@
 }
 
 .content {
-	padding-top: 65px;
+	/* padding-top: 65px; */
 	overflow-y: auto;
 	height: calc(100vh - 60px);
 }

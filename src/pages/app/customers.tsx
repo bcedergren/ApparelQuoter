@@ -1,26 +1,21 @@
 import type { NextPage } from 'next';
 import { useSession } from 'next-auth/react';
 import { useState, useEffect } from 'react';
-import {
-	Container,
-	Row,
-	Col,
-	Button,
-	Alert,
-	Spinner,
-	Table,
-} from 'react-bootstrap';
-import { SlPlus, SlPencil, SlTrash } from 'react-icons/sl';
+import { Container, Row, Col, Button, Spinner, Table } from 'react-bootstrap';
+import { SlPlus, SlPencil, SlTrash, SlNote } from 'react-icons/sl';
 import { ToastContainer, toast } from 'react-toastify';
 import Layout from '@/components/app/Layout';
 import AddEditCustomerModal from '@/components/app/AddEditCustomerModal';
+import FollowUpNotesModal from '@/components/app/FollowUpNotesModal';
 import DeleteConfirmationModal from '@/components/app/DeleteConfirmationModal';
-import { Customer } from '@/types/Customer';
+import { Customer, FollowUpNote } from '@/types/Customer';
+import styles from '@/styles/UsersPage.module.css';
 
 const Customers: NextPage = () => {
 	const { data: session, status } = useSession();
 	const [customers, setCustomers] = useState<Customer[]>([]);
 	const [showAddEditModal, setShowAddEditModal] = useState(false);
+	const [showFollowUpNotesModal, setShowFollowUpNotesModal] = useState(false);
 	const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 	const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
 		null
@@ -70,10 +65,21 @@ const Customers: NextPage = () => {
 			return;
 		}
 
+		const followUpNote: FollowUpNote = {
+			date: new Date(),
+			note: 'Customer Added',
+			addedBy: `${session.user.id}`,
+			addedDate: new Date(),
+		};
+
 		const customerDataWithCompanyId = {
 			...customerData,
 			companyId: session.user.companyId,
+			followUpNotes: customerData._id
+				? customerData.followUpNotes
+				: [followUpNote],
 		};
+
 		const apiUrl = customerData._id
 			? `/api/customers/update/${customerData._id}`
 			: '/api/customers/add';
@@ -90,16 +96,16 @@ const Customers: NextPage = () => {
 			const responseData = await response.json();
 			if (response.ok) {
 				setSuccessMessage('Customer saved successfully.');
-				toast.success(successMessage);
+				toast.success(successMessage || 'Customer saved successfully.');
 				fetchCustomers(); // Refresh the customer list
 			} else {
 				setError(responseData.message || 'Failed to save customer.');
-				toast.error(error);
+				toast.error(responseData.message || 'Failed to save customer.');
 				throw new Error(responseData.message || 'Failed to save customer.');
 			}
 		} catch (error) {
 			setError(error instanceof Error ? error.message : 'An error occurred');
-			toast.error('An error occurred');
+			toast.error(error instanceof Error ? error.message : 'An error occurred');
 		} finally {
 			setIsLoading(false);
 		}
@@ -108,6 +114,46 @@ const Customers: NextPage = () => {
 	const handleEditCustomer = (customer: Customer) => {
 		setSelectedCustomer(customer);
 		setShowAddEditModal(true);
+	};
+
+	const handleManageFollowUpNotes = (customer: Customer) => {
+		setSelectedCustomer(customer);
+		setShowFollowUpNotesModal(true);
+	};
+
+	const handleSaveNote = async (updatedCustomer: Customer) => {
+		if (status !== 'authenticated' || !session?.user?.companyId) {
+			setError('Session not found. Unable to save note.');
+			return;
+		}
+
+		setIsLoading(true);
+		try {
+			const response = await fetch(
+				`/api/customers/update/${updatedCustomer._id}`,
+				{
+					method: 'PUT',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify(updatedCustomer),
+				}
+			);
+
+			const responseData = await response.json();
+			if (response.ok) {
+				setSuccessMessage('Note saved successfully.');
+				toast.success(successMessage || 'Note saved successfully.');
+				fetchCustomers(); // Refresh the customer list
+			} else {
+				setError(responseData.message || 'Failed to save note.');
+				toast.error(responseData.message || 'Failed to save note.');
+				throw new Error(responseData.message || 'Failed to save note.');
+			}
+		} catch (error) {
+			setError(error instanceof Error ? error.message : 'An error occurred');
+			toast.error(error instanceof Error ? error.message : 'An error occurred');
+		} finally {
+			setIsLoading(false);
+		}
 	};
 
 	const handleDeleteCustomer = (customer: Customer) => {
@@ -129,10 +175,14 @@ const Customers: NextPage = () => {
 				setCustomers(customers.filter((c) => c._id !== selectedCustomer._id));
 				setSuccessMessage('Customer deleted successfully.');
 			} else {
-				throw new Error('Failed to delete customer.');
+				const responseData = await response.json();
+				setError(responseData.message || 'Failed to delete customer.');
+				toast.error(responseData.message || 'Failed to delete customer.');
+				throw new Error(responseData.message || 'Failed to delete customer.');
 			}
 		} catch (error) {
 			setError(error instanceof Error ? error.message : 'An error occurred');
+			toast.error(error instanceof Error ? error.message : 'An error occurred');
 		} finally {
 			setIsLoading(false);
 			setShowDeleteConfirmation(false);
@@ -156,10 +206,6 @@ const Customers: NextPage = () => {
 						</Button>
 					</Col>
 				</Row>
-
-				{error && <Alert variant='danger'>{error}</Alert>}
-				{successMessage && <Alert variant='success'>{successMessage}</Alert>}
-
 				{isLoading ? (
 					<Spinner animation='border' />
 				) : customers.length > 0 ? (
@@ -170,6 +216,7 @@ const Customers: NextPage = () => {
 					>
 						<thead>
 							<tr>
+								<th></th>
 								<th>Company Name</th>
 								<th>Contact Name</th>
 								<th>Email</th>
@@ -180,27 +227,26 @@ const Customers: NextPage = () => {
 						<tbody>
 							{customers.map((customer) => (
 								<tr key={customer._id}>
+									<td>
+										<SlNote
+											onClick={() => handleManageFollowUpNotes(customer)}
+											className={`${styles.notesIcon}`}
+										/>
+									</td>
 									<td>{customer.companyName}</td>
 									<td>{customer.contactName}</td>
 									<td>{customer.email}</td>
 									<td>{customer.phone}</td>
 									<td>
-										<Button
-											variant='info'
-											size='sm'
+										<SlPencil
 											onClick={() => handleEditCustomer(customer)}
-											disabled={isLoading}
-										>
-											<SlPencil /> Edit
-										</Button>{' '}
-										<Button
-											variant='danger'
-											size='sm'
+											className={styles.editIcon}
+										/>
+
+										<SlTrash
 											onClick={() => handleDeleteCustomer(customer)}
-											disabled={isLoading}
-										>
-											<SlTrash /> Delete
-										</Button>
+											className={`${styles.editIcon} ${styles.deleteIcon}`}
+										/>
 									</td>
 								</tr>
 							))}
@@ -219,6 +265,15 @@ const Customers: NextPage = () => {
 					/>
 				)}
 
+				{showFollowUpNotesModal && (
+					<FollowUpNotesModal
+						show={showFollowUpNotesModal}
+						onHide={() => setShowFollowUpNotesModal(false)}
+						customer={selectedCustomer}
+						onSave={handleSaveNote}
+					/>
+				)}
+
 				{showDeleteConfirmation && (
 					<DeleteConfirmationModal
 						show={showDeleteConfirmation}
@@ -229,6 +284,7 @@ const Customers: NextPage = () => {
 					/>
 				)}
 			</Container>
+			<ToastContainer />
 		</Layout>
 	);
 };

@@ -2,16 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
-import {
-	Button,
-	Container,
-	Row,
-	Col,
-	Spinner,
-	Alert,
-	Modal,
-	Form,
-} from 'react-bootstrap';
+import { Button, Container, Row, Col, Form } from 'react-bootstrap';
 import { ToastContainer, toast } from 'react-toastify';
 import Layout from '@/components/app/Layout';
 import CustomerDropdown from '@/components/app/quote/CustomerDropdown';
@@ -28,6 +19,7 @@ import SummaryComponent from '@/components/app/quote/SummaryComponent';
 import { Customer } from '@/types/Customer';
 import { Price } from '@/types/Price';
 import { Quote, QuoteItem } from '@/types/Quote';
+import { Company } from '@/types/Company';
 
 type PrintingOptionKeys =
 	| 'colorsFront'
@@ -39,15 +31,17 @@ interface ScreenPrintingDetails {
 	newScreensNeeded: boolean;
 	additionalScreens: number;
 	colorChanges: number;
+	inkType: string;
 }
 
 const initialQuoteState: Quote = {
 	_id: '',
 	customerName: '',
 	quoteType: 'savedQuotes',
+	depositPercentage: 0,
 	items: [
 		{
-			quoteType: '',
+			quoteType: 'savedQuotes',
 			brandAndStyle: '',
 			color: '',
 			standardPrice: 0,
@@ -95,6 +89,7 @@ const initialQuoteState: Quote = {
 		newScreensNeeded: false,
 		additionalScreens: 0,
 		colorChanges: 0,
+		inkType: 'None',
 	},
 	embroideryDetails: {
 		stitchesFront: 0,
@@ -111,7 +106,6 @@ const initialQuoteState: Quote = {
 	},
 	printingDetails: {
 		colorMatches: 0,
-		inkType: '',
 		artworkNeeded: false,
 		deliveryDueDays: 0,
 		deliveryDueDate: new Date(),
@@ -144,25 +138,25 @@ const QuotePage: NextPage = () => {
 	const [quote, setQuote] = useState<Quote | null>(null);
 	const [customers, setCustomers] = useState<Customer[]>([]);
 	const [prices, setPrices] = useState<Price | null>(null);
+	const [company, setCompany] = useState<Company | null>(null);
 	const [isLoading, setIsLoading] = useState(false);
-	const [error, setError] = useState<string | null>(null);
 	const [selectedCustomerId, setSelectedCustomerId] = useState('');
-	const [showSuccessModal, setShowSuccessModal] = useState(false);
 	const [isQuoteModified, setIsQuoteModified] = useState(false);
-	const [items, setItems] = useState<QuoteItem[]>();
+	const [deliveryDays, setDeliveryDays] = useState(0);
 
 	useEffect(() => {
 		const fetchData = async () => {
 			if (session) {
 				try {
-					const [customersRes, pricesRes] = await Promise.all([
+					const [customersRes, pricesRes, companyRes] = await Promise.all([
 						fetch(`/api/customers/${session.user.companyId}`),
 						fetch(`/api/prices/${session.user.companyId}`),
+						fetch(`/api/company/${session.user.companyId}`),
 					]);
 
 					if (!customersRes) {
-						toast.error('Failed to customer data');
-						throw new Error('Failed to customer data');
+						toast.error('Failed to fetch customer data');
+						throw new Error('Failed to fetch customer data');
 					}
 
 					if (!pricesRes) {
@@ -170,16 +164,23 @@ const QuotePage: NextPage = () => {
 						throw new Error('Failed to fetch prices');
 					}
 
-					if (!customersRes.ok || !pricesRes.ok) {
+					if (!companyRes) {
+						toast.error('Failed to fetch company data');
+						throw new Error('Failed to fetch company data');
+					}
+
+					if (!customersRes.ok || !pricesRes.ok || !companyRes.ok) {
 						toast.error('Failed to fetch data');
 						throw new Error('Failed to fetch data');
 					}
 
 					const customersData = await customersRes.json();
 					const pricesData = await pricesRes.json();
+					const companyData = await companyRes.json();
 
 					setCustomers(customersData.customers);
 					setPrices(pricesData.prices);
+					setCompany(companyData.company);
 
 					if (quoteId && typeof quoteId === 'string') {
 						try {
@@ -195,15 +196,13 @@ const QuotePage: NextPage = () => {
 							setIsQuoteModified(true);
 						} catch (err) {
 							console.error(err);
-							toast.error('Failed to load quote');
-							setError('Failed to load quote');
+							toast.error(`Failed to load quote: ${err}`);
 						}
 					} else {
 						setQuote(initialQuoteState);
 					}
 				} catch (error) {
-					toast.error('Failed to load data');
-					setError('Failed to load data');
+					toast.error(`Failed to load data: ${error}`);
 				} finally {
 					setIsLoading(false);
 				}
@@ -235,11 +234,19 @@ const QuotePage: NextPage = () => {
 	const handleDateChange = (date: Date) => {
 		setQuote((prevQuote) => {
 			if (!prevQuote) return null;
+
+			const currentDate = new Date();
+			const timeDiff = date.getTime() - currentDate.getTime();
+			const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24)); // Calculate days difference
+
+			setDeliveryDays(daysDiff); // Set the calculated days to state
+
 			return {
 				...prevQuote,
 				printingDetails: {
 					...prevQuote.printingDetails,
 					deliveryDueDate: date,
+					deliveryDueDays: daysDiff,
 				},
 			};
 		});
@@ -329,29 +336,32 @@ const QuotePage: NextPage = () => {
 		});
 	};
 
-	const handlePrintingDetailsChange = (
-		updatedPrintingDetails: typeof initialQuoteState.printingDetails
-	) => {
-		setQuote((prevQuote) => {
-			if (!prevQuote) return null;
-
-			return {
-				...prevQuote,
-				printingDetails: updatedPrintingDetails,
-				customerName: prevQuote.customerName || '',
-			};
-		});
-	};
+	// const handleInkTypeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	// 	const { value } = e.target;
+	// 	setQuote((prevQuote) => {
+	// 		if (!prevQuote) return null;
+	// 		return {
+	// 			...prevQuote,
+	// 			printingDetails: {
+	// 				...prevQuote.printingDetails,
+	// 				inkType: value,
+	// 			},
+	// 		};
+	// 	});
+	// };
 
 	const handleScreenPrintingDetailsChange = (
 		updatedScreenPrintingDetails: ScreenPrintingDetails
 	) => {
 		setQuote((prevQuote) => {
-			if (prevQuote === null) return null;
+			if (!prevQuote) return null;
 
 			const updatedQuote: Quote = {
 				...prevQuote,
-				screenPrintingDetails: updatedScreenPrintingDetails,
+				screenPrintingDetails: {
+					...prevQuote.screenPrintingDetails,
+					...updatedScreenPrintingDetails,
+				},
 			};
 
 			return updatedQuote;
@@ -384,7 +394,7 @@ const QuotePage: NextPage = () => {
 			}
 
 			if (!prices || !prices.screenPrinting) {
-				console.error('Prices or screen printing prices are undefined');
+				toast.error('Prices or screen printing prices are undefined');
 				return totalPrintingCost;
 			}
 
@@ -392,8 +402,8 @@ const QuotePage: NextPage = () => {
 				[
 					'colorsFront',
 					'colorsBack',
-					'colorsLeftSleeve',
-					'colorsRightSleeve',
+					'colorsLeft',
+					'colorsRight',
 				] as PrintingOptionKeys[]
 			).forEach((option) => {
 				const colorCount = quote.printingOptions?.[option] ?? 0;
@@ -404,7 +414,7 @@ const QuotePage: NextPage = () => {
 					const priceRanges = prices.screenPrinting[colorKey];
 
 					if (!priceRanges) {
-						console.error(
+						toast.error(
 							`No pricing found for '${colorKey}'. Check your pricing structure.`
 						);
 						return;
@@ -541,7 +551,22 @@ const QuotePage: NextPage = () => {
 	const handleSubmit = async () => {
 		try {
 			setIsLoading(true);
-			if (session?.user?.companyId && quote) {
+
+			if (!quote) {
+				throw new Error('Quote data is missing.');
+			}
+
+			for (let i = 0; i < quote.items.length; i++) {
+				if (!quote.items[i].quoteType) {
+					throw new Error(`quoteType is required for item at index ${i}`);
+				}
+			}
+
+			if (!quote.screenPrintingDetails.inkType) {
+				throw new Error('inkType is required in screenPrintingDetails');
+			}
+
+			if (session?.user?.companyId) {
 				quote.companyId = session.user.companyId.toString();
 				quote.selectedCustomerId = selectedCustomerId;
 
@@ -552,27 +577,22 @@ const QuotePage: NextPage = () => {
 					quote.ModifiedAt = new Date();
 				}
 
-				const quoteWithMetadata = {
-					...quote,
-				};
-
-				console.log(quoteWithMetadata);
+				// Include the user information
+				const userId = session.user.id;
 
 				const response = await fetch('/api/quotes/saveQuote', {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
 					},
-					body: JSON.stringify(quoteWithMetadata),
+					body: JSON.stringify({ ...quote, userId }),
 				});
 
-				const data = await response.json();
-
 				if (!response.ok) {
-					throw new Error(data.message || 'Something went wrong!');
+					throw new Error('Failed to save the quote.');
 				}
 
-				setShowSuccessModal(true);
+				toast.success('Quote Saved Successfully');
 				if (!isQuoteModified) {
 					setQuote(initialQuoteState);
 				}
@@ -580,53 +600,19 @@ const QuotePage: NextPage = () => {
 		} catch (error) {
 			const message =
 				error instanceof Error ? error.message : 'Failed to save the quote.';
-			console.error('Error saving the quote:', error);
-			setError(message);
+			toast.error(`Error saving the quote: ${message}`);
 		} finally {
 			setIsLoading(false);
 		}
 	};
 
-	if (isLoading)
-		return (
-			<Layout>
-				<Spinner animation='border' />
-			</Layout>
-		);
-	if (error)
-		return (
-			<Layout>
-				<Alert variant='danger'>{error}</Alert>
-			</Layout>
-		);
-
 	return (
 		<>
-			<Modal
-				show={showSuccessModal}
-				onHide={() => setShowSuccessModal(false)}
-				size='lg'
-				aria-labelledby='contained-modal-title-vcenter'
-				centered
-			>
-				<Modal.Header closeButton>
-					<Modal.Title id='contained-modal-title-vcenter'>
-						Quote Saved Successfully
-					</Modal.Title>
-				</Modal.Header>
-				<Modal.Body>
-					<p>
-						Your quote has been saved successfully. You can now view or edit
-						this quote from the quotes list.
-					</p>
-				</Modal.Body>
-				<Modal.Footer>
-					<Button onClick={() => setShowSuccessModal(false)}>Close</Button>
-				</Modal.Footer>
-			</Modal>
-
 			<Layout>
-				<Container fluid>
+				<Container
+					fluid
+					className='mb-5'
+				>
 					<Row>
 						<Col>
 							<h1 className='standout-header'>
@@ -640,13 +626,23 @@ const QuotePage: NextPage = () => {
 										onCustomerSelect={handleCustomerSelect}
 									/>
 								</Col>
-								<Col md={6}>
+								<Col md={2}>
 									<DeliveryDueDate
 										selectedDate={
 											quote?.printingDetails?.deliveryDueDate ?? null
 										}
 										onDateChange={handleDateChange}
 									/>
+								</Col>
+								<Col md={4}>
+									<Form.Group>
+										<Form.Label>Days Until Delivery</Form.Label>
+										<Form.Control
+											type='text'
+											value={deliveryDays}
+											readOnly
+										/>
+									</Form.Group>
 								</Col>
 							</Row>
 							{quote && (
@@ -659,30 +655,36 @@ const QuotePage: NextPage = () => {
 										items={quote.items}
 										onItemsChange={handleBrandStylePricingChange}
 									/>
-									<PrintingDetails
-										details={quote.printingDetails}
-										onDetailsChange={handlePrintingDetailsChange}
-									/>
 									<ApparelAndShipping
 										data={quote.apparelAndShipping}
 										onChange={handleApparelAndShippingChange}
 									/>
-									<PrintingOptions
-										options={quote.printingOptions}
-										onOptionsChange={handlePrintingOptionsChange}
-									/>
-									<ScreenPrintingDetails
-										details={quote.screenPrintingDetails}
-										onDetailsChange={handleScreenPrintingDetailsChange}
-									/>
-									<VinylDetails
-										details={quote.vinylDetails}
-										onDetailsChange={handleVinylDetailsChange}
-									/>
-									<EmbroideryOptions
-										embroideryDetails={quote.embroideryDetails}
-										onEmbroideryDetailsChange={handleEmbroideryOptionsChange}
-									/>
+
+									{company?.offerings.includes('Screen Printing') && (
+										<>
+											<ScreenPrintingDetails
+												details={quote.screenPrintingDetails}
+												onDetailsChange={handleScreenPrintingDetailsChange}
+											/>
+											<PrintingOptions
+												options={quote.printingOptions}
+												onOptionsChange={handlePrintingOptionsChange}
+											/>
+										</>
+									)}
+									{company?.offerings.includes('Vinyl') && (
+										<VinylDetails
+											details={quote.vinylDetails}
+											onDetailsChange={handleVinylDetailsChange}
+										/>
+									)}
+									{company?.offerings.includes('Embroidery') && (
+										<EmbroideryOptions
+											embroideryDetails={quote.embroideryDetails}
+											onEmbroideryDetailsChange={handleEmbroideryOptionsChange}
+										/>
+									)}
+
 									<SummaryComponent
 										qty={quote?.summary?.qty ?? 0}
 										avgCost={quote?.summary?.avgCost ?? 0}
@@ -705,6 +707,7 @@ const QuotePage: NextPage = () => {
 						</Col>
 					</Row>
 				</Container>
+				<ToastContainer />
 			</Layout>
 		</>
 	);

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, FC, ChangeEvent } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import { Customer } from '@/types/Customer';
+import { US_STATES } from '@/consts/constants';
 
 interface AddEditCustomerModalProps {
 	show: boolean;
@@ -25,8 +26,7 @@ const AddEditCustomerModal: FC<AddEditCustomerModalProps> = ({
 		zip: '',
 		phone: '',
 		email: '',
-		depositPercentage: 0,
-		totalDueDays: 0,
+		followUpNotes: [],
 	};
 
 	const [customerData, setCustomerData] =
@@ -36,25 +36,19 @@ const AddEditCustomerModal: FC<AddEditCustomerModalProps> = ({
 		setCustomerData(customer ?? initialCustomerState);
 	}, [customer]);
 
-	const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+	const handleChange = (
+		e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+	) => {
 		const { name, value } = e.target;
-		let newValue: any = value;
-
-		// For numeric fields, ensure the value is a number. If not, default to 0
-		if (name === 'depositPercentage' || name === 'totalDueDays') {
-			const parsedValue = parseInt(value, 10);
-			newValue = isNaN(parsedValue) ? 0 : parsedValue; // Use 0 or another appropriate default value
-		}
-
 		setCustomerData((prevData) => ({
 			...prevData,
-			[name]: newValue,
+			[name]: value,
 		}));
 	};
 
 	const handleSubmit = () => {
 		onSave(customerData);
-		onHide(); // Close the modal after saving
+		onHide();
 	};
 
 	return (
@@ -136,14 +130,22 @@ const AddEditCustomerModal: FC<AddEditCustomerModalProps> = ({
 
 					{/* State */}
 					<Form.Group className='form-floating mb-3'>
-						<Form.Control
-							type='text'
+						<Form.Select
 							id='state'
 							name='state'
-							placeholder='State'
 							value={customerData.state}
 							onChange={handleChange}
-						/>
+						>
+							<option value=''>Select State</option>
+							{US_STATES.map((state) => (
+								<option
+									key={state.abbreviation}
+									value={state.abbreviation}
+								>
+									{state.name}
+								</option>
+							))}
+						</Form.Select>
 						<Form.Label htmlFor='state'>State</Form.Label>
 					</Form.Group>
 
@@ -184,34 +186,6 @@ const AddEditCustomerModal: FC<AddEditCustomerModalProps> = ({
 							onChange={handleChange}
 						/>
 						<Form.Label htmlFor='email'>Email</Form.Label>
-					</Form.Group>
-
-					{/* Deposit Percentage */}
-					<Form.Group className='form-floating mb-3'>
-						<Form.Control
-							type='number'
-							id='depositPercentage'
-							name='depositPercentage'
-							placeholder='Deposit Percentage'
-							value={customerData.depositPercentage.toString()}
-							onChange={handleChange}
-						/>
-						<Form.Label htmlFor='depositPercentage'>
-							Deposit Percentage
-						</Form.Label>
-					</Form.Group>
-
-					{/* Total Due (in days) */}
-					<Form.Group className='form-floating mb-3'>
-						<Form.Control
-							type='number'
-							id='totalDueDays'
-							name='totalDueDays'
-							placeholder='Total Due (in days)'
-							value={customerData.totalDueDays.toString()}
-							onChange={handleChange}
-						/>
-						<Form.Label htmlFor='totalDueDays'>Total Due (in days)</Form.Label>
 					</Form.Group>
 				</Form>
 			</Modal.Body>

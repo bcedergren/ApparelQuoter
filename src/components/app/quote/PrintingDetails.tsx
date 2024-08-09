@@ -52,7 +52,7 @@ const PrintingDetails: FC<PrintingDetailsProps> = ({
 						xs={6}
 						md={3}
 					>
-						<Form.Group controlId='inkType'>
+						{/* <Form.Group controlId='inkType'>
 							<Form.Label>Puff or Glitter Ink?</Form.Label>
 							<Form.Select
 								value={details.inkType}
@@ -61,7 +61,7 @@ const PrintingDetails: FC<PrintingDetailsProps> = ({
 								<option value='No'>No</option>
 								<option value='Yes'>Yes</option>
 							</Form.Select>
-						</Form.Group>
+						</Form.Group> */}
 					</Col>
 					<Col
 						xs={6}

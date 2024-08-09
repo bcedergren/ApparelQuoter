@@ -1,15 +1,21 @@
+export interface FollowUpNote {
+	date: Date;
+	note: string;
+	addedBy: string;
+	addedDate: Date;
+}
+
 export interface Customer {
 	_id?: string;
-	companyId?: string; // To associate the customer with a specific company
+	companyId?: string;
 	companyName: string;
 	contactName: string;
 	address: string;
-	address2: string;
+	address2?: string;
 	city: string;
 	state: string;
 	zip: string;
 	phone: string;
 	email: string;
-	depositPercentage: number;
-	totalDueDays: number;
+	followUpNotes: FollowUpNote[];
 }

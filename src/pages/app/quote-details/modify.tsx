@@ -53,6 +53,7 @@ const initialQuoteState: Quote = {
 	_id: '',
 	customerName: '',
 	quoteType: 'savedQuotes',
+	depositPercentage: 0,
 	items: [
 		{
 			quoteType: '',
@@ -103,6 +104,7 @@ const initialQuoteState: Quote = {
 		newScreensNeeded: false,
 		additionalScreens: 0,
 		colorChanges: 0,
+		inkType: '',
 	},
 	embroideryDetails: {
 		stitchesFront: 0,
@@ -119,7 +121,6 @@ const initialQuoteState: Quote = {
 	},
 	printingDetails: {
 		colorMatches: 0,
-		inkType: '',
 		artworkNeeded: false,
 		deliveryDueDays: 0,
 		deliveryDueDate: new Date(),

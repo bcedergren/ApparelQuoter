@@ -1,5 +1,7 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
+// Interfaces for sub-documents and main document
+
 interface IQuoteItem {
 	brandAndStyle: string;
 	quoteType: string;
@@ -52,7 +54,6 @@ interface IPrintingOptions {
 
 interface IPrintingDetails {
 	colorMatches: number;
-	inkType: string;
 	artworkNeeded: boolean;
 	deliveryDueDays: number;
 	deliveryDueDate: Date;
@@ -76,6 +77,7 @@ interface IScreenPrintingDetails {
 	newScreensNeeded: boolean;
 	additionalScreens: number;
 	colorChanges: number;
+	inkType: string;
 }
 
 interface ISummary {
@@ -87,6 +89,8 @@ interface ISummary {
 	taxCost: number;
 	totalCost: number;
 }
+
+// Main Quote interface
 
 export interface IQuote extends Document {
 	companyId?: mongoose.Schema.Types.ObjectId;
@@ -106,9 +110,13 @@ export interface IQuote extends Document {
 	vinylDetails: IVinylDetails;
 	screenPrintingDetails: IScreenPrintingDetails;
 	summary: ISummary;
+	depositPercentage: number;
+	totalDueDays: number;
 	CreatedAt?: Date;
 	ModifiedAt?: Date;
 }
+
+// Schema Definitions for sub-documents
 
 const QuoteItemSchema = new Schema<IQuoteItem>({
 	brandAndStyle: { type: String, required: true },
@@ -160,7 +168,6 @@ const PrintingOptionsSchema = new Schema<IPrintingOptions>({
 
 const PrintingDetailsSchema = new Schema<IPrintingDetails>({
 	colorMatches: { type: Number, required: true },
-	inkType: { type: String, required: true },
 	artworkNeeded: { type: Boolean, required: true },
 	deliveryDueDays: { type: Number, required: true },
 	deliveryDueDate: { type: Date, required: true },
@@ -184,6 +191,7 @@ const ScreenPrintingDetailsSchema = new Schema<IScreenPrintingDetails>({
 	newScreensNeeded: { type: Boolean, required: true },
 	additionalScreens: { type: Number, required: true },
 	colorChanges: { type: Number, required: true },
+	inkType: { type: String, required: true },
 });
 
 const SummarySchema = new Schema<ISummary>({
@@ -195,6 +203,8 @@ const SummarySchema = new Schema<ISummary>({
 	taxCost: { type: Number, required: true },
 	totalCost: { type: Number, required: true },
 });
+
+// Main Quote Schema
 
 const QuoteSchema = new Schema<IQuote>({
 	companyId: { type: Schema.Types.ObjectId, ref: 'Company' },
@@ -219,9 +229,11 @@ const QuoteSchema = new Schema<IQuote>({
 	vinylDetails: { type: VinylDetailsSchema, required: true },
 	screenPrintingDetails: { type: ScreenPrintingDetailsSchema, required: true },
 	summary: { type: SummarySchema, required: true },
+	depositPercentage: { type: Number, required: true },
+	totalDueDays: { type: Number, required: true },
 	CreatedAt: { type: Date, default: Date.now },
 	ModifiedAt: { type: Date, default: Date.now },
 });
 
-export default mongoose.models.Quote ||
+export default mongoose.models.Quotes ||
 	mongoose.model<IQuote>('Quotes', QuoteSchema);
