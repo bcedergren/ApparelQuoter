@@ -160,23 +160,23 @@ const QuoteDetails = () => {
 				);
 			}
 
-			// Calculate cost for left sleeve colors if not 0 or null
-			if (quote.printingOptions.colorsLeftSleeve > 0) {
+			// Calculate cost for left colors if not 0 or null
+			if (quote.printingOptions.colorsLeft > 0) {
 				const backCost = getScreenPrintingCost(
-					quote.printingOptions.colorsLeftSleeve
+					quote.printingOptions.colorsLeft
 				);
 				decorationDetails.push(
-					`Left: ${quote.printingOptions.colorsLeftSleeve} color(s)`
+					`Left: ${quote.printingOptions.colorsLeft} color(s)`
 				);
 			}
 
-			// Calculate cost for right sleeve colors if not 0 or null
-			if (quote.printingOptions.colorsRightSleeve > 0) {
+			// Calculate cost for right colors if not 0 or null
+			if (quote.printingOptions.colorsRight > 0) {
 				const backCost = getScreenPrintingCost(
-					quote.printingOptions.colorsRightSleeve
+					quote.printingOptions.colorsRight
 				);
 				decorationDetails.push(
-					`Right: ${quote.printingOptions.colorsRightSleeve} color(s)`
+					`Right: ${quote.printingOptions.colorsRight} color(s)`
 				);
 			}
 
@@ -300,11 +300,10 @@ const QuoteDetails = () => {
 			return;
 		}
 
-		// Assume you have functions or calculations to get these values
-		const decorationDetails = getDecorationDetails(quote); // Define this function based on your business logic
-		const artworkFee = getArtworkFee(quote); // Define this function based on your business logic
-		const setupFee = getSetupFee(quote); // Define this function based on your business logic
-		const deliveryDate = getDeliveryDate(quote); // Define this function based on your business logic
+		const decorationDetails = getDecorationDetails(quote);
+		const artworkFee = getArtworkFee(quote);
+		const setupFee = getSetupFee(quote);
+		const deliveryDate = getDeliveryDate(quote);
 
 		// Data for the items table in the PDF
 		const itemsTableData = quote.items.map((item) => [
@@ -365,6 +364,7 @@ const QuoteDetails = () => {
 					<div className={styles.header}>
 						<h1 className={styles.title}>{formatQuoteType(quote.quoteType)}</h1>
 						<h4>{quote.customerName}</h4>
+						<h5>Quote Number {quote.quoteId}</h5>
 						<p>
 							<strong>Contact: </strong> {customer.contactName}
 							<br />
@@ -515,7 +515,10 @@ const QuoteDetails = () => {
 						</tr>
 					</tfoot>
 				</table>
-				<Link href={`/quote?quoteId=${quote._id}`}>
+				<Link
+					href={`/app/quote?quoteId=${quote._id}`}
+					className='m-4'
+				>
 					<Button type='button'>Modify Quote</Button>
 				</Link>
 				<Button onClick={printQuote}>Print Quote</Button>

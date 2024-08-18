@@ -3,33 +3,45 @@ import Card from './Card';
 import { FaServer, FaEnvelope, FaFileAlt, FaCalendarAlt } from 'react-icons/fa';
 import styles from '@/styles/ActivityList.module.css';
 
-const ActivityList: React.FC = () => (
+interface Activity {
+	activityType: string;
+	message: string;
+	timestamp: string; // Assuming timestamp is in ISO format
+}
+
+interface ActivityListProps {
+	activities: Activity[];
+}
+
+const getActivityIcon = (activityType: string): JSX.Element => {
+	switch (activityType) {
+		case 'email':
+			return <FaEnvelope />;
+		case 'server':
+			return <FaServer />;
+		case 'file':
+			return <FaFileAlt />;
+		case 'calendar':
+			return <FaCalendarAlt />;
+		default:
+			return <FaFileAlt />; // Default icon if activity type is unknown
+	}
+};
+
+const formatTime = (timestamp: string): string => {
+	const date = new Date(timestamp);
+	return date.toLocaleString(); // Adjust to the desired time format
+};
+
+const ActivityList: React.FC<ActivityListProps> = ({ activities }) => (
 	<Card title='Recent Activities'>
 		<ul className={styles.activitiesList}>
-			<li>
-				<FaServer /> Updated Server Logs - Just Now
-			</li>
-			<li>
-				<FaEnvelope /> Send Mail to HR and Admin - 2 min ago
-			</li>
-			<li>
-				<FaFileAlt /> Backup Files EOD - 14:00
-			</li>
-			<li>
-				<FaCalendarAlt /> Collect documents from Sara - 16:00
-			</li>
-			<li>
-				<FaCalendarAlt /> Conference call with Marketing Manager - 17:00
-			</li>
-			<li>
-				<FaServer /> Rebooted Server - 17:00
-			</li>
-			<li>
-				<FaFileAlt /> Send contract details to Freelancer - 18:00
-			</li>
-			<li>
-				<FaServer /> Server down for maintenance - 19:00
-			</li>
+			{activities.map((activity, index) => (
+				<li key={index}>
+					{getActivityIcon(activity.activityType)} {activity.message} -{' '}
+					{formatTime(activity.timestamp)}
+				</li>
+			))}
 		</ul>
 	</Card>
 );

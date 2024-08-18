@@ -3,13 +3,18 @@ import Card from './Card';
 import { FaWallet } from 'react-icons/fa';
 import styles from '@/styles/Balance.module.css';
 
-const Balance: React.FC = () => (
+interface BalanceProps {
+	balanceAmount: string;
+	interestRate: string;
+}
+
+const Balance: React.FC<BalanceProps> = ({ balanceAmount, interestRate }) => (
 	<Card title='Total Balance'>
 		<div className={styles.balance}>
 			<FaWallet className={styles.balanceIcon} />
-			<p className={styles.balanceAmount}>$26,177.88</p>
+			<p className={styles.balanceAmount}>{balanceAmount}</p>
 		</div>
-		<p className={styles.balanceInterest}>Get 6% interest</p>
+		<p className={styles.balanceInterest}>Get {interestRate} interest</p>
 		<div className={styles.buttons}>
 			<button className='btn btn-primary'>Topup</button>
 			<button className='btn btn-success'>Send</button>

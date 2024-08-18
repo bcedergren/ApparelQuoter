@@ -14,18 +14,18 @@ const BrandStylePricing: FC<BrandStylePricingProps> = ({
 	onItemsChange,
 }) => {
 	// Local state for managing extended sizes prices input by user
-	const [localPrices, setLocalPrices] = useState<{ [key: string]: number }>({});
+	const [localPrices, setLocalPrices] = useState<{ [key: string]: string }>({});
 
 	useEffect(() => {
-		const initialPrices = items.reduce<{ [key: string]: number }>(
+		const initialPrices = items.reduce<{ [key: string]: string }>(
 			(acc, item, index) => {
 				extendedSizeColumns.forEach((size) => {
 					const priceKey = `${size}-${index}`;
 					// Only use standardPrice if an explicit price for the size is not set
 					acc[priceKey] =
 						item.sizePrices && item.sizePrices[size] !== undefined
-							? item.sizePrices[size]
-							: 0; // Use 0 or any other default value for uninitialized extended sizes
+							? item.sizePrices[size].toFixed(2)
+							: '0.00'; // Use '0.00' or any other default value for uninitialized extended sizes
 				});
 				return acc;
 			},
@@ -51,21 +51,41 @@ const BrandStylePricing: FC<BrandStylePricingProps> = ({
 		size: SizeKey,
 		value: string
 	) => {
-		const newValue = parseFloat(value) || 0; // Default to 0 if the input is not a number
 		setLocalPrices((currentPrices) => ({
 			...currentPrices,
-			[`${size}-${index}`]: newValue,
+			[`${size}-${index}`]: value,
 		}));
+	};
 
-		// Update the corresponding item's sizePrices
-		const updatedItems = [...items];
-		const itemToUpdate = updatedItems[index];
-		if (!itemToUpdate.sizePrices) {
-			itemToUpdate.sizePrices = {};
+	const handleBlur = (index: number, size?: SizeKey) => {
+		if (size) {
+			const key = `${size}-${index}`;
+			const newValue = parseFloat(localPrices[key]) || 0;
+			setLocalPrices((currentPrices) => ({
+				...currentPrices,
+				[key]: newValue.toFixed(2),
+			}));
+
+			// Update the corresponding item's sizePrices
+			const updatedItems = [...items];
+			const itemToUpdate = updatedItems[index];
+			if (!itemToUpdate.sizePrices) {
+				itemToUpdate.sizePrices = {};
+			}
+			itemToUpdate.sizePrices[size] = newValue;
+			onItemsChange(updatedItems);
+		} else {
+			const updatedItems = items.map((item, idx) => {
+				if (idx === index) {
+					return {
+						...item,
+						standardPrice: parseFloat(item.standardPrice.toFixed(2)) || 0,
+					};
+				}
+				return item;
+			});
+			onItemsChange(updatedItems);
 		}
-		itemToUpdate.sizePrices[size] = newValue;
-
-		onItemsChange(updatedItems);
 	};
 
 	return (
@@ -96,10 +116,11 @@ const BrandStylePricing: FC<BrandStylePricingProps> = ({
 									type='number'
 									step='0.01'
 									min='0.00'
-									value={item.standardPrice.toString()} // Ensure the value is a string
+									value={item.standardPrice.toString() ?? '0.00'}
 									onChange={(e) =>
 										handleStandardPricingChange(index, e.target.value)
 									}
+									onBlur={() => handleBlur(index)}
 								/>
 							</InputGroup>
 						</td>
@@ -110,9 +131,9 @@ const BrandStylePricing: FC<BrandStylePricingProps> = ({
 									<FormControl
 										type='number'
 										step='0.01'
-										min='0'
+										min='0.00'
 										name={`${size}-${index}`}
-										value={(localPrices[`${size}-${index}`] ?? 0).toString()}
+										value={localPrices[`${size}-${index}`] ?? '0.00'}
 										onChange={(e) =>
 											handleExtendedPricingChange(
 												index,
@@ -120,6 +141,7 @@ const BrandStylePricing: FC<BrandStylePricingProps> = ({
 												e.target.value
 											)
 										}
+										onBlur={() => handleBlur(index, size as SizeKey)}
 									/>
 								</InputGroup>
 							</td>

@@ -13,21 +13,34 @@ export default async function handler(
 	await dbConnect();
 
 	const { id } = req.query;
-	const quoteData = req.body;
+	const { status: quoteType } = req.body; // Retrieve the new quoteType from the body
 
 	try {
-		const updatedQuote = await Quote.findByIdAndUpdate(id, quoteData, {
-			new: true,
-			runValidators: true,
-		});
+		console.log('Attempting to update quote with ID:', id);
+		console.log('New quoteType:', quoteType);
+
+		const updatedQuote = await Quote.findByIdAndUpdate(
+			id,
+			{ quoteType }, // Update the quoteType field
+			{
+				new: true,
+				runValidators: true,
+			}
+		);
 
 		if (!updatedQuote) {
+			console.error(`Quote with ID ${id} not found`);
 			return res.status(404).json({ message: 'Quote not found' });
 		}
 
-		res.status(200).json(updatedQuote);
-	} catch (error) {
+		console.log('Quote updated successfully');
+		res
+			.status(200)
+			.json({ message: 'Order updated successfully', updatedQuote });
+	} catch (error: Error | any) {
 		console.error('Failed to update quote:', error);
-		res.status(500).json({ message: 'Failed to update quote' });
+		res
+			.status(500)
+			.json({ message: 'Failed to update quote', error: error.message });
 	}
 }

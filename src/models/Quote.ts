@@ -1,10 +1,8 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 // Interfaces for sub-documents and main document
-
 interface IQuoteItem {
 	brandAndStyle: string;
-	quoteType: string;
 	color: string;
 	standardPrice: number;
 	sizes: {
@@ -102,6 +100,7 @@ export interface IQuote extends Document {
 		| 'openOrders'
 		| 'savedOrders'
 		| 'completedOrders';
+	quoteId: string;
 	items: IQuoteItem[];
 	embroideryDetails: IEmbroideryDetails;
 	printingOptions: IPrintingOptions;
@@ -117,10 +116,8 @@ export interface IQuote extends Document {
 }
 
 // Schema Definitions for sub-documents
-
 const QuoteItemSchema = new Schema<IQuoteItem>({
 	brandAndStyle: { type: String, required: true },
-	quoteType: { type: String, required: true },
 	color: { type: String, required: true },
 	standardPrice: { type: Number, required: true },
 	sizes: {
@@ -221,6 +218,7 @@ const QuoteSchema = new Schema<IQuote>({
 		],
 		required: true,
 	},
+	quoteId: { type: String, required: true },
 	items: { type: [QuoteItemSchema], required: true },
 	embroideryDetails: { type: EmbroideryDetailsSchema, required: true },
 	printingOptions: { type: PrintingOptionsSchema, required: true },

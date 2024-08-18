@@ -1,46 +1,23 @@
 import { useEffect, useState } from 'react';
 import Router from 'next/router';
-import { Button, Container } from 'react-bootstrap';
+import { Container } from 'react-bootstrap';
 import { useSession } from 'next-auth/react';
 import Layout from '@/components/app/Layout';
-import {
-	DragDropContext,
-	Droppable,
-	Draggable,
-	DropResult,
-} from 'react-beautiful-dnd';
-import { Quote, QuoteItem } from '@/types/Quote';
-import { formatColumnHeader } from '@/utils/formatQuoteType';
+import { Quote } from '@/types/Quote';
+import { initialOrders, OrdersState } from '@/utils/ordersUtils';
 import styles from '@/styles/Ordersboard.module.css';
-import Link from 'next/link';
+import { DropResult } from 'react-beautiful-dnd';
+import dynamic from 'next/dynamic';
 
-interface Order {
-	id: string;
-	customerName: string;
-	items: QuoteItem[];
-}
+// Dynamic import of OrdersBoardComponent with SSR disabled
+const OrdersBoardComponent = dynamic(
+	() => import('@/components/app/OrdersBoardComponent'),
+	{
+		ssr: false,
+	}
+);
 
-interface OrdersState {
-	savedQuotes: Order[];
-	openOrders: Order[];
-	savedOrders: Order[];
-	completedOrders: Order[];
-}
-
-const initialOrders: OrdersState = {
-	savedQuotes: [],
-	openOrders: [],
-	savedOrders: [],
-	completedOrders: [],
-};
-
-interface UpdateResponse {
-	message: string;
-	quoteId?: string;
-	error?: string;
-}
-
-const Dashboard = () => {
+const OrdersBoardPage = () => {
 	const { data: session, status } = useSession();
 	const [orders, setOrders] = useState<OrdersState>(initialOrders);
 
@@ -64,13 +41,12 @@ const Dashboard = () => {
 
 					if (!Array.isArray(data.quotes)) {
 						console.error('Expected an array of quotes, received:', data);
-						return initialOrders; // Return some fallback or initial state
+						return initialOrders;
 					}
 
 					const categorizedQuotes: OrdersState = data.quotes.reduce(
 						(acc: OrdersState, quote: Quote) => {
-							// Determine the category based on quote.quoteType
-							let category: keyof OrdersState; // Ensures category is a valid key of OrdersState
+							let category: keyof OrdersState;
 
 							switch (quote.quoteType) {
 								case 'savedQuotes':
@@ -90,17 +66,11 @@ const Dashboard = () => {
 									break;
 							}
 
-							const order: Order = transformQuoteToOrder(quote);
-							acc[category].push(order);
+							acc[category].push(quote);
 							return acc;
 						},
-						{
-							savedQuotes: [],
-							openOrders: [],
-							savedOrders: [],
-							completedOrders: [],
-						} as OrdersState
-					); // Type assertion to match the initial value with OrdersState
+						{ ...initialOrders }
+					);
 
 					setOrders(categorizedQuotes);
 				} catch (error) {
@@ -127,20 +97,35 @@ const Dashboard = () => {
 			return;
 		}
 
-		if (
-			!(source.droppableId in orders) ||
-			!(destination.droppableId in orders)
-		) {
-			// Handle the case where droppableId does not correspond to a key in orders
-			console.error('Invalid droppableId');
-			return;
-		}
-
 		const startKey = source.droppableId as keyof OrdersState;
 		const finishKey = destination.droppableId as keyof OrdersState;
 
 		const start = orders[startKey];
 		const finish = orders[finishKey];
+
+		let updatedOrderId = draggableId;
+
+		// Determine the new quoteType based on the finish column
+		let newStatus = finishKey as string;
+		let newQuoteType: string;
+
+		switch (newStatus) {
+			case 'savedQuotes':
+				newQuoteType = 'savedQuotes';
+				break;
+			case 'openOrders':
+				newQuoteType = 'openOrders';
+				break;
+			case 'savedOrders':
+				newQuoteType = 'savedOrders';
+				break;
+			case 'completedOrders':
+				newQuoteType = 'completedOrders';
+				break;
+			default:
+				newQuoteType = 'savedQuotes';
+				break;
+		}
 
 		if (start === finish) {
 			const newOrderItems = Array.from(start);
@@ -149,7 +134,7 @@ const Dashboard = () => {
 
 			const newOrders = {
 				...orders,
-				[source.droppableId]: newOrderItems,
+				[startKey]: newOrderItems,
 			};
 
 			setOrders(newOrders);
@@ -161,70 +146,19 @@ const Dashboard = () => {
 
 			const newOrders = {
 				...orders,
-				[source.droppableId]: startOrderItems,
-				[destination.droppableId]: finishOrderItems,
+				[startKey]: startOrderItems,
+				[finishKey]: finishOrderItems,
 			};
 
 			setOrders(newOrders);
 		}
 
-		// Call updateDatabase function after reordering
-		updateDatabase(draggableId, destination.droppableId)
-			.then((response) => console.log(response.message))
-			.catch((error) => console.error('Error updating order:', error));
-	};
-
-	function transformQuoteToOrder(quote: Quote): Order {
-		return {
-			id: quote._id, // Map _id from Quote to id in Order
-			customerName: quote.customerName,
-			items: quote.items,
-			// Set other properties of Order as needed
-		};
-	}
-
-	async function updateDatabase(
-		orderId: string,
-		newStatus: string
-	): Promise<UpdateResponse> {
-		try {
-			const endpoint = `/api/status/update`;
-
-			// Construct the request options
-			const requestOptions: RequestInit = {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({ orderId, newStatus }),
-			};
-
-			// Make the fetch call to the API endpoint
-			const response = await fetch(endpoint, requestOptions);
-
-			// Throw an error if the response is not OK to trigger the catch block
-			if (!response.ok) {
-				throw new Error(`API call failed with status: ${response.status}`);
-			}
-
-			// Parse the response data
-			const data: UpdateResponse = await response.json();
-
-			// Return the parsed data
-			return data;
-		} catch (error) {
-			// Log and return the error details
-			console.error('Error updating the database:', error);
-			return {
-				message: 'Failed to update the database',
-				error: error instanceof Error ? error.message : 'Unknown error',
-			};
+		if (session?.user) {
+			updateDatabase(updatedOrderId, newQuoteType, session).catch((error) =>
+				console.error('Error updating order:', error)
+			);
 		}
-	}
-
-	if (status === 'loading') {
-		return <p>Loading...</p>;
-	}
+	};
 
 	return (
 		<Layout>
@@ -233,76 +167,67 @@ const Dashboard = () => {
 				className={styles.dashboardContainer}
 			>
 				<h1>Orders Board</h1>
-				<DragDropContext onDragEnd={onDragEnd}>
-					<div className={styles.board}>
-						{Object.entries(orders).map(([columnId, orderItems]) => (
-							<Droppable
-								droppableId={columnId}
-								key={columnId}
-							>
-								{(provided) => (
-									<div
-										{...provided.droppableProps}
-										ref={provided.innerRef}
-										className={styles.column}
-									>
-										<div className={styles.columnHeader}>
-											<h4>{formatColumnHeader(columnId)}</h4>
-										</div>
-										{orderItems.map((item: Order, index: number) => (
-											<Draggable
-												key={item.id}
-												draggableId={item.id}
-												index={index}
-											>
-												{(provided) => (
-													<div
-														ref={provided.innerRef}
-														{...provided.draggableProps}
-														{...provided.dragHandleProps}
-														className={styles.card}
-													>
-														<div className={styles.cardBody}>
-															<h5 className={styles.cardTitle}>
-																{item.customerName}
-															</h5>
-															{item.items &&
-																item.items.map((quoteItem: QuoteItem) => (
-																	<div
-																		key={quoteItem.brandAndStyle}
-																		className={styles.cardText}
-																	>
-																		<strong>{quoteItem.quoteType}</strong>
-																		<strong>
-																			{quoteItem.brandAndStyle} -{' '}
-																			{quoteItem.color}
-																		</strong>
-																		{Object.entries(quoteItem.sizes)
-																			.filter(([size, qty]) => qty > 0) // Filter out sizes with quantity 0
-																			.map(([size, qty]) => (
-																				<div key={size}>
-																					{size} ({qty})
-																				</div>
-																			))}
-																	</div>
-																))}
-															<Link href={`/app/quote-details/${item.id}`}>
-																-View Order-
-															</Link>
-														</div>
-													</div>
-												)}
-											</Draggable>
-										))}
-									</div>
-								)}
-							</Droppable>
-						))}
-					</div>
-				</DragDropContext>
+				<OrdersBoardComponent
+					orders={orders}
+					onDragEnd={onDragEnd}
+				/>
 			</Container>
 		</Layout>
 	);
 };
 
-export default Dashboard;
+async function updateDatabase(
+	orderId: string,
+	newStatus: string,
+	session: any
+) {
+	try {
+		console.log('Updating order:', orderId, 'to status:', newStatus);
+		const updateResponse = await fetch(`/api/quotes/update/${orderId}`, {
+			method: 'PUT',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({ status: newStatus }),
+		});
+
+		if (!updateResponse.ok) {
+			throw new Error(`API call failed with status: ${updateResponse.status}`);
+		}
+
+		const updatedOrder = await updateResponse.json();
+
+		console.log('Order updated, creating activity record...');
+		const activityResponse = await fetch(`/api/activities/create`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				orderId,
+				companyId: session.user.companyId,
+				updatedBy: session.user.id,
+				activityType: 'status-update',
+				message: `Order ${orderId} status changed to ${newStatus} by ${session.user.name}`,
+				timestamp: new Date().toISOString(),
+			}),
+		});
+
+		if (!activityResponse.ok) {
+			throw new Error(
+				`Activity logging failed with status: ${activityResponse.status}`
+			);
+		}
+
+		const activityRecord = await activityResponse.json();
+
+		console.log('Activity record created:', activityRecord);
+
+		return { updatedOrder, activityRecord };
+	} catch (error) {
+		console.error('Error updating the database:', error);
+		throw error;
+	}
+}
+
+export default OrdersBoardPage;

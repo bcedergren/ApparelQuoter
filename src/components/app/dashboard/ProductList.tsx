@@ -3,16 +3,28 @@ import Card from './Card';
 import { FaHeadphones, FaShoePrints } from 'react-icons/fa';
 import styles from '@/styles/ProductList.module.css';
 
-const ProductList: React.FC = () => (
+interface Product {
+	icon: JSX.Element;
+	name: string;
+	price: string;
+}
+
+interface ProductListProps {
+	products: Product[];
+}
+
+const ProductList: React.FC<ProductListProps> = ({ products }) => (
 	<Card title='Top Selling Product'>
 		<ul className={styles.productsList}>
-			<li>
-				<FaHeadphones /> Headphone - $168.09
-			</li>
-			<li>
-				<FaShoePrints /> Shoes - $108.09
-			</li>
-			<li> Watch - $98.00</li>
+			{products && products.length > 0 ? (
+				products.map((product, index) => (
+					<li key={index}>
+						{product.icon} {product.name} - {product.price}
+					</li>
+				))
+			) : (
+				<li>No products available</li>
+			)}
 		</ul>
 	</Card>
 );

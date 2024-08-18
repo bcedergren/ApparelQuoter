@@ -14,6 +14,7 @@ export interface ICompany extends Document {
 	salesTax?: string;
 	creditCardCharge?: string;
 	offerings?: string[];
+	quoteIdFormat: string;
 }
 
 const CompanySchema: Schema = new Schema({
@@ -30,6 +31,7 @@ const CompanySchema: Schema = new Schema({
 	salesTax: { type: String },
 	creditCardCharge: { type: String },
 	offerings: { type: [String] },
+	quoteIdFormat: { type: String },
 });
 
 export default mongoose.models.Company ||

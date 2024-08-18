@@ -75,6 +75,7 @@ const Customers: NextPage = () => {
 		const customerDataWithCompanyId = {
 			...customerData,
 			companyId: session.user.companyId,
+			userId: session.user.id,
 			followUpNotes: customerData._id
 				? customerData.followUpNotes
 				: [followUpNote],
@@ -173,7 +174,6 @@ const Customers: NextPage = () => {
 
 			if (response.ok) {
 				setCustomers(customers.filter((c) => c._id !== selectedCustomer._id));
-				setSuccessMessage('Customer deleted successfully.');
 			} else {
 				const responseData = await response.json();
 				setError(responseData.message || 'Failed to delete customer.');

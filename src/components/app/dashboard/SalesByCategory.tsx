@@ -4,12 +4,26 @@ import Card from './Card';
 import styles from '@/styles/SalesByCategory.module.css';
 import '@/chartjs-setup';
 
-const SalesByCategory: React.FC = () => {
-	const data = {
-		labels: ['Electronics', 'Fashion', 'Home & Garden', 'Sports', 'Toys'],
-		datasets: [
+interface SalesByCategoryProps {
+	data: {
+		labels: string[];
+		datasets: {
+			data: number[];
+			backgroundColor: string[];
+		}[];
+	};
+	totalSales: string;
+}
+
+const SalesByCategory: React.FC<SalesByCategoryProps> = ({
+	data,
+	totalSales,
+}) => {
+	const defaultData = {
+		labels: data?.labels || [],
+		datasets: data?.datasets || [
 			{
-				data: [1992, 1567, 1423, 1123, 890],
+				data: [],
 				backgroundColor: [
 					'#ff6384',
 					'#36a2eb',
@@ -23,8 +37,8 @@ const SalesByCategory: React.FC = () => {
 
 	return (
 		<Card title='Sales by Category'>
-			<p className={styles.totalSales}>Total: 1992</p>
-			<Doughnut data={data} />
+			<p className={styles.totalSales}>Total: {totalSales || '0'}</p>
+			<Doughnut data={defaultData} />
 		</Card>
 	);
 };

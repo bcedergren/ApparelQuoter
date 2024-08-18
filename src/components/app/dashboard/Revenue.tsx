@@ -4,19 +4,32 @@ import Card from './Card';
 import styles from '@/styles/Revenue.module.css';
 import '@/chartjs-setup';
 
-const Revenue: React.FC = () => {
-	const data = {
-		labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
-		datasets: [
+interface RevenueProps {
+	data: {
+		labels: string[];
+		datasets: {
+			label: string;
+			data: number[];
+			borderColor: string;
+			fill: boolean;
+		}[];
+	};
+	totalProfit: string;
+}
+
+const Revenue: React.FC<RevenueProps> = ({ data, totalProfit }) => {
+	const defaultData = {
+		labels: data?.labels || [],
+		datasets: data?.datasets || [
 			{
 				label: 'Income',
-				data: [16500, 14500, 16000, 17000, 18000, 20000, 22000],
+				data: [],
 				borderColor: '#4caf50',
 				fill: false,
 			},
 			{
 				label: 'Expenses',
-				data: [9000, 10500, 11000, 10000, 9500, 11500, 12500],
+				data: [],
 				borderColor: '#f44336',
 				fill: false,
 			},
@@ -25,8 +38,10 @@ const Revenue: React.FC = () => {
 
 	return (
 		<Card title='Revenue'>
-			<p className={styles.totalProfit}>Total Profit: $10,840</p>
-			<Line data={data} />
+			<p className={styles.totalProfit}>
+				Total Profit: {totalProfit || '$0.00'}
+			</p>
+			<Line data={defaultData} />
 		</Card>
 	);
 };

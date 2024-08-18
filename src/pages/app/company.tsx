@@ -2,7 +2,15 @@ import { useState, useEffect } from 'react';
 import { NextPage } from 'next';
 import { useSession } from 'next-auth/react';
 import { useForm, Controller } from 'react-hook-form';
-import { Container, Row, Col, Form, Button, Spinner } from 'react-bootstrap';
+import {
+	Container,
+	Row,
+	Col,
+	Form,
+	Button,
+	Spinner,
+	InputGroup,
+} from 'react-bootstrap';
 import Image from 'next/image';
 import Layout from '@/components/app/Layout';
 import { Company } from '@/types/Company';
@@ -125,170 +133,299 @@ const CompanyPage: NextPage = () => {
 							<Spinner animation='border' />
 						) : (
 							<Form onSubmit={handleSubmit(onSubmit)}>
-								{/* Company Name */}
-								<Form.Group className='form-floating mb-3'>
-									<Controller
-										name='name'
-										control={control}
-										render={({ field }) => (
-											<Form.Control
-												type='text'
-												id='companyName'
-												placeholder='Company Name'
-												{...field}
+								{/* Company Details Section */}
+								<Row>
+									<Col md={12}>
+										<Form.Group className='form-floating mb-3'>
+											<Controller
+												name='name'
+												control={control}
+												render={({ field }) => (
+													<Form.Control
+														type='text'
+														id='companyName'
+														placeholder='Company Name'
+														{...field}
+													/>
+												)}
 											/>
-										)}
-									/>
-									<Form.Label htmlFor='companyName'>Company Name</Form.Label>
-								</Form.Group>
-
-								{/* Street Address */}
-								<Form.Group className='form-floating mb-3'>
-									<Controller
-										name='streetAddress'
-										control={control}
-										render={({ field }) => (
-											<Form.Control
-												type='text'
-												id='streetAddress'
-												placeholder='Street Address'
-												{...field}
+											<Form.Label htmlFor='companyName'>
+												Company Name
+											</Form.Label>
+										</Form.Group>
+									</Col>
+									{/* Offerings Section */}
+									<Form.Group
+										as={Row}
+										className='mb-3 align-items-center'
+									>
+										<Form.Label
+											column
+											md={3}
+											style={{ fontWeight: 'bold' }}
+										>
+											Offerings
+										</Form.Label>
+										<Col md={9}>
+											<Controller
+												name='offerings'
+												control={control}
+												render={({ field }) => (
+													<div className={styles.offerings}>
+														{offeringsList.map((offering) => (
+															<div
+																key={offering}
+																className={styles.section}
+															>
+																<Form.Check
+																	type='checkbox'
+																	id={`offering-${offering}`}
+																	label={offering}
+																	{...field}
+																	checked={watchOfferings.includes(offering)}
+																	onChange={(e) => {
+																		const checked = e.target.checked;
+																		const updatedSections = checked
+																			? [...watchOfferings, offering]
+																			: watchOfferings.filter(
+																					(item) => item !== offering
+																			  );
+																		field.onChange(updatedSections);
+																	}}
+																/>
+															</div>
+														))}
+													</div>
+												)}
 											/>
-										)}
-									/>
-									<Form.Label htmlFor='streetAddress'>
-										Street Address
-									</Form.Label>
-								</Form.Group>
-
-								{/* City */}
-								<Form.Group className='form-floating mb-3'>
-									<Controller
-										name='city'
-										control={control}
-										render={({ field }) => (
-											<Form.Control
-												type='text'
-												id='city'
-												placeholder='City'
-												{...field}
+										</Col>
+									</Form.Group>
+									<Col md={12}>
+										<Form.Group className='form-floating mb-3'>
+											<Controller
+												name='streetAddress'
+												control={control}
+												render={({ field }) => (
+													<Form.Control
+														type='text'
+														id='streetAddress'
+														placeholder='Street Address'
+														{...field}
+													/>
+												)}
 											/>
-										)}
-									/>
-									<Form.Label htmlFor='city'>City</Form.Label>
-								</Form.Group>
-
-								{/* State */}
-								<Form.Group className='form-floating mb-3'>
-									<Controller
-										name='state'
-										control={control}
-										render={({ field }) => (
-											<Form.Select
-												id='state'
-												{...field}
-											>
-												<option value=''>Select State</option>
-												{US_STATES.map((state) => (
-													<option
-														key={state.abbreviation}
-														value={state.abbreviation}
+											<Form.Label htmlFor='streetAddress'>
+												Street Address
+											</Form.Label>
+										</Form.Group>
+									</Col>
+								</Row>
+								<Row>
+									<Col md={4}>
+										<Form.Group className='form-floating mb-3'>
+											<Controller
+												name='city'
+												control={control}
+												render={({ field }) => (
+													<Form.Control
+														type='text'
+														id='city'
+														placeholder='City'
+														{...field}
+													/>
+												)}
+											/>
+											<Form.Label htmlFor='city'>City</Form.Label>
+										</Form.Group>
+									</Col>
+									<Col md={4}>
+										<Form.Group className='form-floating mb-3'>
+											<Controller
+												name='state'
+												control={control}
+												render={({ field }) => (
+													<Form.Select
+														id='state'
+														{...field}
 													>
-														{state.name}
-													</option>
-												))}
-											</Form.Select>
-										)}
-									/>
-									<Form.Label htmlFor='state'>State</Form.Label>
-								</Form.Group>
-
-								{/* Zip */}
-								<Form.Group className='form-floating mb-3'>
-									<Controller
-										name='zip'
-										control={control}
-										render={({ field }) => (
-											<Form.Control
-												type='text'
-												id='zip'
-												placeholder='Zip'
-												{...field}
+														<option value=''>Select State</option>
+														{US_STATES.map((state) => (
+															<option
+																key={state.abbreviation}
+																value={state.abbreviation}
+															>
+																{state.name}
+															</option>
+														))}
+													</Form.Select>
+												)}
 											/>
-										)}
-									/>
-									<Form.Label htmlFor='zip'>Zip</Form.Label>
-								</Form.Group>
-
-								{/* Phone */}
-								<Form.Group className='form-floating mb-3'>
-									<Controller
-										name='phone'
-										control={control}
-										render={({ field }) => (
-											<Form.Control
-												type='text'
-												id='phone'
-												placeholder='Phone'
-												{...field}
+											<Form.Label htmlFor='state'>State</Form.Label>
+										</Form.Group>
+									</Col>
+									<Col md={4}>
+										<Form.Group className='form-floating mb-3'>
+											<Controller
+												name='zip'
+												control={control}
+												render={({ field }) => (
+													<Form.Control
+														type='text'
+														id='zip'
+														placeholder='Zip'
+														{...field}
+													/>
+												)}
 											/>
-										)}
-									/>
-									<Form.Label htmlFor='phone'>Phone</Form.Label>
-								</Form.Group>
+											<Form.Label htmlFor='zip'>Zip</Form.Label>
+										</Form.Group>
+									</Col>
+								</Row>
 
-								{/* Fax */}
-								<Form.Group className='form-floating mb-3'>
-									<Controller
-										name='fax'
-										control={control}
-										render={({ field }) => (
-											<Form.Control
-												type='text'
-												id='fax'
-												placeholder='Fax'
-												{...field}
+								{/* Contact Information Section */}
+								<Row>
+									<Col md={6}>
+										<Form.Group className='form-floating mb-3'>
+											<Controller
+												name='phone'
+												control={control}
+												render={({ field }) => (
+													<Form.Control
+														type='text'
+														id='phone'
+														placeholder='Phone'
+														{...field}
+													/>
+												)}
 											/>
-										)}
-									/>
-									<Form.Label htmlFor='fax'>Fax</Form.Label>
-								</Form.Group>
-
-								{/* Email */}
-								<Form.Group className='form-floating mb-3'>
-									<Controller
-										name='email'
-										control={control}
-										render={({ field }) => (
-											<Form.Control
-												type='email'
-												id='email'
-												placeholder='Email'
-												{...field}
+											<Form.Label htmlFor='phone'>Phone</Form.Label>
+										</Form.Group>
+									</Col>
+									<Col md={6}>
+										<Form.Group className='form-floating mb-3'>
+											<Controller
+												name='fax'
+												control={control}
+												render={({ field }) => (
+													<Form.Control
+														type='text'
+														id='fax'
+														placeholder='Fax'
+														{...field}
+													/>
+												)}
 											/>
-										)}
-									/>
-									<Form.Label htmlFor='email'>Email</Form.Label>
-								</Form.Group>
-
-								{/* Website */}
-								<Form.Group className='form-floating mb-3'>
-									<Controller
-										name='url'
-										control={control}
-										render={({ field }) => (
-											<Form.Control
-												type='text'
-												id='url'
-												placeholder='Website'
-												{...field}
+											<Form.Label htmlFor='fax'>Fax</Form.Label>
+										</Form.Group>
+									</Col>
+								</Row>
+								<Row>
+									<Col md={6}>
+										<Form.Group className='form-floating mb-3'>
+											<Controller
+												name='email'
+												control={control}
+												render={({ field }) => (
+													<Form.Control
+														type='email'
+														id='email'
+														placeholder='Email'
+														{...field}
+													/>
+												)}
 											/>
-										)}
-									/>
-									<Form.Label htmlFor='url'>Website</Form.Label>
-								</Form.Group>
+											<Form.Label htmlFor='email'>Email</Form.Label>
+										</Form.Group>
+									</Col>
+									<Col md={6}>
+										<Form.Group className='form-floating mb-3'>
+											<Controller
+												name='url'
+												control={control}
+												render={({ field }) => (
+													<Form.Control
+														type='text'
+														id='url'
+														placeholder='Website'
+														{...field}
+													/>
+												)}
+											/>
+											<Form.Label htmlFor='url'>Website</Form.Label>
+										</Form.Group>
+									</Col>
+								</Row>
 
-								{/* Payment Methods */}
+								{/* Financial Information Section */}
+								<Row>
+									<Col md={12}>
+										<Form.Group className='form-floating mb-3'>
+											<Controller
+												name='quoteIdFormat'
+												control={control}
+												render={({ field }) => (
+													<Form.Control
+														type='text'
+														id='quoteIdFormat'
+														placeholder='Quote Id Format'
+														{...field}
+													/>
+												)}
+											/>
+											<Form.Label htmlFor='quoteIdFormat'>
+												Quote Id Format
+											</Form.Label>
+										</Form.Group>
+									</Col>
+								</Row>
+								<Row>
+									<Col md={6}>
+										<Form.Group className='mb-3'>
+											<Form.Label htmlFor='salesTax'>Sales Tax</Form.Label>
+											<InputGroup>
+												<Controller
+													name='salesTax'
+													control={control}
+													render={({ field }) => (
+														<Form.Control
+															type='number'
+															id='salesTax'
+															step='0.01'
+															placeholder='Sales Tax'
+															{...field}
+														/>
+													)}
+												/>
+												<InputGroup.Text>%</InputGroup.Text>
+											</InputGroup>
+										</Form.Group>
+									</Col>
+									<Col md={6}>
+										<Form.Group className='mb-3'>
+											<Form.Label htmlFor='creditCardCharge'>
+												Credit Card Charge
+											</Form.Label>
+											<InputGroup>
+												<Controller
+													name='creditCardCharge'
+													control={control}
+													render={({ field }) => (
+														<Form.Control
+															type='number'
+															id='creditCardCharge'
+															step='0.01'
+															placeholder='Credit Card Charge'
+															{...field}
+														/>
+													)}
+												/>
+												<InputGroup.Text>%</InputGroup.Text>
+											</InputGroup>
+										</Form.Group>
+									</Col>
+								</Row>
+
+								{/* Payment Methods Section */}
 								<Form.Group
 									as={Row}
 									className='mb-3 align-items-center'
@@ -346,54 +483,6 @@ const CompanyPage: NextPage = () => {
 										/>
 									</Col>
 								</Form.Group>
-
-								{/* Offerings */}
-								<Form.Group
-									as={Row}
-									className='mb-3 align-items-center'
-								>
-									<Form.Label
-										column
-										md={3}
-										style={{ fontWeight: 'bold' }}
-									>
-										Offerings
-									</Form.Label>
-									<Col md={9}>
-										<Controller
-											name='offerings'
-											control={control}
-											render={({ field }) => (
-												<div className={styles.offerings}>
-													{offeringsList.map((offering) => (
-														<div
-															key={offering}
-															className={styles.section}
-														>
-															<Form.Check
-																type='checkbox'
-																id={`offering-${offering}`}
-																label={offering}
-																{...field}
-																checked={watchOfferings.includes(offering)}
-																onChange={(e) => {
-																	const checked = e.target.checked;
-																	const updatedSections = checked
-																		? [...watchOfferings, offering]
-																		: watchOfferings.filter(
-																				(item) => item !== offering
-																		  );
-																	field.onChange(updatedSections);
-																}}
-															/>
-														</div>
-													))}
-												</div>
-											)}
-										/>
-									</Col>
-								</Form.Group>
-
 								<Button
 									className={styles.updateButton}
 									variant='primary'

@@ -15,19 +15,18 @@ export default async function handler(
 
 	await dbConnect();
 
-	const session = await getSession({ req });
-
-	if (!session) {
-		return res.status(401).json({ message: 'Unauthorized' });
-	}
-
-	const userId = new mongoose.Types.ObjectId(session.user.id);
-	const customerData = {
-		...req.body,
-		userId,
-	};
-
 	try {
+		const { companyId, userId } = req.query;
+
+		const userIdObject = new mongoose.Types.ObjectId(userId as string);
+		const companyIdObject = new mongoose.Types.ObjectId(companyId as string);
+
+		const customerData = {
+			...req.body,
+			userIdObject,
+			companyIdObject,
+		};
+
 		// Save the new customer
 		const customer = new Customer(customerData);
 		const savedCustomer = await customer.save();
@@ -36,7 +35,7 @@ export default async function handler(
 		const customerNote = new CustomerNote({
 			customerId: savedCustomer._id,
 			note: `Customer Added: ${savedCustomer.companyName}`,
-			createdBy: userId,
+			createdBy: userIdObject,
 			createdAt: new Date(),
 		});
 
@@ -46,7 +45,16 @@ export default async function handler(
 		// Respond with the saved customer data
 		res.status(201).json(savedCustomer);
 	} catch (error) {
-		console.error('Failed to add customer and create note:', error);
-		res.status(500).json({ message: 'Failed to add customer' });
+		if (error instanceof Error) {
+			console.error('Failed to add customer and create note:', error.message);
+			res
+				.status(500)
+				.json({ message: 'Failed to add customer', error: error.message });
+		} else {
+			console.error('An unknown error occurred');
+			res
+				.status(500)
+				.json({ message: 'Failed to add customer due to an unknown error' });
+		}
 	}
 }

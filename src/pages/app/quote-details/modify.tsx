@@ -31,8 +31,8 @@ import { Quote, QuoteItem } from '@/types/Quote';
 type PrintingOptionKeys =
 	| 'colorsFront'
 	| 'colorsBack'
-	| 'colorsLeftSleeve'
-	| 'colorsRightSleeve';
+	| 'colorsLeft'
+	| 'colorsRight';
 
 interface ScreenPrintingDetails {
 	newScreensNeeded: boolean;
@@ -52,11 +52,11 @@ interface Prices {
 const initialQuoteState: Quote = {
 	_id: '',
 	customerName: '',
+	quoteId: '',
 	quoteType: 'savedQuotes',
 	depositPercentage: 0,
 	items: [
 		{
-			quoteType: '',
 			brandAndStyle: '',
 			color: '',
 			standardPrice: 0,
@@ -86,12 +86,12 @@ const initialQuoteState: Quote = {
 		colorsBack: 0,
 		flashBack: false,
 		dtgDarkBack: false,
-		colorsLeftSleeve: 0,
-		flashLeftSleeve: false,
-		dtgDarkLeftSleeve: false,
-		colorsRightSleeve: 0,
-		flashRightSleeve: false,
-		dtgDarkRightSleeve: false,
+		colorsLeft: 0,
+		flashLeft: false,
+		dtgDarkLeft: false,
+		colorsRight: 0,
+		flashRight: false,
+		dtgDarkRight: false,
 	},
 
 	vinylDetails: {
@@ -142,19 +142,19 @@ const ModifyQuote: NextPage = () => {
 	const { data: session, status } = useSession();
 	const [quote, setQuote] = useState<Quote>(initialQuoteState); // Initial state
 	const [customers, setCustomers] = useState<Customer[]>([]);
-	const [prices, setPrices] = useState(null);
+	const [prices, setPrices] = useState<Price | null>(null);
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [selectedCustomerId, setSelectedCustomerId] = useState('');
 	const [showSuccessModal, setShowSuccessModal] = useState(false);
 
+	const printingLocations = ['Front', 'Back', 'Left', 'Right']; // Define the printing locations
+
 	useEffect(() => {
 		const fetchQuoteData = async () => {
 			if (quoteId) {
-				// Check if quoteId is not undefined
 				const response = await fetch(`/api/quotes/${quoteId}`);
 				if (!response.ok) {
-					// Handle error
 					console.error('Failed to fetch quote data');
 					return;
 				}
@@ -208,7 +208,6 @@ const ModifyQuote: NextPage = () => {
 			(customer) => customer._id === customerId
 		);
 
-		// Check if the customer is found and update the quote state
 		if (selectedCustomer) {
 			setQuote((prevQuote) => ({
 				...prevQuote,
@@ -293,13 +292,12 @@ const ModifyQuote: NextPage = () => {
 				return totalPrintingCost;
 			}
 
-			// Loop through each printing option (Front, Back, Left Sleeve, Right Sleeve)
 			(
 				[
 					'colorsFront',
 					'colorsBack',
-					'colorsLeftSleeve',
-					'colorsRightSleeve',
+					'colorsLeft',
+					'colorsRight',
 				] as PrintingOptionKeys[]
 			).forEach((option) => {
 				const colorCount = quote.printingOptions[option];
@@ -309,7 +307,6 @@ const ModifyQuote: NextPage = () => {
 					}` as keyof typeof prices.screenPrinting;
 					const priceRanges = prices.screenPrinting[colorKey];
 
-					// If priceRanges is undefined, log an error and skip this option
 					if (!priceRanges) {
 						console.error(
 							`No pricing found for '${colorKey}'. Check your pricing structure.`
@@ -317,13 +314,11 @@ const ModifyQuote: NextPage = () => {
 						return;
 					}
 
-					// Assume first value in priceRanges array is the cost per piece for simplicity
 					const costPerColorPerPiece = parseFloat(priceRanges[0]);
 					totalPrintingCost += costPerColorPerPiece * colorCount;
 				}
 			});
 
-			// Multiply by total quantity of items
 			const totalQty = quote.items.reduce(
 				(acc, item) =>
 					acc + Object.values(item.sizes).reduce((sum, qty) => sum + qty, 0),
@@ -340,9 +335,8 @@ const ModifyQuote: NextPage = () => {
 		(screenPrintingDetails: ScreenPrintingDetails, prices: Price) => {
 			let totalCost = 0;
 
-			// Convert string values to numbers for calculation
-			const newScreenCost = parseFloat(prices.screenPrinting.perScreenNew); // Cost for each new screen
-			const colorChangeCost = parseFloat(prices.artCost.inkColorChanges); // Cost for each ink color change
+			const newScreenCost = parseFloat(prices.screenPrinting.perScreenNew);
+			const colorChangeCost = parseFloat(prices.artCost.inkColorChanges);
 
 			if (screenPrintingDetails.newScreensNeeded) {
 				totalCost += screenPrintingDetails.additionalScreens * newScreenCost;
@@ -365,7 +359,6 @@ const ModifyQuote: NextPage = () => {
 			return acc + itemCost;
 		}, 0);
 
-		// Determine the applicable markup and additional charge based on totalApparelCost
 		let markupRate = 0;
 		let additionalCharge = 0;
 		const markup = (prices as Price).wholesaleMarkup;
@@ -403,7 +396,6 @@ const ModifyQuote: NextPage = () => {
 			printingCost = printingCost * (150 / 100);
 		}
 
-		// Calculate cost for new screens and color changes
 		let screenAndColorChangeCost = calculateScreenAndColorChangeCost(
 			quote.screenPrintingDetails,
 			prices
@@ -413,7 +405,6 @@ const ModifyQuote: NextPage = () => {
 		let totalCost = totalApparelCost + printingCost + shippingCost;
 		const avgCost = totalQty > 0 ? totalCost / totalQty : 0;
 
-		// Before setting the state, compare the new values with the current ones
 		setQuote((prevQuote) => {
 			const isSummaryUnchanged =
 				prevQuote.summary.qty === totalQty &&
@@ -421,10 +412,9 @@ const ModifyQuote: NextPage = () => {
 				prevQuote.summary.apparelCost === totalApparelCost &&
 				prevQuote.summary.printingCost === printingCost &&
 				prevQuote.summary.shippingCost === shippingCost &&
-				prevQuote.summary.taxCost === 0 && // Assuming taxCost calculation is not implemented yet
+				prevQuote.summary.taxCost === 0 &&
 				prevQuote.summary.totalCost === totalCost;
 
-			// Only update the state if there's a change in the summary
 			if (!isSummaryUnchanged) {
 				return {
 					...prevQuote,
@@ -434,34 +424,31 @@ const ModifyQuote: NextPage = () => {
 						apparelCost: totalApparelCost,
 						printingCost,
 						shippingCost,
-						taxCost: 0, // Add logic for tax calculation if necessary
+						taxCost: 0,
 						totalCost,
 					},
 				};
 			}
 
-			// Return the previous state to avoid unnecessary update
 			return prevQuote;
 		});
 	}, [prices, calculatePrintingCost, quote, calculateScreenAndColorChangeCost]);
 
-	// useEffect to watch for changes in the items, printing options, and apparel/shipping details
 	useEffect(() => {
 		calculateQuote();
 	}, [calculateQuote]);
 
 	const handleSubmit = async () => {
 		try {
-			setIsLoading(true); // Use the existing isLoading state to indicate loading
+			setIsLoading(true);
 			if (session?.user?.companyId) {
 				quote.companyId = session.user.companyId.toString();
 				quote.selectedCustomerId = selectedCustomerId;
 
-				// Clone the quote object to avoid directly mutating the state
 				const quoteWithMetadata = {
 					...quote,
-					CreatedAt: new Date().toISOString(), // Set current date and time in ISO format
-					ModifiedAt: new Date().toISOString(), // Set current date and time in ISO format
+					CreatedAt: new Date().toISOString(),
+					ModifiedAt: new Date().toISOString(),
 				};
 
 				const response = await fetch('/api/quotes/saveQuote', {
@@ -478,11 +465,8 @@ const ModifyQuote: NextPage = () => {
 					throw new Error(data.message || 'Something went wrong!');
 				}
 
-				// Handle success by showing the success modal
 				setShowSuccessModal(true);
 
-				// Handle success (e.g., show a success message, clear the form, etc.)
-				// Reset or clear the quote state if necessary
 				setQuote(initialQuoteState);
 			}
 		} catch (error) {
@@ -546,6 +530,7 @@ const ModifyQuote: NextPage = () => {
 							/>
 							<PrintingOptions
 								options={quote.printingOptions}
+								printingLocations={printingLocations}
 								onOptionsChange={handlePrintingOptionsChange}
 							/>
 							<VinylDetails

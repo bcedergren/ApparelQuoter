@@ -137,10 +137,10 @@ const SavedQuotes: NextPage = () => {
 							>
 								{/* Make Quote ID a clickable link to quote-details */}
 								<Link
-									href={`/quote-details/${quote._id}`}
+									href={`/app/quote-details/${quote._id}`}
 									className='text-decoration-none'
 								>
-									<h5 className='mb-1'>Quote ID: {quote._id}</h5>
+									<h5 className='mb-1'>Quote ID: {quote.quoteId}</h5>
 								</Link>
 								{/* Display the date underneath the Quote ID */}
 								{quote.CreatedAt && (

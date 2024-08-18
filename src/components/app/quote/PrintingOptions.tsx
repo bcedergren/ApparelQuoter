@@ -5,24 +5,26 @@ import { PrintingOptions as PrintingOptionsType } from '@/types/Quote';
 interface PrintingOptionsProps {
 	options: PrintingOptionsType;
 	onOptionsChange: (options: PrintingOptionsType) => void;
+	printingLocations: string[];
 }
 
 const PrintingOptions: FC<PrintingOptionsProps> = ({
 	options = {
 		colorsFront: 0,
 		colorsBack: 0,
-		colorsLeftSleeve: 0,
+		colorsLeft: 0,
 		flashFront: false,
 		dtgDarkFront: false,
 		flashBack: false,
 		dtgDarkBack: false,
-		flashLeftSleeve: false,
-		dtgDarkLeftSleeve: false,
-		colorsRightSleeve: 0,
-		flashRightSleeve: false,
-		dtgDarkRightSleeve: false,
+		flashLeft: false,
+		dtgDarkLeft: false,
+		colorsRight: 0,
+		flashRight: false,
+		dtgDarkRight: false,
 	},
 	onOptionsChange,
+	printingLocations,
 }) => {
 	const handleChange = (
 		field: keyof PrintingOptionsType,
@@ -41,7 +43,9 @@ const PrintingOptions: FC<PrintingOptionsProps> = ({
 				<Row>
 					<Col>
 						<InputGroup>
-							<InputGroup.Text>Print Colors - Front</InputGroup.Text>
+							<InputGroup.Text>
+								Print Colors - {printingLocations[0]}
+							</InputGroup.Text>
 							<FormControl
 								type='number'
 								value={options.colorsFront}
@@ -67,7 +71,9 @@ const PrintingOptions: FC<PrintingOptionsProps> = ({
 				<Row>
 					<Col>
 						<InputGroup>
-							<InputGroup.Text>Print Colors - Back</InputGroup.Text>
+							<InputGroup.Text>
+								Print Colors - {printingLocations[1]}
+							</InputGroup.Text>
 							<FormControl
 								type='number'
 								value={options.colorsBack}
@@ -93,28 +99,26 @@ const PrintingOptions: FC<PrintingOptionsProps> = ({
 				<Row>
 					<Col>
 						<InputGroup>
-							<InputGroup.Text>Print Colors - Left Sleeve</InputGroup.Text>
+							<InputGroup.Text>
+								Print Colors - {printingLocations[2]}
+							</InputGroup.Text>
 							<FormControl
 								type='number'
-								value={options.colorsLeftSleeve}
+								value={options.colorsLeft}
 								onChange={(e) =>
-									handleChange('colorsLeftSleeve', parseInt(e.target.value, 10))
+									handleChange('colorsLeft', parseInt(e.target.value, 10))
 								}
 							/>
 							<InputGroup.Checkbox
-								checked={options.flashLeftSleeve}
-								onChange={(e) =>
-									handleChange('flashLeftSleeve', e.target.checked)
-								}
-								aria-label='Flash Left Sleeve'
+								checked={options.flashLeft}
+								onChange={(e) => handleChange('flashLeft', e.target.checked)}
+								aria-label='Flash Left'
 							/>
 							<InputGroup.Text>Flash</InputGroup.Text>
 							<InputGroup.Checkbox
-								checked={options.dtgDarkLeftSleeve}
-								onChange={(e) =>
-									handleChange('dtgDarkLeftSleeve', e.target.checked)
-								}
-								aria-label='DTG Dark LeftSleeve'
+								checked={options.dtgDarkLeft}
+								onChange={(e) => handleChange('dtgDarkLeft', e.target.checked)}
+								aria-label='DTG Dark Left'
 							/>
 							<InputGroup.Text>DTG Dark</InputGroup.Text>
 						</InputGroup>
@@ -123,31 +127,26 @@ const PrintingOptions: FC<PrintingOptionsProps> = ({
 				<Row>
 					<Col>
 						<InputGroup>
-							<InputGroup.Text>Print Colors - Right Sleeve</InputGroup.Text>
+							<InputGroup.Text>
+								Print Colors - {printingLocations[3]}
+							</InputGroup.Text>
 							<FormControl
 								type='number'
-								value={options.colorsRightSleeve}
+								value={options.colorsRight}
 								onChange={(e) =>
-									handleChange(
-										'colorsRightSleeve',
-										parseInt(e.target.value, 10)
-									)
+									handleChange('colorsRight', parseInt(e.target.value, 10))
 								}
 							/>
 							<InputGroup.Checkbox
-								checked={options.flashRightSleeve}
-								onChange={(e) =>
-									handleChange('flashRightSleeve', e.target.checked)
-								}
-								aria-label='Flash Right Sleeve'
+								checked={options.flashRight}
+								onChange={(e) => handleChange('flashRight', e.target.checked)}
+								aria-label='Flash Right'
 							/>
 							<InputGroup.Text>Flash</InputGroup.Text>
 							<InputGroup.Checkbox
-								checked={options.dtgDarkRightSleeve}
-								onChange={(e) =>
-									handleChange('dtgDarkRightSleeve', e.target.checked)
-								}
-								aria-label='DTG Dark Right Sleeve'
+								checked={options.dtgDarkRight}
+								onChange={(e) => handleChange('dtgDarkRight', e.target.checked)}
+								aria-label='DTG Dark Right'
 							/>
 							<InputGroup.Text>DTG Dark</InputGroup.Text>
 						</InputGroup>

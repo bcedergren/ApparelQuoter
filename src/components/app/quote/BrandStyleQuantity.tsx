@@ -160,7 +160,6 @@ const BrandStyleQuantity: FC<BrandStyleQuantityProps> = ({
 												onItemsChange([
 													...items,
 													{
-														quoteType: '',
 														brandAndStyle: '',
 														color: '',
 														standardPrice: 0,
@@ -175,7 +174,7 @@ const BrandStyleQuantity: FC<BrandStyleQuantityProps> = ({
 															'4XL': 0,
 															'5XL': 0,
 														},
-													},
+													} as QuoteItem,
 												])
 											}
 										>

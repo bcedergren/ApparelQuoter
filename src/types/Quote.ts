@@ -9,6 +9,7 @@ export interface Quote {
 		| 'openOrders'
 		| 'savedOrders'
 		| 'completedOrders'; // Type of quote
+	quoteId: string; // ID of the quote
 	items: QuoteItem[]; // Array to handle multiple items in the quote
 	embroideryDetails: EmbroideryDetails; // Embroidery-specific details
 	printingOptions: PrintingOptions; // Options for printing
@@ -24,7 +25,6 @@ export interface Quote {
 
 export interface QuoteItem {
 	brandAndStyle: string; // Brand and style of the item
-	quoteType: string; // Type of the quote item
 	color: string; // Color of the item
 	standardPrice: number; // Standard price for sizes XS through XL
 	sizes: {
@@ -65,12 +65,12 @@ export interface PrintingOptions {
 	colorsBack: number; // Number of colors used on the back
 	flashBack: boolean; // Whether flash curing is used on the back
 	dtgDarkBack: boolean; // Whether DTG printing is used on dark shirts for the back
-	colorsLeftSleeve: number; // Number of colors used on the left sleeve
-	flashLeftSleeve: boolean; // Whether flash curing is used on the left sleeve
-	dtgDarkLeftSleeve: boolean; // Whether DTG printing is used on dark shirts for the left sleeve
-	colorsRightSleeve: number; // Number of colors used on the right sleeve
-	flashRightSleeve: boolean; // Whether flash curing is used on the right sleeve
-	dtgDarkRightSleeve: boolean; // Whether DTG printing is used on dark shirts for the right sleeve
+	colorsLeft: number; // Number of colors used on the left
+	flashLeft: boolean; // Whether flash curing is used on the left
+	dtgDarkLeft: boolean; // Whether DTG printing is used on dark shirts for the left
+	colorsRight: number; // Number of colors used on the right
+	flashRight: boolean; // Whether flash curing is used on the right
+	dtgDarkRight: boolean; // Whether DTG printing is used on dark shirts for the right
 }
 
 export interface PrintingDetails {

@@ -13,4 +13,5 @@ export interface Company {
 	salesTax: string;
 	creditCardCharge: string;
 	offerings: string[];
+	quoteIdFormat: string;
 }
