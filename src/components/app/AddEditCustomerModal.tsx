@@ -27,6 +27,8 @@ const AddEditCustomerModal: FC<AddEditCustomerModalProps> = ({
 		phone: '',
 		email: '',
 		followUpNotes: [],
+		createdBy: '', // Set default or fetch from logged-in user context
+		createdDate: new Date(), // Default to current date
 	};
 
 	const [customerData, setCustomerData] =

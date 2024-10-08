@@ -4,7 +4,6 @@ import ArtCostComponent from '@/components/app/pricing/ArtCost';
 import WholesaleMarkupComponent from '@/components/app/pricing/WholesaleMarkup';
 import PrintingQuantityRanges from '@/components/app/pricing/PrintingQuantityRanges';
 import PrintingLocationNames from '@/components/app/pricing/PrintingLocationNames';
-import DTGPrintingComponent from '@/components/app/pricing/DTGPrinting';
 import DyeSublimation from '@/components/app/pricing/DyeSublimation';
 import PreCutVinyl from '@/components/app/pricing/PreCutVinyl';
 import Embroidery from '@/components/app/pricing/Embroidery';
@@ -83,16 +82,6 @@ const PricingComponents: FC<PricingComponentsProps> = ({
 							setPriceData({
 								...priceData,
 								screenPrinting: updatedScreenPrinting,
-							});
-						}}
-						printingQuantityRanges={priceData.printingQuantityRanges}
-					/>
-					<DTGPrintingComponent
-						dtgPrintingData={priceData.dtgPrinting}
-						setDTGPrintingData={(updatedDTGPrinting) => {
-							setPriceData({
-								...priceData,
-								dtgPrinting: updatedDTGPrinting,
 							});
 						}}
 						printingQuantityRanges={priceData.printingQuantityRanges}
