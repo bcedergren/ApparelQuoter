@@ -1,20 +1,22 @@
 import { ChangeEvent } from 'react';
 import { Table, Form, Spinner } from 'react-bootstrap';
 import styles from '@/styles/Pricing.module.css';
-import { ArtCost } from '@/types/Price';
+import { ArtCost, ScreenPrinting } from '@/types/Price';
 
 type ArtCostProps = {
 	artCostData: ArtCost;
+	screenPrintingData: ScreenPrinting;
 	setArtCostData: (artCostData: ArtCost) => void;
+	setScreenPrintingData: (screenPrintingData: ScreenPrinting) => void;
 };
-
-type NestedKeys = 'colorMatch';
 
 const ArtCostComponent: React.FC<ArtCostProps> = ({
 	artCostData,
+	screenPrintingData,
 	setArtCostData,
+	setScreenPrintingData,
 }) => {
-	if (!artCostData) {
+	if (!artCostData || !screenPrintingData) {
 		return (
 			<div className='text-center'>
 				<Spinner animation='border' />
@@ -24,23 +26,20 @@ const ArtCostComponent: React.FC<ArtCostProps> = ({
 
 	const handleInputChange = (
 		event: ChangeEvent<HTMLInputElement>,
-		field: keyof ArtCost | NestedKeys,
-		subField?: keyof ArtCost['colorMatch']
+		field: keyof ArtCost | keyof ScreenPrinting,
+		type: 'artCost' | 'screenPrinting'
 	) => {
 		const value = event.target.value;
 
-		// Create a new updated object based on the field type
-		const updatedArtCost: ArtCost = { ...artCostData };
-
-		if (subField && field === 'colorMatch') {
-			// Update nested object field
-			(updatedArtCost[field] as any)[subField] = value;
-		} else {
-			// Update top-level field
+		if (type === 'artCost') {
+			const updatedArtCost: ArtCost = { ...artCostData };
 			(updatedArtCost as any)[field] = value;
+			setArtCostData(updatedArtCost);
+		} else if (type === 'screenPrinting') {
+			const updatedScreenPrinting: ScreenPrinting = { ...screenPrintingData };
+			(updatedScreenPrinting as any)[field] = value;
+			setScreenPrintingData(updatedScreenPrinting);
 		}
-
-		setArtCostData(updatedArtCost);
 	};
 
 	return (
@@ -51,7 +50,7 @@ const ArtCostComponent: React.FC<ArtCostProps> = ({
 		>
 			<thead>
 				<tr>
-					<th colSpan={7}>Art Cost</th>
+					<th colSpan={11}>Art Cost</th>
 				</tr>
 				<tr>
 					<th>First Color</th>
@@ -61,6 +60,10 @@ const ArtCostComponent: React.FC<ArtCostProps> = ({
 					<th>Ink Charges/Piece</th>
 					<th>Color Match</th>
 					<th>Ink Color Changes</th>
+					<th>DTG Dark Garment Markup</th>
+					<th>Flash Markup</th>
+					<th>New Screen Setup</th>
+					<th>Existing Screen Setup</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -76,7 +79,8 @@ const ArtCostComponent: React.FC<ArtCostProps> = ({
 								onChange={(e) =>
 									handleInputChange(
 										e as ChangeEvent<HTMLInputElement>,
-										'firstColor'
+										'firstColor',
+										'artCost'
 									)
 								}
 							/>
@@ -93,7 +97,8 @@ const ArtCostComponent: React.FC<ArtCostProps> = ({
 								onChange={(e) =>
 									handleInputChange(
 										e as ChangeEvent<HTMLInputElement>,
-										'additionalColor'
+										'additionalColor',
+										'artCost'
 									)
 								}
 							/>
@@ -110,7 +115,8 @@ const ArtCostComponent: React.FC<ArtCostProps> = ({
 								onChange={(e) =>
 									handleInputChange(
 										e as ChangeEvent<HTMLInputElement>,
-										'flatFee'
+										'flatFee',
+										'artCost'
 									)
 								}
 							/>
@@ -126,7 +132,8 @@ const ArtCostComponent: React.FC<ArtCostProps> = ({
 								onChange={(e) =>
 									handleInputChange(
 										e as ChangeEvent<HTMLInputElement>,
-										'inkMarkup'
+										'inkMarkup',
+										'artCost'
 									)
 								}
 							/>
@@ -144,7 +151,8 @@ const ArtCostComponent: React.FC<ArtCostProps> = ({
 								onChange={(e) =>
 									handleInputChange(
 										e as ChangeEvent<HTMLInputElement>,
-										'inkChargesPerPiece'
+										'inkChargesPerPiece',
+										'artCost'
 									)
 								}
 							/>
@@ -161,7 +169,8 @@ const ArtCostComponent: React.FC<ArtCostProps> = ({
 								onChange={(e) =>
 									handleInputChange(
 										e as ChangeEvent<HTMLInputElement>,
-										'colorMatch'
+										'colorMatch',
+										'artCost'
 									)
 								}
 							/>
@@ -178,7 +187,80 @@ const ArtCostComponent: React.FC<ArtCostProps> = ({
 								onChange={(e) =>
 									handleInputChange(
 										e as ChangeEvent<HTMLInputElement>,
-										'inkColorChanges'
+										'inkColorChanges',
+										'artCost'
+									)
+								}
+							/>
+						</div>
+					</td>
+					<td>
+						<div className='input-group'>
+							<span className='input-group-text'>$</span>
+							<Form.Control
+								type='number'
+								step='0.01'
+								min='0.00'
+								value={artCostData.dtgDarkGarmentMarkup || ''}
+								onChange={(e) =>
+									handleInputChange(
+										e as ChangeEvent<HTMLInputElement>,
+										'dtgDarkGarmentMarkup',
+										'artCost'
+									)
+								}
+							/>
+						</div>
+					</td>
+					<td>
+						<div className='input-group'>
+							<span className='input-group-text'>$</span>
+							<Form.Control
+								type='number'
+								step='0.01'
+								min='0.00'
+								value={artCostData.flashMarkup || ''}
+								onChange={(e) =>
+									handleInputChange(
+										e as ChangeEvent<HTMLInputElement>,
+										'flashMarkup',
+										'artCost'
+									)
+								}
+							/>
+						</div>
+					</td>
+					<td>
+						<div className='input-group'>
+							<span className='input-group-text'>$</span>
+							<Form.Control
+								type='number'
+								step='0.01'
+								min='0.00'
+								value={screenPrintingData.perScreenNew || ''}
+								onChange={(e) =>
+									handleInputChange(
+										e as ChangeEvent<HTMLInputElement>,
+										'perScreenNew',
+										'screenPrinting'
+									)
+								}
+							/>
+						</div>
+					</td>
+					<td>
+						<div className='input-group'>
+							<span className='input-group-text'>$</span>
+							<Form.Control
+								type='number'
+								step='0.01'
+								min='0.00'
+								value={screenPrintingData.perScreenExisting || ''}
+								onChange={(e) =>
+									handleInputChange(
+										e as ChangeEvent<HTMLInputElement>,
+										'perScreenExisting',
+										'screenPrinting'
 									)
 								}
 							/>

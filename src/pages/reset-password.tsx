@@ -23,7 +23,6 @@ const ResetPasswordPage = () => {
 	const handleSubmit = async (e: FormEvent) => {
 		e.preventDefault();
 
-		console.log('Submitting reset password form');
 		if (password !== confirmPassword) {
 			setAlert({ type: 'danger', message: 'Passwords do not match.' });
 			console.error('Passwords do not match');
@@ -32,7 +31,6 @@ const ResetPasswordPage = () => {
 
 		// Show the success message immediately
 		setAlert({ type: 'info', message: 'Processing your request...' });
-		console.log('Processing request...');
 
 		try {
 			const res = await fetch('/api/auth/reset-password', {

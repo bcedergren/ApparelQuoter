@@ -75,7 +75,7 @@ const QuotePage: NextPage = () => {
 							company={company}
 							initialQuoteState={initialQuoteState}
 							isQuoteModified={isQuoteModified}
-							onQuoteSaved={() => router.push('/quotes')}
+							onQuoteSaved={() => router.push('/app/saved-quotes')}
 						/>
 					</Col>
 				</Row>

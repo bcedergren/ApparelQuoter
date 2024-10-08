@@ -1,624 +1,238 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import Link from 'next/link';
-import { useSession } from 'next-auth/react';
-import { Button, Spinner } from 'react-bootstrap';
 import Layout from '@/components/app/Layout';
-import {
-	Quote,
-	QuoteItem,
-	VinylDetails,
-	EmbroideryDetails,
-	PrintingDetails,
-} from '@/types/Quote';
-import { Customer } from '@/types/Customer';
-import {
-	Price,
-	PreCutVinyl,
-	Embroidery,
-	ArtCost,
-	ScreenPrinting,
-} from '@/types/Price';
-import QuoteItemRow from '@/components/app/QuoteItemRow';
+import QuoteDetails from '@/components/app/QuoteDetails';
 import { Company } from '@/types/Company';
-import { createQuote } from '@/utils/pdfGenerator';
-import { formatQuoteType } from '@/utils/formatQuoteType';
-import styles from '@/styles/QuoteDetails.module.css';
+import { Quote } from '@/types/Quote';
+import { Price } from '@/types/Price';
+import { Customer } from '@/types/Customer';
+import { useSession } from 'next-auth/react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { QuoteCalculations } from '@/utils/quoteCalculations';
 
-export type SizeKey = keyof QuoteItem['sizes'];
-
-const QuoteDetails = () => {
+const QuoteDetailsPage = () => {
 	const router = useRouter();
-	const { data: session } = useSession();
 	const { quoteId } = router.query;
+	const { data: session } = useSession();
+
 	const [company, setCompany] = useState<Company | null>(null);
 	const [quote, setQuote] = useState<Quote | null>(null);
 	const [prices, setPrices] = useState<Price | null>(null);
 	const [customer, setCustomer] = useState<Customer | null>(null);
-
-	const [decoration, setDecoration] = useState('');
-	const [colorMatches, setColorMatches] = useState('');
-	const [artworkFee, setArtworkFee] = useState(0);
-	const [setupFee, setSetupFee] = useState(0);
-	const [deliveryDate, setDeliveryDate] = useState('');
-	const [vinylFee, setVinylFee] = useState(0);
-	const [embroideryFee, setEmbroideryFee] = useState(0);
-
-	const [invoiceSubtotal, setInvoiceSubtotal] = useState(0);
-	const [invoiceTotal, setInvoiceTotal] = useState(0);
-	const [depositDue, setDepositDue] = useState(0);
-	const [balance, setBalance] = useState(0);
-
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+
+	// Additional fields for fees and totals
+	const [printingFee, setPrintingFee] = useState(0);
+	const [artworkFee, setArtworkFee] = useState(0);
+	const [setupFee, setSetupFee] = useState(0);
+	const [vinylFee, setVinylFee] = useState(0);
+	const [embroideryFee, setEmbroideryFee] = useState(0);
+	const [invoiceSubtotal, setInvoiceSubtotal] = useState(0);
+	const [invoiceTotal, setInvoiceTotal] = useState(0);
+	const [depositPercentage, setDepositPercentage] = useState(0);
+	const [balance, setBalance] = useState(0);
 
 	// Fetch company details
 	useEffect(() => {
 		const fetchCompanyDetails = async () => {
 			if (session) {
-				const companyId = session.user.companyId;
-				const response = await fetch(`/api/company/${companyId}`);
-				if (response.ok) {
-					const { company } = await response.json();
-					setCompany(company);
-				} else {
-					console.error('Failed to fetch company details');
+				try {
+					const companyId = session.user.companyId;
+					const response = await fetch(`/api/company/${companyId}`);
+					if (!response.ok) {
+						toast.error('Failed to fetch company details.');
+						throw new Error('Failed to fetch company details');
+					}
+					const data = await response.json();
+					setCompany(data);
+				} catch (error) {
+					setError('Failed to load company details.');
+					toast.error('Failed to load company details.');
+					console.error(error);
 				}
 			}
 		};
-
 		fetchCompanyDetails();
 	}, [session]);
 
+	// Fetch quote details
 	useEffect(() => {
 		const fetchQuoteDetails = async () => {
-			if (!quoteId || typeof quoteId !== 'string') return;
-
-			setLoading(true);
-			try {
-				const res = await fetch(`/api/quote/${quoteId}`);
-				if (!res.ok) throw new Error('Failed to fetch quote details');
-
-				const data: Quote = await res.json();
-				setQuote(data);
-			} catch (err) {
-				setError('Failed to load quote details');
-			} finally {
-				setLoading(false);
+			if (quoteId && typeof quoteId === 'string') {
+				try {
+					const response = await fetch(`/api/quote/${quoteId}`);
+					if (!response.ok) {
+						toast.error('Failed to fetch quote details.');
+						throw new Error('Failed to fetch quote details');
+					}
+					const data = await response.json();
+					setQuote(data);
+				} catch (error) {
+					setError('Failed to load quote details.');
+					toast.error('Failed to load quote details.');
+					console.error(error);
+				}
 			}
 		};
-
 		fetchQuoteDetails();
 	}, [quoteId]);
 
+	// Fetch prices
 	useEffect(() => {
-		const fetchCustomerDetails = async (companyId: string) => {
-			try {
-				const res = await fetch(`/api/customers/${companyId}`);
-				if (!res.ok) throw new Error('Failed to fetch customer details');
+		const fetchPrices = async () => {
+			if (quote && quote.companyId) {
+				try {
+					const response = await fetch(`/api/prices/${quote.companyId}`);
+					const data = await response.json();
 
-				const { customers } = await res.json();
-				if (customers.length > 0) {
-					setCustomer(customers[0]);
+					if (data?.prices?.screenPrinting) {
+						setPrices(data.prices);
+					} else {
+						setError('Screen printing prices not found in the API response');
+						toast.error(error);
+						console.error(
+							'Screen printing prices not found in the API response'
+						);
+					}
+				} catch (err: Error | any) {
+					setError('Failed to load price details.');
+					toast.error(error);
+					console.error(error);
 				}
-			} catch (err) {
-				console.error('Failed to load customer details:', err);
+			}
+		};
+		fetchPrices();
+	}, [quote]);
+
+	// Fetch customer details
+	useEffect(() => {
+		const fetchCustomerDetails = async () => {
+			if (quote && quote.companyId) {
+				try {
+					const response = await fetch(`/api/customers/${quote.companyId}`);
+					const data = await response.json();
+
+					if (data.customers && data.customers.length > 0) {
+						const matchingCustomer = data.customers.find(
+							(customer: Customer) => customer._id === quote.selectedCustomerId
+						);
+
+						if (matchingCustomer) {
+							setCustomer(matchingCustomer);
+						} else {
+							setError('Customer not found.');
+							toast.error(error);
+							setCustomer(null);
+						}
+					} else {
+						setError('No customers found for this company.');
+						toast.error(error);
+						setCustomer(null);
+					}
+				} catch (err: Error | any) {
+					setError('Failed to load customer details.');
+					toast.error(error);
+					console.error(error, err);
+				}
 			}
 		};
 
-		if (quote && quote.companyId) {
-			fetchCustomerDetails(quote.companyId);
-		}
+		fetchCustomerDetails();
 	}, [quote]);
 
+	// Calculate fees and totals after fetching prices and other relevant data
 	useEffect(() => {
-		const fetchPrices = async (companyId: string) => {
-			try {
-				const res = await fetch(`/api/prices/${companyId}`);
-				if (!res.ok) throw new Error('Failed to fetch prices');
-				const { prices } = await res.json();
-				setPrices(prices);
-			} catch (error) {
-				console.error('Failed to load prices:', error);
-			}
-		};
+		if (prices && quote && customer && company) {
+			const apparelCost = QuoteCalculations.calculateApparelCost(quote, prices);
+			const printingCost = QuoteCalculations.calculatePrintingCost(
+				quote,
+				prices
+			);
+			const shippingCost = quote.apparelAndShipping?.shippingAndHandling || 0;
 
-		if (quote && quote.companyId) {
-			fetchPrices(quote.companyId);
-		}
-	}, [quote]);
+			const taxCost = QuoteCalculations.calculateTaxCost(
+				quote, // Pass the correct Quote object here
+				company, // Pass the Company object
+				apparelCost, // Pass apparelCost as number
+				printingCost, // Pass printingCost as number
+				shippingCost // Pass shippingCost as number
+			);
 
-	useEffect(() => {
-		if (prices && quote && customer) {
-			// Set decoration cost based on the number of colors in the printing options
-			let decorationDetails = [];
+			const totalCost = apparelCost + printingCost + shippingCost;
 
-			// Function to safely retrieve screen printing cost
-			const getScreenPrintingCost = (colors: number): number => {
-				const key = `${colors} color` as keyof ScreenPrinting;
-				const costArray = prices.screenPrinting[key];
-				return costArray ? parseFloat(costArray[0]) : 0;
-			};
+			// Set calculated values
+			setInvoiceSubtotal(apparelCost + printingCost + shippingCost);
+			setInvoiceTotal(totalCost);
+			setDepositPercentage(quote.depositPercentage);
 
-			// Calculate cost for front colors if not 0 or null
-			if (quote.printingOptions.colorsFront > 0) {
-				const frontCost = getScreenPrintingCost(
-					quote.printingOptions.colorsFront
-				);
-				decorationDetails.push(
-					`Front: ${quote.printingOptions.colorsFront} color(s)`
-				);
-			}
+			setBalance(
+				totalCost - (totalCost * (quote.depositPercentage || 0)) / 100
+			);
 
-			// Calculate cost for back colors if not 0 or null
-			if (quote.printingOptions.colorsBack > 0) {
-				const backCost = getScreenPrintingCost(
-					quote.printingOptions.colorsBack
-				);
-				decorationDetails.push(
-					`Back: ${quote.printingOptions.colorsBack} color(s)`
-				);
-			}
+			// Set printing and setup fees
+			setPrintingFee(printingCost);
+			setArtworkFee(
+				quote.printingDetails.artworkNeeded
+					? parseFloat(prices?.artCost?.flatFee || '0')
+					: 0
+			);
+			setSetupFee(
+				quote.screenPrintingDetails.newScreensNeeded
+					? parseFloat(prices?.screenPrinting?.perScreenNew || '0')
+					: 0
+			);
 
-			// Calculate cost for left colors if not 0 or null
-			if (quote.printingOptions.colorsLeft > 0) {
-				const backCost = getScreenPrintingCost(
-					quote.printingOptions.colorsLeft
-				);
-				decorationDetails.push(
-					`Left: ${quote.printingOptions.colorsLeft} color(s)`
-				);
-			}
-
-			// Calculate cost for right colors if not 0 or null
-			if (quote.printingOptions.colorsRight > 0) {
-				const backCost = getScreenPrintingCost(
-					quote.printingOptions.colorsRight
-				);
-				decorationDetails.push(
-					`Right: ${quote.printingOptions.colorsRight} color(s)`
-				);
-			}
-
-			// Combine the details into one string, if there are details to display
-			if (decorationDetails.length > 0) {
-				setDecoration(decorationDetails.join(', '));
-			} else {
-				setDecoration('');
-			}
-
-			// Color match cost
-			if (quote.printingDetails.colorMatches > 0) {
-				const colorMatchCost = calculateColorMatchCost(
-					quote.printingDetails,
-					prices.artCost
-				);
-				setColorMatches(
-					`Color Matches: ${
-						quote.printingDetails.colorMatches
-					}, Cost: $${colorMatchCost.toFixed(2)}`
-				);
-			} else {
-				setColorMatches('');
-			}
-
-			// Artwork fee based on printingDetails.artworkNeeded
-			const artworkCost = quote.printingDetails.artworkNeeded
-				? parseFloat(prices.artCost.flatFee)
+			// Calculate vinyl fees using PreCutVinyl structure
+			const vinylNameCost = quote.vinylDetails
+				? parseFloat(prices?.preCutVinyl?.names[0] || '0') *
+				  quote.vinylDetails.namesFront
 				: 0;
-			setArtworkFee(artworkCost);
+			const vinylNumberCost = quote.vinylDetails
+				? parseFloat(prices?.preCutVinyl?.numbers[0] || '0') *
+				  quote.vinylDetails.numbersFront
+				: 0;
+			setVinylFee(vinylNameCost + vinylNumberCost);
 
-			// Setup fee based on embroideryDetails.setupFee and screenPrintingDetails.additionalScreens
-			const setupCost =
-				(quote.screenPrintingDetails.newScreensNeeded
-					? parseFloat(prices.screenPrinting.perScreenNew)
-					: 0) +
-				(quote.embroideryDetails.hoopingFeeFront
-					? parseFloat(prices.embroidery.hoopingFee)
-					: 0);
-			setSetupFee(setupCost);
-
-			// Calculate Vinyl and Embroidery fees
-			const vinylCost = calculateVinylCost(
-				quote.vinylDetails,
-				prices.preCutVinyl
-			);
-			setVinylFee(vinylCost);
-
-			const embroideryCost = calculateEmbroideryCost(
-				quote.embroideryDetails,
-				prices.embroidery
-			);
-
-			setEmbroideryFee(Number(embroideryCost) || 0);
-
-			if (quote && quote.ModifiedAt) {
-				const modifiedAt = new Date(quote.ModifiedAt);
-				const deliveryDueDays = quote.printingDetails.deliveryDueDays || 0;
-
-				// Create a new date based on the number of milliseconds in 'deliveryDueDays'
-				const deliveryDueDate = new Date(
-					modifiedAt.getTime() + deliveryDueDays * 24 * 60 * 60 * 1000
-				);
-
-				setDeliveryDate(deliveryDueDate.toLocaleDateString());
-			}
-
-			// Calculate subtotals and totals
-			const subtotal =
-				quote.summary.apparelCost +
-				quote.summary.printingCost +
-				quote.summary.shippingCost +
-				quote.summary.taxCost +
-				artworkCost +
-				setupCost +
-				vinylCost +
-				embroideryCost;
-
-			setInvoiceSubtotal(Number(subtotal) || 0);
-			const total = subtotal;
-			setInvoiceTotal(Number(total) || 0);
-
-			// Calculate the deposit due based on the quote's deposit percentage or a default value
-			const depositPercentage = quote.depositPercentage || 0;
-			const deposit = invoiceTotal * (depositPercentage / 100);
-			setDepositDue(deposit);
-
-			const balanceDue = total - deposit;
-			setBalance(balanceDue);
+			// Calculate embroidery fees using available properties in the Embroidery object
+			const embroideryCost = quote.embroideryDetails
+				? (parseFloat(prices?.embroidery?.costPerThousandStitches || '0') *
+						quote.embroideryDetails.stitchesFront) /
+				  1000
+				: 0;
+			setEmbroideryFee(embroideryCost);
 		}
-	}, [prices, quote, customer, invoiceTotal]);
+	}, [prices, quote, customer, company]);
 
-	const getTotalQuantity = (sizes: QuoteItem['sizes']): number => {
-		return Object.values(sizes).reduce((total, qty) => total + qty, 0);
-	};
-
-	const getItemCost = (item: QuoteItem): number => {
-		const baseCost = item.standardPrice;
-		let additionalCost = 0;
-		Object.keys(item.sizePrices || {}).forEach((size) => {
-			additionalCost +=
-				item.sizePrices![size as keyof typeof item.sizePrices] *
-				(item.sizes[size as SizeKey] || 0);
-		});
-		return baseCost + additionalCost;
-	};
-
-	const printQuote = () => {
-		if (!quote) {
-			console.error('No quote data available');
-			return;
+	// Ensure all data is loaded before rendering
+	useEffect(() => {
+		if (company && quote && prices && customer) {
+			setLoading(false);
 		}
+	}, [company, quote, prices, customer]);
 
-		if (!company) {
-			console.error('Company details are not available');
-			return;
-		}
-
-		if (!customer) {
-			console.error('Customer details are not available');
-			return;
-		}
-
-		const decorationDetails = getDecorationDetails(quote);
-		const artworkFee = getArtworkFee(quote);
-		const setupFee = getSetupFee(quote);
-		const deliveryDate = getDeliveryDate(quote);
-
-		// Data for the items table in the PDF
-		const itemsTableData = quote.items.map((item) => [
-			item.brandAndStyle,
-			item.color,
-			`$${item.standardPrice.toFixed(2)}`,
-			Object.entries(item.sizes)
-				.map(([size, quantity]) => `${size}: ${quantity}`)
-				.join(', '),
-			`$${(
-				item.standardPrice *
-				Object.values(item.sizes).reduce((acc, qty) => acc + qty, 0)
-			).toFixed(2)}`,
-		]);
-
-		const content = {
-			tables: [
-				{
-					headers: [
-						'Brand & Style',
-						'Color',
-						'Standard Price',
-						'Sizes',
-						'Subtotal',
-					],
-					data: itemsTableData,
-				},
-			],
-			additionalRows: [
-				{ label: 'Decoration', value: decorationDetails },
-				{ label: 'Artwork Fee', value: `$${artworkFee.toFixed(2)}` },
-				{ label: 'Setup Fee', value: `$${setupFee.toFixed(2)}` },
-				{ label: 'Delivery Date', value: deliveryDate },
-				// Add other rows as needed
-			],
-		};
-
-		createQuote(
-			quote,
-			decoration,
-			artworkFee,
-			setupFee,
-			deliveryDate,
-			invoiceSubtotal,
-			company,
-			customer
-		);
-	};
-
-	if (loading) return <Layout>Loading...</Layout>;
-	if (error) return <Layout>Error: {error}</Layout>;
-	if (!quote) return <Layout>Quote not found</Layout>;
+	// Handling loading and error states
+	if (loading || !quoteId || !quote || !prices || !company || !customer) {
+		return <div>Loading...</div>;
+	}
+	if (error) return <div>{error}</div>;
 
 	return (
 		<Layout>
-			<div className={styles.container}>
-				{customer ? (
-					<div className={styles.header}>
-						<h1 className={styles.title}>{formatQuoteType(quote.quoteType)}</h1>
-						<h4>{quote.customerName}</h4>
-						<h5>Quote Number {quote.quoteId}</h5>
-						<p>
-							<strong>Contact: </strong> {customer.contactName}
-							<br />
-							<strong>Address: </strong>
-							{customer.address} {customer.address2} {customer.city}{' '}
-							{customer.state} {customer.zip}
-							<br />
-							<strong>Phone: </strong> {customer.phone}
-							<br />
-							<strong>Email: </strong> {customer.email}
-						</p>
-					</div>
-				) : (
-					<Spinner
-						animation='border'
-						role='status'
-					>
-						<span className='visually-hidden'>Loading...</span>
-					</Spinner>
-				)}
-				<table style={{ width: '100%', marginBottom: '20px' }}>
-					<thead>
-						<tr>
-							<th colSpan={2}>Description</th>
-							<th>Cost</th>
-							<th>Quantity</th>
-							<th>Subtotal</th>
-							<th>Discount (%)</th>
-							<th>Total</th>
-							<th>Override ($)</th>
-						</tr>
-					</thead>
-					<tbody>
-						{quote.items.map((item, index) => (
-							<QuoteItemRow
-								key={index}
-								item={item}
-								getItemCost={getItemCost}
-								getTotalQuantity={getTotalQuantity}
-							/>
-						))}
-					</tbody>
-				</table>
-				{/* Additional details table */}
-				<table
-					style={{ width: '100%', marginBottom: '20px', marginTop: '20px' }}
-				>
-					<tbody>
-						{decoration && (
-							<tr>
-								<td>
-									<strong>Decoration</strong>
-								</td>
-								<td>{decoration}</td>
-								<td></td>
-								<td></td>
-							</tr>
-						)}
-						{colorMatches && (
-							<tr>
-								<td>
-									<strong>Color Matches</strong>
-								</td>
-								<td>{colorMatches}</td>
-								<td></td>
-								<td></td>
-							</tr>
-						)}
-						{vinylFee > 0 && (
-							<tr>
-								<td>
-									<strong>Vinyl</strong>
-								</td>
-								<td></td>
-								<td>${(vinylFee || 0).toFixed(2)}</td>
-								<td>${(vinylFee || 0).toFixed(2)}</td>
-							</tr>
-						)}
-						{artworkFee > 0 && (
-							<tr>
-								<td>
-									<strong>Artwork</strong>
-								</td>
-								<td>Artwork fee for printed design</td>
-								<td>${(artworkFee || 0).toFixed(2)}</td>
-								<td>${(artworkFee || 0).toFixed(2)}</td>
-							</tr>
-						)}
-						{setupFee > 0 && (
-							<tr>
-								<td>
-									<strong>Setup</strong>
-								</td>
-								<td></td>
-								<td>${(setupFee || 0).toFixed(2)}</td>
-								<td>${(setupFee || 0).toFixed(2)}</td>
-							</tr>
-						)}
-						{deliveryDate && (
-							<tr>
-								<td>
-									<strong>Delivery By</strong>
-								</td>
-								<td>{deliveryDate}</td>
-								<td></td>
-								<td></td>
-							</tr>
-						)}
-						{embroideryFee > 0 && (
-							<tr>
-								<td>
-									<strong>Embroidery</strong>
-								</td>
-								<td></td>
-								<td>${(embroideryFee || 0).toFixed(2)}</td>
-								<td>${(embroideryFee || 0).toFixed(2)}</td>
-							</tr>
-						)}
-					</tbody>
-					<tfoot>
-						<tr>
-							<td colSpan={2}></td>
-							<td colSpan={1}>
-								<strong>Invoice Subtotal</strong>
-							</td>
-							<td colSpan={1}>${(invoiceSubtotal || 0).toFixed(2)}</td>
-						</tr>
-						<tr>
-							<td colSpan={2}></td>
-							<td colSpan={1}>
-								<strong>Invoice Total</strong>
-							</td>
-							<td colSpan={1}>${(invoiceTotal || 0).toFixed(2)}</td>
-						</tr>
-						<tr>
-							<td colSpan={2}></td>
-							<td colSpan={1}>
-								<strong>Deposit Due</strong>
-							</td>
-							<td colSpan={1}>${(depositDue || 0).toFixed(2)}</td>
-						</tr>
-						<tr>
-							<td colSpan={2}></td>
-							<td colSpan={1}>
-								<strong>Balance</strong>
-							</td>
-							<td colSpan={1}>${(balance || 0).toFixed(2)}</td>
-						</tr>
-					</tfoot>
-				</table>
-				<Link
-					href={`/app/quote?quoteId=${quote._id}`}
-					className='m-4'
-				>
-					<Button type='button'>Modify Quote</Button>
-				</Link>
-				<Button onClick={printQuote}>Print Quote</Button>
-			</div>
+			<ToastContainer />
+			<QuoteDetails
+				quote={quote}
+				prices={prices}
+				company={company}
+				customer={customer}
+				artworkFee={artworkFee}
+				setupFee={setupFee}
+				depositPercentage={depositPercentage}
+				printingFee={printingFee}
+			/>
 		</Layout>
 	);
 };
 
-export default QuoteDetails;
-
-// Helper functions for calculating costs
-function calculateVinylCost(
-	vinylDetails: VinylDetails,
-	prices: PreCutVinyl
-): number {
-	const namePrice = parseFloat(prices.names[0] || '0'); // Default to 0 if undefined
-	const numberPrice = parseFloat(prices.numbers[0] || '0'); // Default to 0 if undefined
-
-	// Calculate costs for names and numbers on both front and back
-	const namesCostFront = vinylDetails.namesFront * namePrice;
-	const namesCostBack = vinylDetails.namesBack * namePrice;
-	const numbersCostFront = vinylDetails.numbersFront * numberPrice;
-	const numbersCostBack = vinylDetails.numbersBack * numberPrice;
-
-	// Total cost for names and numbers
-	return namesCostFront + namesCostBack + numbersCostFront + numbersCostBack;
-}
-
-function calculateEmbroideryCost(
-	embroideryDetails: EmbroideryDetails,
-	prices: Embroidery
-): number {
-	const costPerThousandStitches = parseFloat(prices.costPerThousandStitches);
-	const hoopingFee = parseFloat(prices.hoopingFee);
-
-	// Calculate costs based on stitch counts and hooping fees for each part of the apparel
-	const stitchesFrontCost =
-		(embroideryDetails.stitchesFront / 1000) * costPerThousandStitches;
-	const stitchesBackCost =
-		(embroideryDetails.stitchesBack / 1000) * costPerThousandStitches;
-	const stitchesLeftSleeveCost =
-		(embroideryDetails.stitchesLeftSleeve / 1000) * costPerThousandStitches;
-	const stitchesRightSleeveCost =
-		(embroideryDetails.stitchesRightSleeve / 1000) * costPerThousandStitches;
-
-	const hoopingFeeFront = embroideryDetails.hoopingFeeFront ? hoopingFee : 0;
-	const hoopingFeeBack = embroideryDetails.hoopingFeeBack ? hoopingFee : 0;
-	const hoopingFeeLeftSleeve = embroideryDetails.hoopingFeeLeftSleeve
-		? hoopingFee
-		: 0;
-	const hoopingFeeRightSleeve = embroideryDetails.hoopingFeeRightSleeve
-		? hoopingFee
-		: 0;
-
-	// Total embroidery cost including stitch counts and hooping fees for all parts
-	return (
-		stitchesFrontCost +
-		stitchesBackCost +
-		stitchesLeftSleeveCost +
-		stitchesRightSleeveCost +
-		hoopingFeeFront +
-		hoopingFeeBack +
-		hoopingFeeLeftSleeve +
-		hoopingFeeRightSleeve +
-		embroideryDetails.digitizingCost +
-		embroideryDetails.setupFee +
-		embroideryDetails.artworkFee
-	);
-}
-
-function calculateColorMatchCost(
-	printingDetails: PrintingDetails,
-	prices: ArtCost
-): number {
-	// Parse the price for a single color match from the prices object
-	const colorMatchPrice = parseFloat(prices.colorMatch);
-
-	// Calculate the total color match cost based on the number of color matches in printingDetails
-	const totalColorMatchCost = printingDetails.colorMatches * colorMatchPrice;
-
-	return totalColorMatchCost;
-}
-
-// Define the functions used in printQuote here, e.g.:
-function getDecorationDetails(quote: Quote): string {
-	// Your logic to calculate decoration details
-	return 'Decoration Details';
-}
-
-function getArtworkFee(quote: Quote): number {
-	// Your logic to calculate artwork fee
-	return 0;
-}
-
-function getSetupFee(quote: Quote): number {
-	// Your logic to calculate setup fee
-	return 0;
-}
-
-function getDeliveryDate(quote: Quote): string {
-	// Your logic to determine the delivery date
-	return new Date().toLocaleDateString();
-}
+export default QuoteDetailsPage;

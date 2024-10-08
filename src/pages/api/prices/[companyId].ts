@@ -7,6 +7,10 @@ import formatFields from '@/utils/formatFields';
 
 // Fields to be formatted with 2 decimal places
 const fieldsToFormat = [
+	'dtgDarkGarmentMarkup',
+	'flashMarkup',
+	'perScreenNew',
+	'perScreenExisting',
 	'firstColor',
 	'additionalColor',
 	'flatFee',

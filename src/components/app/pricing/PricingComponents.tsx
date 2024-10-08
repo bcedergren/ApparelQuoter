@@ -9,8 +9,8 @@ import DyeSublimation from '@/components/app/pricing/DyeSublimation';
 import PreCutVinyl from '@/components/app/pricing/PreCutVinyl';
 import Embroidery from '@/components/app/pricing/Embroidery';
 import ScreenPrinting from '@/components/app/pricing/ScreenPrinting';
-import DTGDarkGarmentMarkupComponent from '@/components/app/pricing/DTGDarkGarmentMarkup';
 import { Price } from '@/types/Price';
+import styles from '@/styles/PricingComponents.module.css';
 
 interface PricingComponentsProps {
 	priceData: Price;
@@ -36,10 +36,17 @@ const PricingComponents: FC<PricingComponentsProps> = ({
 				>
 					<ArtCostComponent
 						artCostData={priceData.artCost}
+						screenPrintingData={priceData.screenPrinting}
 						setArtCostData={(updatedArtCost) => {
 							setPriceData({
 								...priceData,
 								artCost: updatedArtCost,
+							});
+						}}
+						setScreenPrintingData={(updatedScreenPrinting) => {
+							setPriceData({
+								...priceData,
+								screenPrinting: updatedScreenPrinting,
 							});
 						}}
 					/>
@@ -90,15 +97,6 @@ const PricingComponents: FC<PricingComponentsProps> = ({
 						}}
 						printingQuantityRanges={priceData.printingQuantityRanges}
 					/>
-					<DTGDarkGarmentMarkupComponent
-						dtgDarkGarmentMarkup={priceData.dtgDarkGarmentMarkup}
-						setDTGDarkGarmentMarkup={(updatedMarkup) => {
-							setPriceData({
-								...priceData,
-								dtgDarkGarmentMarkup: updatedMarkup,
-							});
-						}}
-					/>
 					<DyeSublimation
 						dyeSubData={priceData.dyeSublimation}
 						setDyeSubData={(updatedDyeSubData) => {
@@ -128,7 +126,15 @@ const PricingComponents: FC<PricingComponentsProps> = ({
 							});
 						}}
 					/>
-					<Button onClick={handleSave}>Save Changes</Button>
+					{/* Sticky Save Button */}
+					<div className={styles.stickySaveButton}>
+						<Button
+							onClick={handleSave}
+							variant='primary'
+						>
+							Save Changes
+						</Button>
+					</div>
 				</Col>
 			</Row>
 		</Container>

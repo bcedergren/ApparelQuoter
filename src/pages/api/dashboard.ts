@@ -1,19 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+import mongoose from 'mongoose';
 import dbConnect from '@/utils/dbConnect';
 import Payment from '@/models/Payment';
 import Customer from '@/models/Customer';
-import Quote, { IQuote } from '@/models/Quote';
-import Activity from '@/models/Activity'; // Import the Activity model
-
-// Utility function to determine if a quote is an order
-function isOrder(quote: IQuote): boolean {
-	const orderTypes: IQuote['quoteType'][] = [
-		'openOrders',
-		'savedOrders',
-		'completedOrders',
-	];
-	return orderTypes.includes(quote.quoteType);
-}
+import Activity from '@/models/Activity';
+import Sale from '@/models/Sale';
 
 export default async function handler(
 	req: NextApiRequest,
@@ -26,79 +17,73 @@ export default async function handler(
 	try {
 		await dbConnect();
 
-		// Extract companyId from the query parameters
 		const { companyId } = req.query;
 
 		if (!companyId) {
 			return res.status(400).json({ message: 'Company ID is required' });
 		}
 
-		// Fetch customers for the logged-in company
-		const customers = await Customer.find({ companyId });
+		const companyObjectId = new mongoose.Types.ObjectId(companyId as string);
 
-		let newCustomersCount = 0;
-		let newOrdersCount = 0;
-		let newSalesCount = 0;
+		// Fetch total number of customers and customers created in the last week
+		const oneWeekAgo = new Date();
+		oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
-		// Loop through each customer to determine new statuses
-		for (const customer of customers) {
-			const customerQuotes = await Quote.find({
-				selectedCustomerId: customer._id,
-				companyId,
-			});
+		const totalCustomersCount = await Customer.countDocuments({
+			companyId: companyObjectId,
+		});
 
-			// Check if the customer is new
-			if (customerQuotes.length === 0) {
-				newCustomersCount++;
-			} else {
-				// Identify if there is a new order
-				const customerOrders = customerQuotes.filter(isOrder);
-				if (customerOrders.length === 1) {
-					newOrdersCount++;
-				}
+		const newCustomersCount = await Customer.countDocuments({
+			companyId: companyObjectId,
+			createdAt: { $gte: oneWeekAgo },
+		});
 
-				// Identify if there is a new sale (first order paid/deposited)
-				const firstOrder = customerOrders[0];
-				if (firstOrder && firstOrder.summary.depositPercentage > 0) {
-					newSalesCount++;
-				}
-			}
-		}
+		// Fetch total sales count and sales from the last 7 days
+		const totalSalesCount = await Sale.countDocuments({
+			companyId: companyObjectId,
+		});
 
-		// Fetch total number of orders for the company
-		const totalOrders = await Quote.countDocuments({ companyId });
+		const newSalesCount = await Sale.countDocuments({
+			companyId: companyObjectId,
+			saleDate: { $gte: oneWeekAgo },
+		});
 
-		// Fetch total sales (sum of all orders' total prices)
-		const totalSales = await Quote.aggregate([
+		// Fetch total income and income from the current week
+		const startOfWeek = new Date();
+		startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+
+		const totalIncomeResult = await Sale.aggregate([
+			{ $match: { companyId: companyObjectId } },
+			{ $group: { _id: null, totalIncome: { $sum: '$totalAmount' } } },
+		]);
+
+		const totalIncome = totalIncomeResult[0]?.totalIncome || 0;
+
+		const weeklyIncomeResult = await Sale.aggregate([
 			{
 				$match: {
-					companyId,
-					quoteType: { $in: ['openOrders', 'savedOrders', 'completedOrders'] },
+					companyId: companyObjectId,
+					saleDate: { $gte: startOfWeek },
 				},
 			},
-			{ $group: { _id: null, totalSales: { $sum: '$summary.totalPrice' } } },
+			{ $group: { _id: null, weeklyIncome: { $sum: '$totalAmount' } } },
 		]);
 
-		// Fetch total payments
-		const totalPayments = await Payment.aggregate([
-			{ $match: { companyId } },
-			{ $group: { _id: null, totalPayments: { $sum: '$amount' } } },
-		]);
+		const weeklyIncome = weeklyIncomeResult[0]?.weeklyIncome || 0;
 
 		// Fetch recent activities from the Activity collection
-		const recentActivities = await Activity.find({ companyId })
-			.sort({ timestamp: -1 }) // Sort by timestamp in descending order
+		const recentActivities = await Activity.find({ companyId: companyObjectId })
+			.sort({ timestamp: -1 })
 			.limit(10);
 
 		res.status(200).json({
-			totalCustomers: customers.length,
-			totalOrders,
-			totalSales: totalSales[0]?.totalSales || 0,
-			totalPayments: totalPayments[0]?.totalPayments || 0,
+			totalCustomers: totalCustomersCount,
 			newCustomers: newCustomersCount,
-			newOrders: newOrdersCount,
+			totalSales: totalSalesCount,
 			newSales: newSalesCount,
-			recentActivities, // Send the fetched recent activities
+			totalIncome,
+			weeklyIncome,
+			recentActivities,
 		});
 	} catch (error) {
 		console.error('Error fetching dashboard data:', error);

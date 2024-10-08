@@ -36,9 +36,9 @@ body.app-styles p {
 	line-height: 1.6;
 }
 
-body.app-styles .container {
+/* body.app-styles body.container {
 	max-width: 1140px !important;
-}
+} */
 
 body.app-styles .bg-light {
 	background-color: #f9fafc !important;

@@ -65,6 +65,17 @@
 	color: #999;
 }
 
+.closeOrderButton {
+	margin: 10px;
+	width: 92%;
+	border: none;
+	padding: 5px 10px;
+	cursor: pointer;
+	margin-top: 10px;
+	border-radius: 3px;
+	font-size: 0.9em;
+}
+
 /* Responsive Styles */
 @media (max-width: 1200px) {
 	.column {

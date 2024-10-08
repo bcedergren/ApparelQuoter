@@ -1,21 +1,53 @@
+.container {
+	margin-bottom: 100px;
+	margin-left: 0 !important;
+	max-width: 100% !important;
+}
+
+.floatingSummary {
+	position: fixed;
+	bottom: 30px;
+	left: 208px;
+	right: 20px;
+	background-color: white;
+	padding: 10px;
+	box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	z-index: 1000;
+}
+
+.floatingSummary button {
+	margin-left: 20px;
+}
+
 @media (max-width: 768px) {
+	.container {
+		margin-bottom: 150px;
+	}
+
 	.form-group {
 		margin-bottom: 1rem;
+	}
+
+	.floatingSummary {
+		bottom: 0;
+		left: 0;
+		right: 0;
+		flex-direction: column; /* Stack the summary and button vertically */
+		align-items: center;
+	}
+
+	.floatingSummary button {
+		margin-left: 0;
+		margin-top: 10px; /* Add space between summary and button */
+		width: 100%; /* Make the button full width for mobile */
 	}
 }
 
 .form-group {
 	margin-bottom: 2rem;
-}
-
-/* h1 {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-} */
-
-.container {
-	max-width: 1200px;
-	padding: 1rem;
 }
 
 .saveButton {

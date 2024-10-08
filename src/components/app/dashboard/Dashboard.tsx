@@ -13,13 +13,15 @@ import styles from '@/styles/Dashboard.module.css';
 import { FaChartBar, FaBoxOpen, FaUsers, FaDollarSign } from 'react-icons/fa';
 
 const Dashboard: React.FC<{ data: any }> = ({ data }) => {
-	console.log(data);
-
-	// Calculate the percentage of new sales
+	// Sales and Income data
 	const totalSales = data.totalSales || 0;
 	const newSales = data.newSales || 0;
-	const newSalesPercentage =
-		totalSales > 0 ? ((newSales / totalSales) * 100).toFixed(2) : 0;
+	const totalIncome = data.totalIncome || 0;
+	const weeklyIncome = data.weeklyIncome || 0;
+
+	// Customer data
+	const totalCustomers = data.totalCustomers || 0;
+	const newCustomers = data.newCustomers || 0;
 
 	return (
 		<Container
@@ -31,7 +33,7 @@ const Dashboard: React.FC<{ data: any }> = ({ data }) => {
 					<Card
 						title='Sales'
 						value={totalSales.toLocaleString()}
-						subtitle={`${newSalesPercentage}% New Sales`}
+						subtitle={`${newSales.toLocaleString()} New Sales`}
 						icon={FaChartBar}
 						color='#D1C4E9'
 					/>
@@ -48,8 +50,8 @@ const Dashboard: React.FC<{ data: any }> = ({ data }) => {
 				<Col md={3}>
 					<Card
 						title='Customers'
-						value={(data.totalCustomers || 0).toLocaleString()}
-						subtitle={`${data.newCustomers || 0} New Customers`}
+						value={totalCustomers.toLocaleString()}
+						subtitle={`${newCustomers.toLocaleString()} New Customers`}
 						icon={FaUsers}
 						color='#FFCDD2'
 					/>
@@ -57,8 +59,8 @@ const Dashboard: React.FC<{ data: any }> = ({ data }) => {
 				<Col md={3}>
 					<Card
 						title='Income'
-						value={`${(data.totalPayments || 0).toLocaleString()} M`}
-						subtitle={`$${data.weeklyIncome || 0} This Week`}
+						value={`$${totalIncome.toLocaleString()}`}
+						subtitle={`$${weeklyIncome.toLocaleString()} This Week`}
 						icon={FaDollarSign}
 						color='#C8E6C9'
 					/>

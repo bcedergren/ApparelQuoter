@@ -18,4 +18,6 @@ export interface Customer {
 	phone: string;
 	email: string;
 	followUpNotes: FollowUpNote[];
+	createdBy: string;
+	createdDate: Date;
 }

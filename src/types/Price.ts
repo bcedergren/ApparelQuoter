@@ -7,12 +7,8 @@ export interface ArtCost {
 	glitterOrPuff: string;
 	colorMatch: string;
 	inkColorChanges: string;
-}
-
-export interface DTGDarkGarmentMarkup {
-	small: string[];
-	medium: string[];
-	large: string[];
+	dtgDarkGarmentMarkup: string;
+	flashMarkup: string;
 }
 
 export interface WholesaleMarkup {
@@ -45,16 +41,8 @@ export interface ScreenPrinting {
 	perScreenExisting: string;
 }
 
-export interface DTGPrinting {
-	small: string[];
-	medium: string[];
-	large: string[];
-}
-
 export interface DyeSublimation {
-	small: string[];
-	medium: string[];
-	large: string[];
+	quantity: string[];
 }
 
 export interface PreCutVinyl {
@@ -82,8 +70,6 @@ export interface Price {
 	printingQuantityRanges: Array<PrintingQuantityRange>;
 	printingLocationNames: string[];
 	screenPrinting: ScreenPrinting;
-	dtgPrinting: DTGPrinting;
-	dtgDarkGarmentMarkup: DTGDarkGarmentMarkup;
 	dyeSublimation: DyeSublimation;
 	preCutVinyl: PreCutVinyl;
 	embroidery: Embroidery;

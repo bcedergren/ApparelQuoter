@@ -26,10 +26,10 @@ interface IEmbroideryDetails {
 	hoopingFeeFront: boolean;
 	stitchesBack: number;
 	hoopingFeeBack: boolean;
-	stitchesLeftSleeve: number;
-	hoopingFeeLeftSleeve: boolean;
-	stitchesRightSleeve: number;
-	hoopingFeeRightSleeve: boolean;
+	stitchesLeft: number;
+	hoopingFeeLeft: boolean;
+	stitchesRight: number;
+	hoopingFeeRight: boolean;
 	digitizingCost: number;
 	setupFee: number;
 	artworkFee: number;
@@ -42,12 +42,12 @@ interface IPrintingOptions {
 	colorsBack: number;
 	flashBack: boolean;
 	dtgDarkBack: boolean;
-	colorsLeftSleeve: number;
-	flashLeftSleeve: boolean;
-	dtgDarkLeftSleeve: boolean;
-	colorsRightSleeve: number;
-	flashRightSleeve: boolean;
-	dtgDarkRightSleeve: boolean;
+	colorsLeft: number;
+	flashLeft: boolean;
+	dtgDarkLeft: boolean;
+	colorsRight: number;
+	flashRight: boolean;
+	dtgDarkRight: boolean;
 }
 
 interface IPrintingDetails {
@@ -99,7 +99,8 @@ export interface IQuote extends Document {
 		| 'savedQuotes'
 		| 'openOrders'
 		| 'savedOrders'
-		| 'completedOrders';
+		| 'completedOrders'
+		| 'closedOrders';
 	quoteId: string;
 	items: IQuoteItem[];
 	embroideryDetails: IEmbroideryDetails;
@@ -121,50 +122,50 @@ const QuoteItemSchema = new Schema<IQuoteItem>({
 	color: { type: String, required: true },
 	standardPrice: { type: Number, required: true },
 	sizes: {
-		XS: { type: Number, required: true },
-		S: { type: Number, required: true },
-		M: { type: Number, required: true },
-		L: { type: Number, required: true },
-		XL: { type: Number, required: true },
-		'2XL': { type: Number, required: true },
-		'3XL': { type: Number, required: true },
-		'4XL': { type: Number, required: true },
-		'5XL': { type: Number, required: true },
+		XS: { type: Number },
+		S: { type: Number },
+		M: { type: Number },
+		L: { type: Number },
+		XL: { type: Number },
+		'2XL': { type: Number },
+		'3XL': { type: Number },
+		'4XL': { type: Number },
+		'5XL': { type: Number },
 	},
 	sizePrices: { type: Map, of: Number },
 });
 
 const EmbroideryDetailsSchema = new Schema<IEmbroideryDetails>({
-	stitchesFront: { type: Number, required: true },
-	hoopingFeeFront: { type: Boolean, required: true },
-	stitchesBack: { type: Number, required: true },
-	hoopingFeeBack: { type: Boolean, required: true },
-	stitchesLeftSleeve: { type: Number, required: true },
-	hoopingFeeLeftSleeve: { type: Boolean, required: true },
-	stitchesRightSleeve: { type: Number, required: true },
-	hoopingFeeRightSleeve: { type: Boolean, required: true },
-	digitizingCost: { type: Number, required: true },
-	setupFee: { type: Number, required: true },
-	artworkFee: { type: Number, required: true },
+	stitchesFront: { type: Number },
+	hoopingFeeFront: { type: Boolean },
+	stitchesBack: { type: Number },
+	hoopingFeeBack: { type: Boolean },
+	stitchesLeft: { type: Number },
+	hoopingFeeLeft: { type: Boolean },
+	stitchesRight: { type: Number },
+	hoopingFeeRight: { type: Boolean },
+	digitizingCost: { type: Number },
+	setupFee: { type: Number },
+	artworkFee: { type: Number },
 });
 
 const PrintingOptionsSchema = new Schema<IPrintingOptions>({
-	colorsFront: { type: Number, required: true },
-	flashFront: { type: Boolean, required: true },
-	dtgDarkFront: { type: Boolean, required: true },
-	colorsBack: { type: Number, required: true },
-	flashBack: { type: Boolean, required: true },
-	dtgDarkBack: { type: Boolean, required: true },
-	colorsLeftSleeve: { type: Number, required: true },
-	flashLeftSleeve: { type: Boolean, required: true },
-	dtgDarkLeftSleeve: { type: Boolean, required: true },
-	colorsRightSleeve: { type: Number, required: true },
-	flashRightSleeve: { type: Boolean, required: true },
-	dtgDarkRightSleeve: { type: Boolean, required: true },
+	colorsFront: { type: Number },
+	flashFront: { type: Boolean },
+	dtgDarkFront: { type: Boolean },
+	colorsBack: { type: Number },
+	flashBack: { type: Boolean },
+	dtgDarkBack: { type: Boolean },
+	colorsLeft: { type: Number },
+	flashLeft: { type: Boolean },
+	dtgDarkLeft: { type: Boolean },
+	colorsRight: { type: Number },
+	flashRight: { type: Boolean },
+	dtgDarkRight: { type: Boolean },
 });
 
 const PrintingDetailsSchema = new Schema<IPrintingDetails>({
-	colorMatches: { type: Number, required: true },
+	colorMatches: { type: Number },
 	artworkNeeded: { type: Boolean, required: true },
 	deliveryDueDays: { type: Number, required: true },
 	deliveryDueDate: { type: Date, required: true },
@@ -173,21 +174,21 @@ const PrintingDetailsSchema = new Schema<IPrintingDetails>({
 const ApparelAndShippingSchema = new Schema<IApparelAndShipping>({
 	customerProvidesApparel: { type: Boolean, required: true },
 	creditCardCharge: { type: Boolean, required: true },
-	shippingAndHandling: { type: Number, required: true },
+	shippingAndHandling: { type: Number },
 	shippingAndHandlingTaxed: { type: Boolean, required: true },
 });
 
 const VinylDetailsSchema = new Schema<IVinylDetails>({
-	namesFront: { type: Number, required: true },
-	namesBack: { type: Number, required: true },
-	numbersFront: { type: Number, required: true },
-	numbersBack: { type: Number, required: true },
+	namesFront: { type: Number },
+	namesBack: { type: Number },
+	numbersFront: { type: Number },
+	numbersBack: { type: Number },
 });
 
 const ScreenPrintingDetailsSchema = new Schema<IScreenPrintingDetails>({
 	newScreensNeeded: { type: Boolean, required: true },
-	additionalScreens: { type: Number, required: true },
-	colorChanges: { type: Number, required: true },
+	additionalScreens: { type: Number },
+	colorChanges: { type: Number },
 	inkType: { type: String, required: true },
 });
 
@@ -215,6 +216,7 @@ const QuoteSchema = new Schema<IQuote>({
 			'openOrders',
 			'savedOrders',
 			'completedOrders',
+			'closedOrders',
 		],
 		required: true,
 	},

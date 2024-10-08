@@ -5,6 +5,7 @@ export interface OrdersState {
 	openOrders: Quote[];
 	savedOrders: Quote[];
 	completedOrders: Quote[];
+	closedOrders: Quote[];
 	[key: string]: Quote[];
 }
 
@@ -13,4 +14,5 @@ export const initialOrders: OrdersState = {
 	openOrders: [],
 	savedOrders: [],
 	completedOrders: [],
+	closedOrders: [],
 };

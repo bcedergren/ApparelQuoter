@@ -5,6 +5,7 @@ import { EmbroideryDetails } from '@/types/Quote';
 interface EmbroideryOptionsProps {
 	embroideryDetails: EmbroideryDetails;
 	onEmbroideryDetailsChange: (details: EmbroideryDetails) => void;
+	printingLocations: string[];
 }
 
 const EmbroideryOptions: FC<EmbroideryOptionsProps> = ({
@@ -13,19 +14,25 @@ const EmbroideryOptions: FC<EmbroideryOptionsProps> = ({
 		stitchesBack: 0,
 		hoopingFeeFront: false,
 		hoopingFeeBack: false,
-		stitchesLeftSleeve: 0,
-		hoopingFeeLeftSleeve: false,
-		stitchesRightSleeve: 0,
-		hoopingFeeRightSleeve: false,
+		stitchesLeft: 0,
+		hoopingFeeLeft: false,
+		stitchesRight: 0,
+		hoopingFeeRight: false,
 		digitizingCost: 0,
 		setupFee: 0,
 		artworkFee: 0,
 	},
 	onEmbroideryDetailsChange,
+	printingLocations,
 }) => {
 	const handleChange = (field: keyof EmbroideryDetails, value: any) => {
 		const updatedDetails = { ...embroideryDetails, [field]: value };
 		onEmbroideryDetailsChange(updatedDetails);
+	};
+
+	const getLabel = (index: number, defaultLabel: string) => {
+		const location = printingLocations[index];
+		return location ? `Stitches - ${location}` : defaultLabel;
 	};
 
 	return (
@@ -35,7 +42,7 @@ const EmbroideryOptions: FC<EmbroideryOptionsProps> = ({
 				<Row>
 					<Col md={6}>
 						<Form.Group controlId='stitchesFront'>
-							<Form.Label>Stitches - Front</Form.Label>
+							<Form.Label>{getLabel(0, 'Stitches - Front')}</Form.Label>
 							<InputGroup>
 								<FormControl
 									type='number'
@@ -76,7 +83,7 @@ const EmbroideryOptions: FC<EmbroideryOptionsProps> = ({
 				<Row>
 					<Col md={6}>
 						<Form.Group controlId='stitchesBack'>
-							<Form.Label>Stitches - Back</Form.Label>
+							<Form.Label>{getLabel(1, 'Stitches - Back')}</Form.Label>
 							<InputGroup>
 								<FormControl
 									type='number'
@@ -114,26 +121,24 @@ const EmbroideryOptions: FC<EmbroideryOptionsProps> = ({
 				</Row>
 				<Row>
 					<Col md={6}>
-						<Form.Group controlId='stitchesLeftSleeve'>
-							<Form.Label>Stitches - Left Sleeve</Form.Label>
+						<Form.Group controlId='stitchesLeft'>
+							<Form.Label>{getLabel(2, 'Stitches - Left')}</Form.Label>
 							<InputGroup>
 								<FormControl
 									type='number'
 									value={
-										embroideryDetails.stitchesLeftSleeve != null
-											? embroideryDetails.stitchesLeftSleeve.toString()
+										embroideryDetails.stitchesLeft != null
+											? embroideryDetails.stitchesLeft.toString()
 											: ''
 									}
-									onChange={(e) =>
-										handleChange('stitchesLeftSleeve', e.target.value)
-									}
+									onChange={(e) => handleChange('stitchesLeft', e.target.value)}
 								/>
 								<InputGroup.Checkbox
-									checked={embroideryDetails.hoopingFeeLeftSleeve}
+									checked={embroideryDetails.hoopingFeeLeft}
 									onChange={(e) =>
-										handleChange('hoopingFeeLeftSleeve', e.target.checked)
+										handleChange('hoopingFeeLeft', e.target.checked)
 									}
-									aria-label='Hooping Fee Left Sleeve'
+									aria-label='Hooping Fee Left'
 								/>
 								<InputGroup.Text>Hooping Fee</InputGroup.Text>
 							</InputGroup>
@@ -142,26 +147,26 @@ const EmbroideryOptions: FC<EmbroideryOptionsProps> = ({
 				</Row>
 				<Row>
 					<Col md={6}>
-						<Form.Group controlId='stitchesRightSleeve'>
-							<Form.Label>Stitches - Right Sleeve</Form.Label>
+						<Form.Group controlId='stitchesRight'>
+							<Form.Label>{getLabel(3, 'Stitches - Right')}</Form.Label>
 							<InputGroup>
 								<FormControl
 									type='number'
 									value={
-										embroideryDetails.stitchesRightSleeve != null
-											? embroideryDetails.stitchesRightSleeve.toString()
+										embroideryDetails.stitchesRight != null
+											? embroideryDetails.stitchesRight.toString()
 											: ''
 									}
 									onChange={(e) =>
-										handleChange('stitchesRightSleeve', e.target.value)
+										handleChange('stitchesRight', e.target.value)
 									}
 								/>
 								<InputGroup.Checkbox
-									checked={embroideryDetails.hoopingFeeRightSleeve}
+									checked={embroideryDetails.hoopingFeeRight}
 									onChange={(e) =>
-										handleChange('hoopingFeeRightSleeve', e.target.checked)
+										handleChange('hoopingFeeRight', e.target.checked)
 									}
-									aria-label='Hooping Fee Right Sleeve'
+									aria-label='Hooping Fee Right'
 								/>
 								<InputGroup.Text>Hooping Fee</InputGroup.Text>
 							</InputGroup>

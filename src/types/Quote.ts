@@ -8,7 +8,8 @@ export interface Quote {
 		| 'savedQuotes'
 		| 'openOrders'
 		| 'savedOrders'
-		| 'completedOrders'; // Type of quote
+		| 'completedOrders'
+		| 'closedOrders'; // Type of quote
 	quoteId: string; // ID of the quote
 	items: QuoteItem[]; // Array to handle multiple items in the quote
 	embroideryDetails: EmbroideryDetails; // Embroidery-specific details
@@ -49,10 +50,10 @@ export interface EmbroideryDetails {
 	hoopingFeeFront: boolean; // Whether a hooping fee applies for the front
 	stitchesBack: number; // Number of stitches on the back
 	hoopingFeeBack: boolean; // Whether a hooping fee applies for the back
-	stitchesLeftSleeve: number; // Number of stitches on the left sleeve
-	hoopingFeeLeftSleeve: boolean; // Whether a hooping fee applies for the left sleeve
-	stitchesRightSleeve: number; // Number of stitches on the right sleeve
-	hoopingFeeRightSleeve: boolean; // Whether a hooping fee applies for the right sleeve
+	stitchesLeft: number; // Number of stitches on the left
+	hoopingFeeLeft: boolean; // Whether a hooping fee applies for the left
+	stitchesRight: number; // Number of stitches on the right
+	hoopingFeeRight: boolean; // Whether a hooping fee applies for the right
 	digitizingCost: number; // Cost of digitizing the design
 	setupFee: number; // Setup fee for embroidery
 	artworkFee: number; // Fee for artwork preparation
@@ -97,6 +98,7 @@ export interface VinylDetails {
 export interface ScreenPrintingDetails {
 	newScreensNeeded: boolean; // Whether new screens are needed
 	additionalScreens: number; // Number of additional new screens
+	existingScreens: number; // Number of existing screens to be used
 	colorChanges: number; // Number of color changes needed
 	inkType: string; // Type of ink used (e.g., None, Puff, Glitter)
 }

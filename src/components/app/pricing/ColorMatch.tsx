@@ -20,8 +20,6 @@ const ColorMatchComponent: React.FC<ColorMatchProps> = ({
 	colorMatchData,
 	setColorMatchData,
 }) => {
-	console.log(colorMatchData);
-
 	const handleInputChange = (
 		event: ChangeEvent<HTMLInputElement>,
 		field: keyof ColorMatch | keyof ColorMatch['dtgDarkGarmentMarkup']

@@ -12,7 +12,12 @@ interface ApparelAndShippingProps {
 }
 
 const ApparelAndShipping: React.FC<ApparelAndShippingProps> = ({
-	data,
+	data = {
+		customerProvidesApparel: false, // Default value if undefined
+		creditCardCharge: false, // Default value if undefined
+		shippingAndHandling: 0, // Default value if undefined
+		shippingAndHandlingTaxed: false, // Default value if undefined
+	},
 	onChange,
 }) => {
 	type FormControlElement =
@@ -39,6 +44,16 @@ const ApparelAndShipping: React.FC<ApparelAndShippingProps> = ({
 					: event.target.value;
 		} else if (isHTMLSelectElement(event.target)) {
 			updatedValue = event.target.value;
+		}
+
+		// Convert 'yes'/'no' to boolean for shippingAndHandlingTaxed
+		if (name === 'shippingAndHandlingTaxed') {
+			updatedValue = value === 'yes';
+		}
+
+		// Convert 'yes'/'no' to boolean for creditCardCharge and shippingAndHandlingTaxed
+		if (name === 'creditCardCharge' || name === 'shippingAndHandlingTaxed') {
+			updatedValue = value === 'yes';
 		}
 
 		onChange(name, updatedValue);

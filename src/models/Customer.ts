@@ -19,6 +19,8 @@ interface ICustomer extends Document {
 	phone: string;
 	email: string;
 	followUpNotes: IFollowUpNote[];
+	createdBy: mongoose.Types.ObjectId;
+	createdDate: Date;
 }
 
 const FollowUpNoteSchema = new mongoose.Schema({
@@ -44,8 +46,15 @@ const CustomerSchema = new mongoose.Schema({
 	phone: { type: String, required: true },
 	email: { type: String, required: true },
 	followUpNotes: { type: [FollowUpNoteSchema], default: [] },
+	createdBy: {
+		type: mongoose.Schema.Types.ObjectId,
+		required: true,
+		ref: 'User',
+	},
+	createdDate: { type: Date, default: Date.now },
 });
 
 const Customer: Model<ICustomer> =
 	mongoose.models.Customer || mongoose.model('Customer', CustomerSchema);
+
 export default Customer;

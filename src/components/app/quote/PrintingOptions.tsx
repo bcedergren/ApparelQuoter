@@ -38,7 +38,9 @@ const PrintingOptions: FC<PrintingOptionsProps> = ({
 
 	return (
 		<div>
-			<h6 className='standout-header'>Screen Printing Colors</h6>
+			<h6 className='standout-header'>
+				Screen Printing, DTG, Sublimation and Vinyl Colors
+			</h6>
 			<Form>
 				<Row>
 					<Col>
@@ -48,6 +50,8 @@ const PrintingOptions: FC<PrintingOptionsProps> = ({
 							</InputGroup.Text>
 							<FormControl
 								type='number'
+								min={0}
+								max={12}
 								value={options.colorsFront}
 								onChange={(e) =>
 									handleChange('colorsFront', parseInt(e.target.value, 10))
@@ -76,6 +80,7 @@ const PrintingOptions: FC<PrintingOptionsProps> = ({
 							</InputGroup.Text>
 							<FormControl
 								type='number'
+								min={0}
 								value={options.colorsBack}
 								onChange={(e) =>
 									handleChange('colorsBack', parseInt(e.target.value, 10))
@@ -104,6 +109,8 @@ const PrintingOptions: FC<PrintingOptionsProps> = ({
 							</InputGroup.Text>
 							<FormControl
 								type='number'
+								min={0}
+								max={12}
 								value={options.colorsLeft}
 								onChange={(e) =>
 									handleChange('colorsLeft', parseInt(e.target.value, 10))
@@ -132,6 +139,8 @@ const PrintingOptions: FC<PrintingOptionsProps> = ({
 							</InputGroup.Text>
 							<FormControl
 								type='number'
+								min={0}
+								max={12}
 								value={options.colorsRight}
 								onChange={(e) =>
 									handleChange('colorsRight', parseInt(e.target.value, 10))

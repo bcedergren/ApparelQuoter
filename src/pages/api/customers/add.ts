@@ -16,15 +16,25 @@ export default async function handler(
 	await dbConnect();
 
 	try {
-		const { companyId, userId } = req.query;
+		const session = await getSession({ req });
 
-		const userIdObject = new mongoose.Types.ObjectId(userId as string);
+		if (!session || !session.user) {
+			return res.status(401).json({ message: 'Unauthorized' });
+		}
+
+		const { companyId } = req.query;
+		const userId = session.user.id;
+
+		// Convert userId and companyId to ObjectId
+		const userIdObject = new mongoose.Types.ObjectId(userId);
 		const companyIdObject = new mongoose.Types.ObjectId(companyId as string);
 
+		// Prepare the customer data including createdBy and createdDate
 		const customerData = {
 			...req.body,
-			userIdObject,
-			companyIdObject,
+			createdBy: userIdObject,
+			createdDate: new Date(),
+			companyId: companyIdObject,
 		};
 
 		// Save the new customer

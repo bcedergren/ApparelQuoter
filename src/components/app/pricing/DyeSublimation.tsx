@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import React, { FC, ChangeEvent } from 'react';
 import {
 	DyeSublimation as DyeSublimationType,
 	PrintingQuantityRange,
@@ -7,7 +7,7 @@ import { Table, Form } from 'react-bootstrap';
 import styles from '@/styles/Pricing.module.css';
 
 interface DyeSublimationProps {
-	dyeSubData: DyeSublimationType;
+	dyeSubData: DyeSublimationType | null;
 	setDyeSubData: (data: DyeSublimationType) => void;
 	printingQuantityRanges: PrintingQuantityRange[];
 }
@@ -17,6 +17,20 @@ const DyeSublimation: FC<DyeSublimationProps> = ({
 	setDyeSubData,
 	printingQuantityRanges,
 }) => {
+	const handleInputChange = (
+		index: number,
+		event: ChangeEvent<HTMLInputElement>
+	) => {
+		if (!dyeSubData?.quantity) return;
+		const updatedPrices = [...dyeSubData.quantity];
+		updatedPrices[index] = parseFloat(event.target.value).toFixed(2);
+		setDyeSubData({ ...dyeSubData, quantity: updatedPrices });
+	};
+
+	if (!dyeSubData || !dyeSubData.quantity) {
+		return <div>Loading or no data available</div>;
+	}
+
 	return (
 		<Table
 			bordered
@@ -30,48 +44,35 @@ const DyeSublimation: FC<DyeSublimationProps> = ({
 					</th>
 				</tr>
 				<tr>
-					<th>Size</th>
+					<th>Quantity Range</th>
 					{printingQuantityRanges.map((range, index) => (
 						<th key={index}>
-							{range.start} - {range.end}
+							{range.start} - {range.end || '∞'}
 						</th>
 					))}
 				</tr>
 			</thead>
 			<tbody>
-				{Object.keys(dyeSubData).map((size) => {
-					const prices = dyeSubData[size as keyof DyeSublimationType];
-					if (Array.isArray(prices)) {
-						return (
-							<tr key={size}>
-								<td>{size.charAt(0).toUpperCase() + size.slice(1)}</td>
-								{prices.map((price, priceIndex) => (
-									<td key={priceIndex}>
-										<div className='input-group'>
-											<span className='input-group-text'>$</span>
-											<Form.Control
-												type='number'
-												step='0.01'
-												min='0.00'
-												className='form-control'
-												value={price}
-												onChange={(e) => {
-													const updatedPrices = [...prices];
-													updatedPrices[priceIndex] = e.target.value;
-													setDyeSubData({
-														...dyeSubData,
-														[size]: updatedPrices,
-													});
-												}}
-											/>
-										</div>
-									</td>
-								))}
-							</tr>
-						);
-					}
-					return null; // Skip if it's not an array
-				})}
+				<tr>
+					<td>Price</td>
+					{(dyeSubData.quantity || []).map((price, index) => (
+						<td key={index}>
+							<div className='input-group'>
+								<span className='input-group-text'>$</span>
+								<Form.Control
+									type='number'
+									step='0.01'
+									min='0.00'
+									className='form-control'
+									value={price || ''}
+									onChange={(e) =>
+										handleInputChange(index, e as ChangeEvent<HTMLInputElement>)
+									}
+								/>
+							</div>
+						</td>
+					))}
+				</tr>
 			</tbody>
 		</Table>
 	);

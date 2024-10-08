@@ -15,60 +15,60 @@ interface ApiResponse {
 }
 
 const Prices: NextPage = () => {
-	const { data: session } = useSession();
+	const { data: session, status } = useSession();
 	const [priceData, setPriceData] = useState<Price | null>(null);
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
-		if (session) {
-			setIsLoading(true);
-			const fetchData = async () => {
-				try {
-					const companyId = session.user.companyId;
-					if (companyId) {
-						const url = `/api/prices/${companyId}`;
-						const response = await axios.get<ApiResponse>(url);
-
-						if (response.data.success) {
-							setPriceData(response.data.prices);
-						} else {
-							toast.error('Failed to fetch prices');
-							setError('Failed to fetch prices');
-						}
-					} else {
-						toast.error('No company ID found in session');
-						setError('No company ID found in session');
-					}
-				} catch (error) {
-					toast.error('Error fetching data');
-					setError('Error fetching data');
-				} finally {
-					setIsLoading(false);
-				}
-			};
-
-			fetchData();
+		if (status === 'authenticated' && session?.user?.companyId) {
+			fetchData(session.user.companyId);
 		}
-	}, [session]);
+	}, [session, status]);
+
+	const fetchData = async (companyId: string) => {
+		setIsLoading(true);
+		try {
+			const url = `/api/prices/${companyId}`;
+			const response = await axios.get<ApiResponse>(url);
+
+			if (response.data.success) {
+				setPriceData(response.data.prices);
+			} else {
+				throw new Error('Failed to fetch prices');
+			}
+		} catch (error) {
+			const errorMessage =
+				error instanceof Error ? error.message : 'Unknown error occurred';
+			toast.error(errorMessage);
+			setError(errorMessage);
+		} finally {
+			setIsLoading(false);
+		}
+	};
 
 	const handleSave = async () => {
 		try {
 			const response = await axios.post('/api/prices/update', {
 				prices: priceData,
-				companyId: session?.user.companyId,
+				companyId: session?.user?.companyId,
 			});
 
 			if (response.status === 200) {
-				console.log('Prices updated successfully');
 				toast.success('Prices updated successfully');
 			} else {
-				console.error('Failed to update prices');
-				toast.error('Error fetching data');
+				throw new Error('Failed to update prices');
 			}
-		} catch (error) {
-			toast.error('Error updating data');
-			console.error('Error updating prices:', error);
+		} catch (error: Error | any) {
+			const errorMessage =
+				error.response && error.response.data
+					? error.response.data.message
+					: error.message || 'Unknown error occurred';
+			toast.error(`Error updating data: ${errorMessage}`);
+			console.error(
+				'Error updating prices:',
+				error.response ? error.response.data : error.message
+			);
 		}
 	};
 
@@ -90,7 +90,11 @@ const Prices: NextPage = () => {
 								handleSave={handleSave}
 							/>
 						) : (
-							<div>No pricing data available.</div>
+							<div>
+								{isLoading
+									? 'Loading pricing data...'
+									: 'No pricing data available.'}
+							</div>
 						)}
 						{error && <div>Error: {error}</div>}
 					</Col>

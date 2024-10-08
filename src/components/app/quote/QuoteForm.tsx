@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Button, Row, Col, Form, InputGroup } from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
+import { Button, Row, Col, Form, InputGroup, Container } from 'react-bootstrap';
 import { ToastContainer, toast } from 'react-toastify';
 import CustomerDropdown from '@/components/app/quote/CustomerDropdown';
 import DeliveryDueDate from '@/components/app/quote/DeliveryDueDate';
@@ -8,7 +8,6 @@ import BrandStylePricing from '@/components/app/quote/BrandStylePricing';
 import ApparelAndShipping from '@/components/app/quote/ApparelShipping';
 import PrintingOptions from '@/components/app/quote/PrintingOptions';
 import VinylDetails from '@/components/app/quote/VinylDetails';
-import ScreenPrintingDetails from '@/components/app/quote/ScreenPrintingDetails';
 import EmbroideryOptions from '@/components/app/quote/EmbroideryOptions';
 import SummaryComponent from '@/components/app/quote/SummaryComponent';
 import { Customer } from '@/types/Customer';
@@ -16,11 +15,13 @@ import { Price } from '@/types/Price';
 import {
 	Quote,
 	QuoteItem,
-	Summary,
 	PrintingOptions as PrintingOptionsType,
+	ScreenPrintingDetails as ScreenPrintingDetailsType,
 } from '@/types/Quote';
 import { Company } from '@/types/Company';
 import { QuoteCalculations } from '@/utils/quoteCalculations';
+import PrintingDetails from '@/components/app/quote/PrintingDetails';
+import styles from '@/styles/QuotePage.module.css';
 
 interface QuoteFormProps {
 	quoteId?: string | string[];
@@ -117,19 +118,18 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
 
 	const handleBrandStyleQuantityChange = (updatedItems: QuoteItem[]) => {
 		setQuote((prevQuote) => {
-			if (!prevQuote) {
-				return {
-					...initialQuoteState,
-					items: updatedItems,
-				};
-			}
+			if (!prevQuote || !company) return prevQuote; // Ensure company is not null
 
 			const updatedQuote = {
 				...prevQuote,
 				items: updatedItems,
 			};
 
-			const summary = QuoteCalculations.calculateSummary(updatedQuote, prices);
+			const summary = QuoteCalculations.calculateSummary(
+				updatedQuote,
+				company,
+				prices
+			);
 			return {
 				...updatedQuote,
 				summary,
@@ -139,7 +139,7 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
 
 	const handleBrandStylePricingChange = (updatedItems: QuoteItem[]) => {
 		setQuote((prevQuote) => {
-			if (!prevQuote) return null;
+			if (!prevQuote || !company) return prevQuote; // Ensure company is not null
 
 			const updatedQuote: Quote = {
 				...prevQuote,
@@ -155,7 +155,11 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
 				}),
 			};
 
-			const summary = QuoteCalculations.calculateSummary(updatedQuote, prices);
+			const summary = QuoteCalculations.calculateSummary(
+				updatedQuote,
+				company,
+				prices
+			);
 			return {
 				...updatedQuote,
 				summary,
@@ -168,7 +172,7 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
 		value: string | number | boolean
 	) => {
 		setQuote((prevQuote) => {
-			if (!prevQuote) return null;
+			if (!prevQuote || !company) return prevQuote; // Ensure company is not null
 
 			const updatedApparelAndShipping = {
 				...prevQuote.apparelAndShipping,
@@ -180,7 +184,11 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
 				apparelAndShipping: updatedApparelAndShipping,
 			};
 
-			const summary = QuoteCalculations.calculateSummary(updatedQuote, prices);
+			const summary = QuoteCalculations.calculateSummary(
+				updatedQuote,
+				company,
+				prices
+			);
 			return {
 				...updatedQuote,
 				summary,
@@ -192,14 +200,44 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
 		updatedPrintingOptions: PrintingOptionsType
 	) => {
 		setQuote((prevQuote) => {
-			if (!prevQuote) return null;
+			if (!prevQuote || !company) return prevQuote; // Ensure company is not null
 
 			const updatedQuote = {
 				...prevQuote,
 				printingOptions: updatedPrintingOptions,
 			};
 
-			const summary = QuoteCalculations.calculateSummary(updatedQuote, prices);
+			const summary = QuoteCalculations.calculateSummary(
+				updatedQuote,
+				company,
+				prices
+			);
+
+			return {
+				...updatedQuote,
+				summary,
+			};
+		});
+	};
+
+	const handleCombinedPrintingDetailsChange = (updatedDetails: {
+		printingDetails: typeof initialQuoteState.printingDetails;
+		screenPrintingDetails: ScreenPrintingDetailsType;
+	}) => {
+		setQuote((prevQuote) => {
+			if (!prevQuote || !company) return prevQuote; // Ensure company is not null
+
+			const updatedQuote = {
+				...prevQuote,
+				printingDetails: updatedDetails.printingDetails,
+				screenPrintingDetails: updatedDetails.screenPrintingDetails,
+			};
+
+			const summary = QuoteCalculations.calculateSummary(
+				updatedQuote,
+				company,
+				prices
+			);
 			return {
 				...updatedQuote,
 				summary,
@@ -211,7 +249,7 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
 		updatedVinylDetails: typeof initialQuoteState.vinylDetails
 	) => {
 		setQuote((prevQuote) => {
-			if (!prevQuote) return null;
+			if (!prevQuote || !company) return prevQuote; // Ensure company is not null
 
 			const updatedQuote = {
 				...prevQuote,
@@ -219,29 +257,11 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
 				customerName: prevQuote.customerName || '',
 			};
 
-			const summary = QuoteCalculations.calculateSummary(updatedQuote, prices);
-			return {
-				...updatedQuote,
-				summary,
-			};
-		});
-	};
-
-	const handleScreenPrintingDetailsChange = (
-		updatedScreenPrintingDetails: typeof initialQuoteState.screenPrintingDetails
-	) => {
-		setQuote((prevQuote) => {
-			if (!prevQuote) return null;
-
-			const updatedQuote = {
-				...prevQuote,
-				screenPrintingDetails: {
-					...prevQuote.screenPrintingDetails,
-					...updatedScreenPrintingDetails,
-				},
-			};
-
-			const summary = QuoteCalculations.calculateSummary(updatedQuote, prices);
+			const summary = QuoteCalculations.calculateSummary(
+				updatedQuote,
+				company,
+				prices
+			);
 			return {
 				...updatedQuote,
 				summary,
@@ -253,14 +273,18 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
 		updatedEmbroideryDetails: typeof initialQuoteState.embroideryDetails
 	) => {
 		setQuote((prevQuote) => {
-			if (!prevQuote) return null;
+			if (!prevQuote || !company) return prevQuote; // Ensure company is not null
 
 			const updatedQuote: Quote = {
 				...prevQuote,
 				embroideryDetails: updatedEmbroideryDetails,
 			};
 
-			const summary = QuoteCalculations.calculateSummary(updatedQuote, prices);
+			const summary = QuoteCalculations.calculateSummary(
+				updatedQuote,
+				company,
+				prices
+			);
 			return {
 				...updatedQuote,
 				summary,
@@ -274,6 +298,10 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
 
 			if (!quote) {
 				throw new Error('Quote data is missing.');
+			}
+
+			if (!company) {
+				throw new Error('Company data is missing.');
 			}
 
 			if (session?.user?.companyId) {
@@ -317,7 +345,7 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
 	};
 
 	return (
-		<>
+		<Container className={styles.container}>
 			<Row className='align-items-center mb-3'>
 				<Col md={3}>
 					<CustomerDropdown
@@ -362,6 +390,10 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
 
 			{quote && (
 				<>
+					<ApparelAndShipping
+						data={quote.apparelAndShipping}
+						onChange={handleApparelAndShippingChange}
+					/>
 					<BrandStyleQuantity
 						items={quote.items}
 						onItemsChange={handleBrandStyleQuantityChange}
@@ -370,23 +402,18 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
 						items={quote.items}
 						onItemsChange={handleBrandStylePricingChange}
 					/>
-					<ApparelAndShipping
-						data={quote.apparelAndShipping}
-						onChange={handleApparelAndShippingChange}
+					<PrintingDetails
+						printingDetails={quote.printingDetails}
+						screenPrintingDetails={quote.screenPrintingDetails}
+						printingOptions={quote.printingOptions}
+						onDetailsChange={handleCombinedPrintingDetailsChange}
 					/>
-
 					{company?.offerings.includes('Screen Printing') && (
-						<>
-							<ScreenPrintingDetails
-								details={quote.screenPrintingDetails}
-								onDetailsChange={handleScreenPrintingDetailsChange}
-							/>
-							<PrintingOptions
-								options={quote?.printingOptions || {}}
-								onOptionsChange={handlePrintingOptionsChange}
-								printingLocations={prices?.printingLocationNames || []}
-							/>
-						</>
+						<PrintingOptions
+							options={quote?.printingOptions || {}}
+							onOptionsChange={handlePrintingOptionsChange}
+							printingLocations={prices?.printingLocationNames || []}
+						/>
 					)}
 					{company?.offerings.includes('Vinyl') && (
 						<VinylDetails
@@ -398,30 +425,34 @@ const QuoteForm: React.FC<QuoteFormProps> = ({
 						<EmbroideryOptions
 							embroideryDetails={quote.embroideryDetails}
 							onEmbroideryDetailsChange={handleEmbroideryOptionsChange}
+							printingLocations={prices?.printingLocationNames || []}
 						/>
 					)}
-
-					<SummaryComponent
-						qty={quote?.summary?.qty ?? 0}
-						avgCost={quote?.summary?.avgCost ?? 0}
-						apparelCost={quote?.summary?.apparelCost ?? 0}
-						printingCost={quote?.summary?.printingCost ?? 0}
-						shippingCost={quote?.summary?.shippingCost ?? 0}
-						taxCost={quote?.summary?.taxCost ?? 0}
-						totalCost={quote?.summary?.totalCost ?? 0}
-					/>
 				</>
 			)}
-			<Button
-				variant='primary'
-				type='button'
-				onClick={handleSubmit}
-				disabled={!session}
-			>
-				Save Quote
-			</Button>
+
+			<div className={styles.floatingSummary}>
+				<SummaryComponent
+					qty={quote?.summary?.qty ?? 0}
+					avgCost={quote?.summary?.avgCost ?? 0}
+					apparelCost={quote?.summary?.apparelCost ?? 0}
+					printingCost={quote?.summary?.printingCost ?? 0}
+					shippingCost={quote?.summary?.shippingCost ?? 0}
+					taxCost={quote?.summary?.taxCost ?? 0}
+					totalCost={quote?.summary?.totalCost ?? 0}
+				/>
+				<Button
+					className={styles.floatingSummaryButton}
+					variant='primary'
+					type='button'
+					onClick={handleSubmit}
+					disabled={!session}
+				>
+					Save Quote
+				</Button>
+			</div>
 			<ToastContainer />
-		</>
+		</Container>
 	);
 };
 

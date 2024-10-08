@@ -1,5 +1,6 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
+// Interfaces
 interface IArtCost {
 	firstColor: string;
 	additionalColor: string;
@@ -9,12 +10,8 @@ interface IArtCost {
 	glitterOrPuff: string;
 	colorMatch: string;
 	inkColorChanges: string;
-}
-
-interface IDTGDarkGarmentMarkup {
-	small: string[];
-	medium: string[];
-	large: string[];
+	dtgDarkGarmentMarkup: string;
+	flashMarkup: string;
 }
 
 interface IWholesaleMarkup {
@@ -48,15 +45,11 @@ interface IScreenPrinting {
 }
 
 interface IDTGPrinting {
-	small: string[];
-	medium: string[];
-	large: string[];
+	quantity: string[];
 }
 
 interface IDyeSublimation {
-	small: string[];
-	medium: string[];
-	large: string[];
+	quantity: string[];
 }
 
 interface IPreCutVinyl {
@@ -84,12 +77,11 @@ interface IPrice extends Document {
 	printingLocationNames: string[];
 	screenPrinting: IScreenPrinting;
 	dtgPrinting: IDTGPrinting;
-	dtgDarkGarmentMarkup: IDTGDarkGarmentMarkup;
-	dyeSublimation: IDyeSublimation;
 	preCutVinyl: IPreCutVinyl;
 	embroidery: IEmbroidery;
 }
 
+// Schemas
 const ArtCostSchema = new Schema<IArtCost>({
 	firstColor: { type: String, required: true },
 	additionalColor: { type: String, required: true },
@@ -99,12 +91,8 @@ const ArtCostSchema = new Schema<IArtCost>({
 	glitterOrPuff: { type: String, required: true },
 	colorMatch: { type: String, required: true },
 	inkColorChanges: { type: String, required: true },
-});
-
-const DTGDarkGarmentMarkupSchema = new Schema<IDTGDarkGarmentMarkup>({
-	small: [{ type: String, required: true }],
-	medium: [{ type: String, required: true }],
-	large: [{ type: String, required: true }],
+	dtgDarkGarmentMarkup: { type: String, required: true },
+	flashMarkup: { type: String, required: true },
 });
 
 const WholesaleMarkupSchema = new Schema<IWholesaleMarkup>({
@@ -137,18 +125,6 @@ const ScreenPrintingSchema = new Schema<IScreenPrinting>({
 	perScreenExisting: { type: String, required: true },
 });
 
-const DTGPrintingSchema = new Schema<IDTGPrinting>({
-	small: [{ type: String, required: true }],
-	medium: [{ type: String, required: true }],
-	large: [{ type: String, required: true }],
-});
-
-const DyeSublimationSchema = new Schema<IDyeSublimation>({
-	small: [{ type: String, required: true }],
-	medium: [{ type: String, required: true }],
-	large: [{ type: String, required: true }],
-});
-
 const PreCutVinylSchema = new Schema<IPreCutVinyl>({
 	names: [{ type: String, required: true }],
 	numbers: [{ type: String, required: true }],
@@ -176,9 +152,6 @@ const PriceSchema = new Schema<IPrice>({
 	},
 	printingLocationNames: [{ type: String, required: true }],
 	screenPrinting: { type: ScreenPrintingSchema, required: true },
-	dtgPrinting: { type: DTGPrintingSchema, required: true },
-	dtgDarkGarmentMarkup: { type: DTGDarkGarmentMarkupSchema, required: true },
-	dyeSublimation: { type: DyeSublimationSchema, required: true },
 	preCutVinyl: { type: PreCutVinylSchema, required: true },
 	embroidery: { type: EmbroiderySchema, required: true },
 });
