@@ -22,6 +22,15 @@ const Home = () => {
 					rel='stylesheet'
 					href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css'
 				/>
+				{/* Manychat */}
+				<script
+					src='//widget.manychat.com/328491250346208.js'
+					defer
+				></script>
+				<script
+					src='https://mccdn.me/assets/js/widget.js'
+					defer
+				></script>
 			</Head>
 			<Header />
 			<main className={styles.main}>
