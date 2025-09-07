@@ -1,19 +1,19 @@
-import Stripe from 'stripe';
-import { loadStripe } from '@stripe/stripe-js';
+import Stripe from 'stripe'
+import { loadStripe } from '@stripe/stripe-js'
 
-let stripePromise: ReturnType<typeof loadStripe>;
+let stripePromise: ReturnType<typeof loadStripe>
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-	apiVersion: '2023-10-16',
-});
+  apiVersion: '2025-08-27.basil',
+})
 
-export default stripe;
+export default stripe
 
 export const getStripe = () => {
-	if (!stripePromise) {
-		stripePromise = loadStripe(
-			process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string
-		);
-	}
-	return stripePromise;
-};
+  if (!stripePromise) {
+    stripePromise = loadStripe(
+      process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string
+    )
+  }
+  return stripePromise
+}

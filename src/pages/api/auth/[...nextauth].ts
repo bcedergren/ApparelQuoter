@@ -1,3 +1,5 @@
+/* This code snippet is setting up authentication using NextAuth in a TypeScript environment. It is
+configuring authentication providers like Google, Facebook, and custom credentials provider. */
 import NextAuth from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import FacebookProvider from 'next-auth/providers/facebook';

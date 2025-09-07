@@ -34,7 +34,7 @@ const DashboardPage: React.FC = () => {
 				setLoading(false);
 			}
 		}
-	}, [status]);
+	}, [status, session?.user?.companyId]);
 
 	if (status === 'loading' || loading) {
 		return (
