@@ -142,7 +142,7 @@ export class QuoteCalculations {
       totalBaseCost += qtyForSize * sizeCostWithMarkup
     })
 
-    const baseCostPerItem = totalBaseCost / itemQuantity
+    const baseCostPerItem = itemQuantity > 0 ? totalBaseCost / itemQuantity : 0
     return baseCostPerItem
   }
 
@@ -330,7 +330,7 @@ export class QuoteCalculations {
   }
 
   static getItemQuantity(sizes: QuoteItem['sizes']): number {
-    return Object.values(sizes).reduce((sum, qty) => sum + qty, 0)
+    return Object.values(sizes).reduce((sum, qty) => sum + Math.max(0, qty), 0)
   }
 
   static getTotalQuantity(quote: Quote): number {
@@ -344,10 +344,10 @@ export class QuoteCalculations {
     const qty = this.getTotalQuantity(quote)
     for (let i = 0; i < prices.printingQuantityRanges.length; i++) {
       const range = prices.printingQuantityRanges[i]
-      if (
-        qty >= parseInt(range.start) &&
-        (!range.end || qty <= parseInt(range.end))
-      ) {
+      const start = parseInt(range.start)
+      const end = range.end ? parseInt(range.end) : Infinity
+      
+      if (qty >= start && qty <= end) {
         return i
       }
     }

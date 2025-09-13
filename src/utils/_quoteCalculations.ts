@@ -284,7 +284,7 @@ export class QuoteCalculations {
     return quote.items.reduce(
       (sum, item) =>
         sum +
-        Object.values(item.sizes).reduce((sizeSum, qty) => sizeSum + qty, 0),
+        Object.values(item.sizes).reduce((sizeSum, qty) => sizeSum + Math.max(0, qty), 0),
       0
     )
   }
@@ -293,10 +293,10 @@ export class QuoteCalculations {
     const qty = this.getTotalQuantity(quote)
     for (let i = 0; i < prices.printingQuantityRanges.length; i++) {
       const range = prices.printingQuantityRanges[i]
-      if (
-        qty >= parseInt(range.start) &&
-        (qty <= parseInt(range.end) || !range.end)
-      ) {
+      const start = parseInt(range.start)
+      const end = range.end ? parseInt(range.end) : Infinity
+      
+      if (qty >= start && qty <= end) {
         return i
       }
     }

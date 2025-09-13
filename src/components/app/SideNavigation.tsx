@@ -152,6 +152,36 @@ const SideNavigation: React.FC<SideNavigationProps> = ({
           <SlBag /> {!collapsed && 'Inventory'}
         </div>
       </Nav.Link>
+      <Nav.Link
+        as={Link}
+        href="/app/invoice"
+        passHref
+        className={styles.navLink}
+      >
+        <div style={iconStyle}>
+          <SlDocs /> {!collapsed && 'Invoices'}
+        </div>
+      </Nav.Link>
+      <Nav.Link
+        as={Link}
+        href="/app/designs"
+        passHref
+        className={styles.navLink}
+      >
+        <div style={iconStyle}>
+          <SlDrawer /> {!collapsed && 'Designs'}
+        </div>
+      </Nav.Link>
+      <Nav.Link
+        as={Link}
+        href="/app/reports"
+        passHref
+        className={styles.navLink}
+      >
+        <div style={iconStyle}>
+          <SlNote /> {!collapsed && 'Reports'}
+        </div>
+      </Nav.Link>
     </Nav>
   )
 }

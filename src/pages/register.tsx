@@ -32,9 +32,9 @@ const RegistrationPage = () => {
 									Sign Up
 								</h3>
 							</div>
-							<RegistrationForm />
-							{/* <Elements stripe={getStripe()}>
-							</Elements> */}
+							<Elements stripe={getStripe()}>
+								<RegistrationForm />
+							</Elements>
 						</div>
 					</div>
 					<div className={styles.imageCol}>

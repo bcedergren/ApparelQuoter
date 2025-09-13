@@ -1,33 +1,33 @@
-import React from 'react';
-import Card from './Card';
-import { FaShippingFast, FaBoxOpen } from 'react-icons/fa';
-import styles from '@/styles/OrderList.module.css';
+import React from 'react'
+import Card from './Card'
+import { FaShippingFast, FaBoxOpen } from 'react-icons/fa'
+import styles from '@/styles/OrderList.module.css'
 
 interface Order {
-	icon: JSX.Element;
-	customerName: string;
-	product: string;
-	amount: string;
+  customerName: string
+  product: string
+  amount: string
 }
 
 interface OrderListProps {
-	orders: Order[];
+  orders: Order[]
 }
 
 const OrderList: React.FC<OrderListProps> = ({ orders }) => (
-	<Card title='Recent Orders'>
-		<ul className={styles.ordersList}>
-			{orders && orders.length > 0 ? (
-				orders.map((order, index) => (
-					<li key={index}>
-						{order.icon} {order.customerName} - {order.product} - {order.amount}
-					</li>
-				))
-			) : (
-				<li>No orders available</li>
-			)}
-		</ul>
-	</Card>
-);
+  <Card title="Recent Orders">
+    <ul className={styles.ordersList}>
+      {orders && orders.length > 0 ? (
+        orders.map((order, index) => (
+          <li key={index}>
+            <FaShippingFast /> {order.customerName} - {order.product} -{' '}
+            {order.amount}
+          </li>
+        ))
+      ) : (
+        <li>No orders available</li>
+      )}
+    </ul>
+  </Card>
+)
 
-export default OrderList;
+export default OrderList

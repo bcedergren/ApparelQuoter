@@ -320,12 +320,4 @@ const RegistrationForm = () => {
 	);
 };
 
-const RegistrationPage = () => {
-	return (
-		<Elements stripe={getStripe()}>
-			<RegistrationForm />
-		</Elements>
-	);
-};
-
-export default RegistrationPage;
+export default RegistrationForm;
