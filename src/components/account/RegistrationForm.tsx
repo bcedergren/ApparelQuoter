@@ -29,10 +29,12 @@ const RegistrationForm = () => {
 	const { data: session, status } = useSession();
 
 	useEffect(() => {
-		// Extract planId from query parameters
+		// Extract planId from query parameters; default to Starter plan if missing
 		const { planId } = router.query;
-		if (planId) {
-			setPlanId(planId as string);
+		if (typeof planId === 'string' && planId) {
+			setPlanId(planId);
+		} else {
+			setPlanId('price_1Ov16JLifuqhaGkV8cjqx4Gd');
 		}
 
 		// Handle Google sign-in and capture the session data
