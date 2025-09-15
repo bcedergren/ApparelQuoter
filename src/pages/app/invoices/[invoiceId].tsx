@@ -116,12 +116,8 @@ const InvoiceDetailPage: React.FC = () => {
 
   const handleSendInvoice = async () => {
     try {
-      const response = await fetch(`/api/invoices/${invoiceId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ status: 'sent' })
+      const response = await fetch(`/api/invoices/${invoiceId}/send`, {
+        method: 'POST'
       });
 
       if (response.ok) {

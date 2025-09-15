@@ -8,18 +8,22 @@ const sendEmailWithRetries = async (
 	to: string[],
 	subject: string,
 	html: string,
-	text?: string
+	text?: string,
+	attachments?: Array<{ filename: string; content: string; type?: string }>
 ) => {
 	const MAX_RETRIES = 3;
 	const RETRY_DELAY = 1000;
 	let retries = 0;
 
-	const msg = {
+	const msg: any = {
 		from,
 		to,
 		subject,
 		text,
 		html,
+		attachments: attachments && attachments.length > 0
+			? attachments.map((a) => ({ filename: a.filename, content: a.content, type: a.type }))
+			: undefined,
 	};
 
 	while (retries < MAX_RETRIES) {
@@ -57,7 +61,7 @@ export default async function handler(
 		return res.status(405).end(`Method ${req.method} Not Allowed`);
 	}
 
-	const { from, to, subject, text, html } = req.body;
+	const { from, to, subject, text, html, attachments } = req.body;
 
 	if (!from || !to || !subject || (!text && !html)) {
 		console.log('Missing required fields:', { from, to, subject, text, html });
@@ -70,7 +74,8 @@ export default async function handler(
 			Array.isArray(to) ? to : [to],
 			subject,
 			html,
-			text
+			text,
+			attachments
 		);
 		console.log('Message sent successfully');
 		res.status(200).json({ message: 'Message sent successfully' });
