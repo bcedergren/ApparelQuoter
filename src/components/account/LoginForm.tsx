@@ -81,6 +81,7 @@ const LoginForm = () => {
 			>
 				Sign In
 			</Button>
+			{/*
 			<div className={`${styles.textCenter} ${styles.marginTop}`}>
 				<small className='text-dark me-2'>Or Login With</small>
 				<div className={styles.socialLogin}>
@@ -119,6 +120,7 @@ const LoginForm = () => {
 					Sign Up
 				</Link>
 			</div>
+			*/}
 			<div className={`${styles.homeButton} ${styles.marginTop}`}>
 				<Link
 					href='/'
