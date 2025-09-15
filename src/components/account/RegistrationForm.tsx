@@ -252,6 +252,8 @@ const RegistrationForm = () => {
 					</Button>
 				</Col>
 			</Row>
+	
+			{/*
 			{!isGoogleAuthenticated && (
 				<div className={`${styles.orRegisterWith} ${styles.marginTop}`}>
 					<h4>Or Register With</h4>
@@ -292,18 +294,20 @@ const RegistrationForm = () => {
 								Google
 							</Button>
 						</Col>
-						<Col className='text-center'>
-							<small className='text-dark me-2'>Already have an account?</small>
-							<Link
-								href='/login'
-								className={styles.boldText}
-							>
-								Login
-							</Link>
-						</Col>
 					</Row>
 				</div>
 			)}
+			*/}
+
+			<Col className='text-center'>
+				<small className='text-dark me-2'>Already have an account?</small>
+				<Link
+					href='/login'
+					className={styles.boldText}
+				>
+					Login
+				</Link>
+			</Col>
 			<div className={`${styles.homeButton} ${styles.marginTop}`}>
 				<Link
 					href='/'

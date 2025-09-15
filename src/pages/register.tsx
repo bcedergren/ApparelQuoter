@@ -2,7 +2,7 @@ import { Elements } from '@stripe/react-stripe-js';
 import Image from 'next/image';
 import AccountLayout from '@/components/account/AccountLayout';
 import RegistrationForm from '@/components/account/RegistrationForm';
-import { getStripe } from '@/lib/stripe';
+import { getStripe } from '@/lib/stripeClient';
 import styles from '@/styles/Register.module.css';
 import registerImage from '../../public/signUp.png';
 

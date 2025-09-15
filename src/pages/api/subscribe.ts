@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getSession } from 'next-auth/react';
 import dbConnect from '@/utils/dbConnect';
-import stripe from '@/lib/stripe';
+import stripe from '@/lib/stripeServer';
 import User from '@/models/User';
 
 export default async function handler(

@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { hashPassword } from '@/lib/password';
 import dbConnect from '@/utils/dbConnect';
-import stripe from '@/lib/stripe';
+import stripe from '@/lib/stripeServer';
 import User from '@/models/User';
 import Company from '@/models/Company';
 import Price from '@/models/Price';
@@ -54,7 +54,7 @@ export default async function handler(
 
 		console.log('Creating default prices...');
 		await Price.create({
-			CompanyId: new mongoose.Types.ObjectId(newCompany._id),
+			CompanyId: newCompany._id,
 			artCost: {
 				firstColor: '',
 				additionalColor: '',

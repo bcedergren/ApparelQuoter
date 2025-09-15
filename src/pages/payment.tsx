@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
-import { getStripe } from '@/lib/stripe';
+import { getStripe } from '@/lib/stripeClient';
 import styles from '@/styles/Payment.module.css';
 
 const PaymentPage = () => {
