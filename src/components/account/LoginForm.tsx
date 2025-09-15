@@ -112,6 +112,8 @@ const LoginForm = () => {
 						Google
 					</Button>
 				</div>
+				</div>
+				*/}
 				<small className='text-dark me-2'>Don&apos;t have an account?</small>
 				<Link
 					href='/register'
@@ -119,8 +121,6 @@ const LoginForm = () => {
 				>
 					Sign Up
 				</Link>
-			</div>
-			*/}
 			<div className={`${styles.homeButton} ${styles.marginTop}`}>
 				<Link
 					href='/'
