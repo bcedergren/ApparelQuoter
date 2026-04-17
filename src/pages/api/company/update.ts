@@ -1,22 +1,35 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import dbConnect from '@/utils/dbConnect';
 import Company from '@/models/Company';
+import { requireAuth } from '@/lib/auth';
 
 export default async function handler(
 	req: NextApiRequest,
 	res: NextApiResponse
 ): Promise<void> {
 	if (req.method === 'POST') {
+		// SECURITY: Require authentication
+		const session = await requireAuth(req, res);
+		if (!session) return;
+
 		await dbConnect();
 		try {
-			const { _id, updatedBy, ...updateData } = req.body;
+			const { _id, ...updateData } = req.body;
 
-			// Add updatedAt and updatedBy fields to the update data
+			// SECURITY: Verify user is updating their own company
+			if (_id !== session.user.companyId) {
+				return res.status(403).json({
+					success: false,
+					message: 'Forbidden - You can only update your own company'
+				});
+			}
+
+			// Add updatedAt and use session userId for updatedBy
 			updateData.updatedAt = new Date().toISOString();
-			updateData.updatedBy = updatedBy;
+			updateData.updatedBy = session.user.id;
 
 			const updatedCompany = await Company.updateOne(
-				{ _id: _id },
+				{ _id: session.user.companyId }, // Always use session companyId
 				{ $set: updateData }
 			);
 

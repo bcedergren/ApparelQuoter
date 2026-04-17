@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import mongoose from 'mongoose';
 import dbConnect from '@/utils/dbConnect';
 import Quote from '@/models/Quote';
+import { requireCompanyAccess } from '@/lib/auth';
 
 export default async function handler(
 	req: NextApiRequest,
@@ -23,11 +24,15 @@ export default async function handler(
 		return res.status(400).json({ message: 'Invalid company ID provided' });
 	}
 
+	// SECURITY: Require authentication and verify company access
+	const session = await requireCompanyAccess(req, res, companyId);
+	if (!session) return;
+
 	await dbConnect();
 
 	try {
-		// Construct the query based on provided parameters
-		const query: any = { companyId: new mongoose.Types.ObjectId(companyId) };
+		// Use authenticated user's companyId to prevent enumeration
+		const query: any = { companyId: new mongoose.Types.ObjectId(session.user.companyId) };
 		if (quoteType) {
 			query.quoteType = quoteType;
 		}

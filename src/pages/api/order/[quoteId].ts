@@ -2,12 +2,17 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import mongoose from 'mongoose';
 import dbConnect from '@/utils/dbConnect';
 import Quote from '@/models/Quote';
+import { requireAuth, verifyResourceOwnership } from '@/lib/auth';
 
 export default async function handler(
 	req: NextApiRequest,
 	res: NextApiResponse
 ) {
 	if (req.method === 'POST') {
+		// SECURITY: Require authentication
+		const session = await requireAuth(req, res);
+		if (!session) return;
+
 		await dbConnect();
 
 		const { quoteId } = req.query; // Get the quote ID from the URL
@@ -21,6 +26,18 @@ export default async function handler(
 		}
 
 		try {
+			// SECURITY: First verify quote ownership before converting to order
+			const quote = await Quote.findById(quoteId);
+
+			if (!quote) {
+				return res.status(404).json({ message: 'Quote not found' });
+			}
+
+			// SECURITY: Verify quote belongs to user's company
+			if (!verifyResourceOwnership(quote.companyId?.toString(), session.user.companyId, res)) {
+				return;
+			}
+
 			// Update the quoteType to "savedOrder" for the given quoteId
 			const updateResult = await Quote.updateOne(
 				{ _id: new mongoose.Types.ObjectId(quoteId) },
