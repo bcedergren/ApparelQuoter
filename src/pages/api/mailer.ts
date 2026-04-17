@@ -61,6 +61,20 @@ export default async function handler(
 		return res.status(405).end(`Method ${req.method} Not Allowed`);
 	}
 
+	// SECURITY: Require internal API key to prevent abuse
+	const apiKey = req.headers['x-internal-api-key'] || req.headers['X-Internal-API-Key'];
+	const expectedKey = process.env.MAILER_API_KEY;
+
+	if (!expectedKey) {
+		console.error('MAILER_API_KEY not configured in environment');
+		return res.status(500).json({ message: 'Server configuration error' });
+	}
+
+	if (apiKey !== expectedKey) {
+		console.warn('Unauthorized mailer access attempt');
+		return res.status(401).json({ message: 'Unauthorized - Invalid API key' });
+	}
+
 	const { from, to, subject, text, html, attachments } = req.body;
 
 	if (!from || !to || !subject || (!text && !html)) {

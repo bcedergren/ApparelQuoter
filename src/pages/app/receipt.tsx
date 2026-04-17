@@ -1,4 +1,6 @@
 import type { NextPage } from 'next';
+import { useEffect } from 'react';
+import { useRouter } from 'next/router';
 import Layout from '@/components/app/Layout';
 
 // Example type for receipt items, adjust according to your actual data structure
@@ -9,7 +11,16 @@ interface ReceiptItem {
 }
 
 const Receipt: NextPage = () => {
-	// Placeholder data for a single receipt
+	const router = useRouter();
+	
+	// TEMPORARY: Redirect to dashboard until receipt feature is fully implemented
+	// This page currently has placeholder data and is not MVP-ready
+	// TODO: Implement real receipt functionality with invoice/quote data
+	useEffect(() => {
+		router.push('/app/dashboard');
+	}, [router]);
+
+	// Placeholder data for a single receipt (will be removed when feature is implemented)
 	const receiptItems: ReceiptItem[] = [
 		{ description: 'T-Shirt', quantity: 2, unitPrice: 25.0 },
 		{ description: 'Jeans', quantity: 1, unitPrice: 40.0 },

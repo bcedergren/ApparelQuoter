@@ -4,6 +4,7 @@ import Quote from '@/models/Quote'
 import Customer from '@/models/Customer'
 import { Types } from 'mongoose'
 import { generateNextQuoteId } from '@/utils/generateQuoteId'
+import { requireAuth, verifyResourceOwnership } from '@/lib/auth'
 
 export default async function handler(
   req: NextApiRequest,
@@ -18,6 +19,10 @@ export default async function handler(
     console.log('Connecting to database...')
     await dbConnect()
     console.log('Database connected successfully.')
+
+    // SECURITY: Require authentication - never trust userId/companyId from request body
+    const session = await requireAuth(req, res)
+    if (!session) return
 
     const quoteData = req.body
     console.log('Received quote data')
@@ -42,18 +47,20 @@ export default async function handler(
       console.log(`Calculated totalDueDays: ${quoteData.totalDueDays}`)
     }
 
-    // Add userId to the quoteData
-    const userId = quoteData.userId
-    if (!userId) {
-      const errorMessage = 'User ID is required to save the quote'
-      console.error(errorMessage)
-      throw new Error(errorMessage)
-    }
-    console.log(`User ID: ${userId}`)
+    // SECURITY FIX: Use session userId and companyId instead of trusting request body
+    const userId = session.user.id
+    const companyId = session.user.companyId
+    
+    console.log(`Authenticated User ID: ${userId}`)
+    console.log(`Authenticated Company ID: ${companyId}`)
+    
+    // Override any userId/companyId from request body with authenticated values
+    quoteData.userId = userId
+    quoteData.companyId = companyId
 
     // Handling POST method (Create new quote)
     if (req.method === 'POST') {
-      const quoteId = await generateNextQuoteId(quoteData.companyId)
+      const quoteId = await generateNextQuoteId(companyId)
       quoteData.quoteId = quoteId
 
       console.log(quoteData)
@@ -62,6 +69,7 @@ export default async function handler(
         ...quoteData,
         createdBy: userId,
         quoteId: quoteId,
+        companyId: companyId, // Ensure companyId is set from session
       })
       const savedQuote = await quote.save()
       console.log('Quote saved successfully with ID:', savedQuote._id)
@@ -80,6 +88,11 @@ export default async function handler(
 
       if (!customer) {
         return res.status(404).json({ message: 'Customer not found' })
+      }
+      
+      // SECURITY: Verify customer belongs to user's company
+      if (!verifyResourceOwnership(customer.companyId?.toString(), companyId, res)) {
+        return
       }
 
       // Convert follow-up notes to plain objects and ensure all required fields are present
@@ -118,8 +131,14 @@ export default async function handler(
         return res.status(404).json({ message: 'Quote not found' })
       }
 
-      // Update the quote with the new data
+      // SECURITY: Verify quote belongs to user's company before updating
+      if (!verifyResourceOwnership(existingQuote.companyId?.toString(), companyId, res)) {
+        return
+      }
+
+      // Update the quote with the new data, but preserve companyId from session
       Object.assign(existingQuote, quoteData)
+      existingQuote.companyId = companyId // Ensure companyId cannot be changed
       existingQuote.ModifiedAt = new Date()
 
       // Save the updated quote

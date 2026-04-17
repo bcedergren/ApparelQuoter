@@ -6,6 +6,7 @@ import Customer from '@/models/Customer'
 import Activity from '@/models/Activity'
 import Sale from '@/models/Sale'
 import Quote from '@/models/Quote'
+import { requireAuth } from '@/lib/auth'
 
 export default async function handler(
   req: NextApiRequest,
@@ -18,10 +19,15 @@ export default async function handler(
   try {
     await dbConnect()
 
-    const { companyId } = req.query
+    // Require authentication and use session's companyId
+    const session = await requireAuth(req, res)
+    if (!session) return
+
+    // Use the authenticated user's companyId instead of trusting query parameter
+    const companyId = session.user.companyId
 
     if (!companyId) {
-      return res.status(400).json({ message: 'Company ID is required' })
+      return res.status(400).json({ message: 'User company not found' })
     }
 
     const companyObjectId = new mongoose.Types.ObjectId(companyId as string)

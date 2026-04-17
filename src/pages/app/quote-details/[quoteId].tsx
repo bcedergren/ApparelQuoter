@@ -46,7 +46,12 @@ const QuoteDetailsPage = () => {
             throw new Error('Failed to fetch company details')
           }
           const data = await response.json()
-          setCompany(data)
+          // FIX: API returns { success, company }, not raw company
+          if (data.success && data.company) {
+            setCompany(data.company)
+          } else {
+            setCompany(data) // Fallback for backward compatibility
+          }
         } catch (error) {
           setError('Failed to load company details.')
           toast.error('Failed to load company details.')
