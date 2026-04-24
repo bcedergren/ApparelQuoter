@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import mongoose from 'mongoose';
 import dbConnect from '@/utils/dbConnect';
 import Customer from '@/models/Customer';
+import { requireCompanyAccess } from '@/lib/auth';
 
 export default async function handler(
 	req: NextApiRequest,
@@ -18,10 +19,15 @@ export default async function handler(
 		return res.status(400).json({ message: 'Invalid company ID' });
 	}
 
+	// SECURITY: Require authentication and verify user has access to this company
+	const session = await requireCompanyAccess(req, res, companyId as string);
+	if (!session) return;
+
 	await dbConnect();
 
 	try {
-		const customers = await Customer.find({ companyId: companyId });
+		// Use authenticated user's companyId to prevent enumeration
+		const customers = await Customer.find({ companyId: session.user.companyId });
 
 		res.status(200).json({ success: true, customers });
 	} catch (error) {

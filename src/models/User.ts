@@ -13,6 +13,8 @@ export interface IUser extends Document {
 	stripeCustomerId: string;
 	isActive: boolean;
 	subscriptionId: string;
+	subscriptionStatus?: 'active' | 'canceled' | 'past_due' | 'unpaid' | 'incomplete' | 'trialing';
+	paymentStatus?: 'succeeded' | 'failed' | 'pending';
 }
 
 const UserSchema: Schema = new Schema(
@@ -29,6 +31,16 @@ const UserSchema: Schema = new Schema(
 		stripeCustomerId: { type: String },
 		isActive: { type: Boolean, required: true },
 		subscriptionId: { type: String, required: true },
+		subscriptionStatus: {
+			type: String,
+			enum: ['active', 'canceled', 'past_due', 'unpaid', 'incomplete', 'trialing'],
+			required: false,
+		},
+		paymentStatus: {
+			type: String,
+			enum: ['succeeded', 'failed', 'pending'],
+			required: false,
+		},
 	},
 	{
 		timestamps: true,

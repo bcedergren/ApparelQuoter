@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import mongoose from 'mongoose';
 import dbConnect from '@/utils/dbConnect';
 import Quote from '@/models/Quote';
+import { requireAuth, verifyResourceOwnership } from '@/lib/auth';
 
 interface UpdateStatusResponse {
 	message: string;
@@ -15,6 +16,10 @@ export default async function handler(
 	await dbConnect();
 
 	if (req.method === 'POST') {
+		// SECURITY: Require authentication
+		const session = await requireAuth(req, res);
+		if (!session) return;
+
 		try {
 			const { orderId, newStatus } = req.body;
 
@@ -25,19 +30,26 @@ export default async function handler(
 				});
 			}
 
+			// SECURITY: First verify order belongs to user's company
+			const order = await Quote.findById(orderId);
+
+			if (!order) {
+				return res
+					.status(404)
+					.json({ message: 'Order not found with provided ID' });
+			}
+
+			// SECURITY: Verify ownership
+			if (!verifyResourceOwnership(order.companyId?.toString(), session.user.companyId, res)) {
+				return;
+			}
+
 			// Perform the update operation
 			const result = await Quote.findByIdAndUpdate(
 				orderId,
 				{ quoteType: newStatus },
 				{ new: true }
 			);
-
-			// Check if the document was found and updated
-			if (!result) {
-				return res
-					.status(404)
-					.json({ message: 'Order not found with provided ID' });
-			}
 
 			res.status(200).json({ message: 'Order status updated successfully' });
 		} catch (error: unknown) {

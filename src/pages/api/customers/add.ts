@@ -2,9 +2,8 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import dbConnect from '@/utils/dbConnect';
 import Customer from '@/models/Customer';
 import CustomerNote from '@/models/CustomerNote';
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/pages/api/auth/[...nextauth]';
 import mongoose from 'mongoose';
+import { requireAuth } from '@/lib/auth';
 
 export default async function handler(
 	req: NextApiRequest,
@@ -17,18 +16,16 @@ export default async function handler(
 	await dbConnect();
 
 	try {
-		const session = await getServerSession(req, res, authOptions);
+		// SECURITY: Use requireAuth instead of getSession, and use session companyId
+		const session = await requireAuth(req, res);
+		if (!session) return;
 
-		if (!session || !session.user) {
-			return res.status(401).json({ message: 'Unauthorized' });
-		}
-
-		const { companyId } = req.query;
 		const userId = session.user.id;
+		const companyId = session.user.companyId; // Use authenticated user's companyId
 
 		// Convert userId and companyId to ObjectId
 		const userIdObject = new mongoose.Types.ObjectId(userId);
-		const companyIdObject = new mongoose.Types.ObjectId(companyId as string);
+		const companyIdObject = new mongoose.Types.ObjectId(companyId);
 
 		// Prepare the customer data including createdBy and createdDate
 		const customerData = {

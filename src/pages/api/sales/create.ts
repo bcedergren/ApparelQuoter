@@ -2,15 +2,20 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import mongoose from 'mongoose';
 import dbConnect from '@/utils/dbConnect';
 import Sale from '@/models/Sale';
+import { requireAuth } from '@/lib/auth';
 
 const createSale = async (req: NextApiRequest, res: NextApiResponse) => {
 	if (req.method !== 'POST') {
 		return res.status(405).json({ message: 'Method not allowed' });
 	}
 
-	const { orderId, companyId, salesPersonId, saleDate, totalAmount } = req.body;
+	// SECURITY: Require authentication
+	const session = await requireAuth(req, res);
+	if (!session) return;
 
-	if (!orderId || !companyId || !salesPersonId || !saleDate || !totalAmount) {
+	const { orderId, saleDate, totalAmount } = req.body;
+
+	if (!orderId || !saleDate || !totalAmount) {
 		return res.status(400).json({ message: 'Missing required fields' });
 	}
 
@@ -22,16 +27,14 @@ const createSale = async (req: NextApiRequest, res: NextApiResponse) => {
 		const orderObjectId = mongoose.Types.ObjectId.isValid(orderId)
 			? new mongoose.Types.ObjectId(orderId as string)
 			: null;
-		const companyObjectId = mongoose.Types.ObjectId.isValid(companyId)
-			? new mongoose.Types.ObjectId(companyId as string)
-			: null;
-		const salesPersonObjectId = mongoose.Types.ObjectId.isValid(salesPersonId)
-			? new mongoose.Types.ObjectId(salesPersonId as string)
-			: null;
 
-		if (!orderObjectId || !companyObjectId || !salesPersonObjectId) {
+		if (!orderObjectId) {
 			return res.status(400).json({ message: 'Invalid ObjectId provided' });
 		}
+
+		// SECURITY: Use session companyId and userId instead of trusting request body
+		const companyObjectId = new mongoose.Types.ObjectId(session.user.companyId);
+		const salesPersonObjectId = new mongoose.Types.ObjectId(session.user.id);
 
 		// Create the sale record with ObjectIds
 		const sale = new Sale({

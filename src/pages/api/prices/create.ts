@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import dbConnect from '@/utils/dbConnect';
 import Price from '@/models/Price';
+import { requireAuth } from '@/lib/auth';
 
 export default async function handler(
 	req: NextApiRequest,
@@ -9,8 +10,15 @@ export default async function handler(
 	const { method } = req;
 
 	if (method === 'POST') {
+		// SECURITY: Require authentication
+		const session = await requireAuth(req, res);
+		if (!session) return;
+
 		await dbConnect();
 		const priceData = req.body;
+
+		// SECURITY: Always use session companyId, never trust request body
+		priceData.companyId = session.user.companyId;
 
 		try {
 			const price = new Price(priceData);

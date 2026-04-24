@@ -1,26 +1,46 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import mongoose from 'mongoose';
 import Price from '@/models/Price';
+import { requireAuth } from '@/lib/auth';
 
 const updatePrice = async (req: NextApiRequest, res: NextApiResponse) => {
 	if (req.method !== 'POST') {
 		return res.status(405).json({ message: 'Method Not Allowed' });
 	}
 
-	const { prices, companyId } = req.body;
+	// SECURITY: Require authentication
+	const session = await requireAuth(req, res);
+	if (!session) return;
+
+	const { prices } = req.body;
 
 	console.log('Prices being updated');
 
-	if (!companyId || !prices) {
+	if (!prices) {
 		return res.status(400).json({ message: 'Invalid data provided' });
 	}
 
 	try {
-		// Convert _id to ObjectId
+		// SECURITY: First verify price document belongs to user's company
 		const priceObjectId = new mongoose.Types.ObjectId(prices._id as string);
+		const existingPrice = await Price.findById(priceObjectId);
+
+		if (!existingPrice) {
+			return res.status(404).json({ message: 'Price document not found' });
+		}
+
+		// SECURITY: Verify ownership
+		if (existingPrice.companyId?.toString() !== session.user.companyId) {
+			return res.status(403).json({ message: 'Forbidden - Access denied' });
+		}
+
+		// Update, but ensure companyId cannot be changed
+		const updateData = { ...prices };
+		updateData.companyId = session.user.companyId;
+
 		const updatedPrice = await Price.findOneAndUpdate(
 			{ _id: priceObjectId },
-			{ $set: prices },
+			{ $set: updateData },
 			{ new: true } // Ensure the updated document is returned
 		);
 

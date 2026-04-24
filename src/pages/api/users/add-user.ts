@@ -2,9 +2,10 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import bcrypt from 'bcryptjs';
 import dbConnect from '@/utils/dbConnect';
 import User from '@/models/User';
+import { requireAdmin } from '@/lib/auth';
 
 type UserData = {
-	companyId: string;
+	companyId?: string; // Optional now since we use session companyId
 	firstName: string;
 	lastName: string;
 	email: string;
@@ -18,14 +19,20 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 		return res.status(405).end(`Method ${req.method} Not Allowed`);
 	}
 
+	// SECURITY: Only admins can add users
+	const session = await requireAdmin(req, res);
+	if (!session) return;
+
 	const {
-		companyId,
 		firstName,
 		lastName,
 		email,
 		password,
 		role = 'user', // Default role if not provided
 	}: UserData = req.body;
+
+	// SECURITY: Use session companyId instead of trusting request body
+	const companyId = session.user.companyId;
 
 	await dbConnect();
 

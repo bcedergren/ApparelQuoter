@@ -4,6 +4,7 @@ import dbConnect from '@/utils/dbConnect';
 import Price from '@/models/Price';
 import logger from '@/utils/logger';
 import formatFields from '@/utils/formatFields';
+import { requireCompanyAccess } from '@/lib/auth';
 
 // Fields to be formatted with 2 decimal places
 const fieldsToFormat = [
@@ -63,10 +64,15 @@ export default async function handler(
 			.json({ success: false, message: 'Invalid company ID' });
 	}
 
+	// SECURITY: Require authentication and verify company access
+	const session = await requireCompanyAccess(req, res, companyId as string);
+	if (!session) return;
+
 	await dbConnect();
 
 	try {
-		const objectId = new mongoose.Types.ObjectId(companyId as string);
+		// Use session companyId to prevent enumeration
+		const objectId = new mongoose.Types.ObjectId(session.user.companyId);
 		const prices = await Price.findOne({ companyId: objectId });
 
 		logger.info('Fetched prices');
