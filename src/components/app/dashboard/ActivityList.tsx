@@ -13,7 +13,7 @@ interface ActivityListProps {
 	activities: Activity[];
 }
 
-const getActivityIcon = (activityType: string): JSX.Element => {
+const getActivityIcon = (activityType: string): React.ReactElement => {
 	switch (activityType) {
 		case 'email':
 			return <FaEnvelope />;

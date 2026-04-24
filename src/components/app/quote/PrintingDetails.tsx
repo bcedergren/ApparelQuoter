@@ -51,12 +51,13 @@ const PrintingDetails: FC<PrintingDetailsProps> = ({
       colorChangeCount = uniqueColors.size - 1
 
       // Only update if the color changes value is different
-      if (screenPrintingDetails.colorChanges !== colorChangeCount) {
+      const clampedColorChanges = Math.max(0, uniqueColors.size - 1)
+      if (screenPrintingDetails.colorChanges !== clampedColorChanges) {
         onDetailsChange({
           printingDetails,
           screenPrintingDetails: {
             ...screenPrintingDetails,
-            colorChanges: colorChangeCount >= 0 ? colorChangeCount : 0,
+            colorChanges: clampedColorChanges,
           },
         })
       }

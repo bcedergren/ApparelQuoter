@@ -18,6 +18,14 @@ export interface Customer {
 	phone: string;
 	email: string;
 	followUpNotes: FollowUpNote[];
+	logoFiles?: Array<{
+		fileId: string;
+		filename: string;
+		displayName?: string;
+		contentType?: string;
+		length?: number;
+		uploadDate?: string | Date;
+	}>;
 	createdBy: string;
 	createdDate: Date;
 }

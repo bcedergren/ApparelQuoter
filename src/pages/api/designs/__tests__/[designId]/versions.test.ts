@@ -2,199 +2,94 @@ import { createMocks } from 'node-mocks-http';
 import handler from '../../[designId]/versions';
 import dbConnect from '@/utils/dbConnect';
 import Design from '@/models/Design';
+import User from '@/models/User';
 
 // Mock the database connection and models
 jest.mock('@/utils/dbConnect');
 jest.mock('@/models/Design');
+jest.mock('@/models/User');
 
 const mockDbConnect = dbConnect as jest.MockedFunction<typeof dbConnect>;
 const mockDesign = Design as jest.Mocked<typeof Design>;
+const mockUser = User as jest.Mocked<typeof User>;
 
 describe('/api/designs/[designId]/versions', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockDbConnect.mockResolvedValue(undefined);
+    mockDesign.findOneAndUpdate = jest.fn();
+    mockUser.findById = jest.fn();
   });
 
-  describe('GET /api/designs/[designId]/versions', () => {
-    it('should return versions for a design', async () => {
-      const mockDesign = {
-        _id: 'design123',
-        versions: [
-          {
-            _id: 'version1',
-            versionNumber: 1,
-            fileUrl: '/uploads/design1_v1.png',
-            description: 'Initial version',
-            createdAt: '2024-01-15T10:00:00Z'
-          }
-        ]
-      };
+  it('adds a version via POST', async () => {
+    mockUser.findById.mockReturnValue({
+      select: jest.fn().mockResolvedValue({ firstName: 'Jane', lastName: 'Doe' })
+    } as any);
+    mockDesign.findOneAndUpdate.mockReturnValue({
+      populate: jest.fn().mockReturnValue({
+        populate: jest.fn().mockResolvedValue({ _id: 'design123', versions: [] })
+      })
+    } as any);
 
-      mockDesign.findById.mockResolvedValue(mockDesign as any);
-
-      const { req, res } = createMocks({
-        method: 'GET',
-        query: { designId: 'design123' }
-      });
-
-      await handler(req, res);
-
-      expect(res._getStatusCode()).toBe(200);
-      const data = JSON.parse(res._getData());
-      expect(data.versions).toEqual(mockDesign.versions);
-    });
-
-    it('should return 404 if design not found', async () => {
-      mockDesign.findById.mockResolvedValue(null);
-
-      const { req, res } = createMocks({
-        method: 'GET',
-        query: { designId: 'nonexistent' }
-      });
-
-      await handler(req, res);
-
-      expect(res._getStatusCode()).toBe(404);
-    });
-  });
-
-  describe('POST /api/designs/[designId]/versions', () => {
-    it('should add a version to a design', async () => {
-      const existingDesign = {
-        _id: 'design123',
-        versions: [],
-        currentVersion: 0,
-        save: jest.fn().mockResolvedValue({})
-      };
-
-      mockDesign.findById.mockResolvedValue(existingDesign as any);
-
-      const versionData = {
-        fileUrl: '/uploads/design1_v2.png',
-        description: 'Updated design with new colors',
-        uploadedBy: 'John Doe'
-      };
-
-      const { req, res } = createMocks({
-        method: 'POST',
-        query: { designId: 'design123' },
-        body: versionData
-      });
-
-      await handler(req, res);
-
-      expect(res._getStatusCode()).toBe(201);
-      expect(existingDesign.save).toHaveBeenCalled();
-      
-      // Check that version was added
-      expect(existingDesign.versions).toHaveLength(1);
-      expect(existingDesign.versions[0]).toMatchObject({
+    const { req, res } = createMocks({
+      method: 'POST',
+      query: { designId: 'design123' },
+      body: {
         versionNumber: 1,
-        fileUrl: versionData.fileUrl,
-        description: versionData.description,
-        uploadedBy: versionData.uploadedBy
-      });
-      expect(existingDesign.currentVersion).toBe(1);
+        fileName: 'design.png',
+        fileUrl: '/uploads/design.png',
+        fileSize: 1024,
+        mimeType: 'image/png'
+      }
     });
 
-    it('should increment version number correctly', async () => {
-      const existingDesign = {
-        _id: 'design123',
-        versions: [
-          { versionNumber: 1, fileUrl: '/uploads/v1.png' },
-          { versionNumber: 2, fileUrl: '/uploads/v2.png' }
-        ],
-        currentVersion: 2,
-        save: jest.fn().mockResolvedValue({})
-      };
+    await handler(req, res);
 
-      mockDesign.findById.mockResolvedValue(existingDesign as any);
+    expect(res._getStatusCode()).toBe(201);
+  });
 
-      const versionData = {
-        fileUrl: '/uploads/v3.png',
-        description: 'Third version'
-      };
-
-      const { req, res } = createMocks({
-        method: 'POST',
-        query: { designId: 'design123' },
-        body: versionData
-      });
-
-      await handler(req, res);
-
-      expect(existingDesign.versions).toHaveLength(3);
-      expect(existingDesign.versions[2].versionNumber).toBe(3);
-      expect(existingDesign.currentVersion).toBe(3);
+  it('returns 400 when required fields are missing', async () => {
+    const { req, res } = createMocks({
+      method: 'POST',
+      query: { designId: 'design123' },
+      body: {}
     });
 
-    it('should return 400 for invalid version data', async () => {
-      const existingDesign = {
-        _id: 'design123',
-        save: jest.fn()
-      };
+    await handler(req, res);
 
-      mockDesign.findById.mockResolvedValue(existingDesign as any);
+    expect(res._getStatusCode()).toBe(400);
+  });
 
-      const { req, res } = createMocks({
-        method: 'POST',
-        query: { designId: 'design123' },
-        body: { invalid: 'data' }
-      });
-
-      await handler(req, res);
-
-      expect(res._getStatusCode()).toBe(400);
+  it('returns 405 for unsupported method', async () => {
+    const { req, res } = createMocks({
+      method: 'GET',
+      query: { designId: 'design123' }
     });
 
-    it('should return 404 if design not found', async () => {
-      mockDesign.findById.mockResolvedValue(null);
+    await handler(req, res);
 
-      const { req, res } = createMocks({
-        method: 'POST',
-        query: { designId: 'nonexistent' },
-        body: {
-          fileUrl: '/uploads/test.png',
-          description: 'Test version'
-        }
-      });
-
-      await handler(req, res);
-
-      expect(res._getStatusCode()).toBe(404);
-    });
-
-    it('should require fileUrl field', async () => {
-      const existingDesign = {
-        _id: 'design123',
-        save: jest.fn()
-      };
-
-      mockDesign.findById.mockResolvedValue(existingDesign as any);
-
-      const { req, res } = createMocks({
-        method: 'POST',
-        query: { designId: 'design123' },
-        body: {
-          description: 'Test version'
-          // Missing fileUrl field
-        }
-      });
-
-      await handler(req, res);
-
-      expect(res._getStatusCode()).toBe(400);
-    });
+    expect(res._getStatusCode()).toBe(405);
   });
 
   describe('Error handling', () => {
     it('should return 500 on database error', async () => {
-      mockDesign.findById.mockRejectedValue(new Error('Database error'));
+      mockUser.findById.mockReturnValue({
+        select: jest.fn().mockResolvedValue({ firstName: 'Jane', lastName: 'Doe' })
+      } as any);
+      mockDesign.findOneAndUpdate.mockImplementation(() => {
+        throw new Error('Database error');
+      });
 
       const { req, res } = createMocks({
-        method: 'GET',
-        query: { designId: 'design123' }
+        method: 'POST',
+        query: { designId: 'design123' },
+        body: {
+          versionNumber: 1,
+          fileName: 'design.png',
+          fileUrl: '/uploads/design.png',
+          fileSize: 1024,
+          mimeType: 'image/png'
+        }
       });
 
       await handler(req, res);
@@ -203,3 +98,8 @@ describe('/api/designs/[designId]/versions', () => {
     });
   });
 });
+
+// Prevent Next route validator errors when test files are under `pages`.
+export default function __testFileRoutePlaceholder() {
+  return null;
+}

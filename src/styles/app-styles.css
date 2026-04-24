@@ -170,3 +170,9 @@ h4 {
 	border-bottom: 2px solid #007bff;
 	padding-bottom: 0.5rem;
 }
+
+@media (max-width: 768px) {
+	body.app-styles .mt-4 {
+		margin-top: 4px !important;
+	}
+}

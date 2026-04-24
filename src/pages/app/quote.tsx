@@ -28,7 +28,7 @@ const QuotePage: NextPage = () => {
 			if (session) {
 				try {
 					const [customersRes, pricesRes, companyRes] = await Promise.all([
-						fetch(`/api/customers/${session.user.companyId}`),
+						fetch(`/api/customers/by-company/${session.user.companyId}`),
 						fetch(`/api/prices/${session.user.companyId}`),
 						fetch(`/api/company/${session.user.companyId}`),
 					]);

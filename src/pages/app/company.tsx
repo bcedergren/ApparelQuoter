@@ -123,6 +123,8 @@ const CompanyPage: NextPage = () => {
 		}
 	};
 
+
+
 	return (
 		<Layout>
 			<Container fluid>

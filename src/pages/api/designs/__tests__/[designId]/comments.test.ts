@@ -2,166 +2,82 @@ import { createMocks } from 'node-mocks-http';
 import handler from '../../[designId]/comments';
 import dbConnect from '@/utils/dbConnect';
 import Design from '@/models/Design';
+import User from '@/models/User';
 
 // Mock the database connection and models
 jest.mock('@/utils/dbConnect');
 jest.mock('@/models/Design');
+jest.mock('@/models/User');
 
 const mockDbConnect = dbConnect as jest.MockedFunction<typeof dbConnect>;
 const mockDesign = Design as jest.Mocked<typeof Design>;
+const mockUser = User as jest.Mocked<typeof User>;
 
 describe('/api/designs/[designId]/comments', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockDbConnect.mockResolvedValue(undefined);
+    mockDesign.findOneAndUpdate = jest.fn();
+    mockUser.findById = jest.fn();
   });
 
-  describe('GET /api/designs/[designId]/comments', () => {
-    it('should return comments for a design', async () => {
-      const mockDesign = {
-        _id: 'design123',
-        comments: [
-          {
-            _id: 'comment1',
-            text: 'Great design!',
-            author: 'John Doe',
-            createdAt: '2024-01-15T10:00:00Z'
-          }
-        ]
-      };
+  it('adds a comment via POST', async () => {
+    mockUser.findById.mockReturnValue({
+      select: jest.fn().mockResolvedValue({ firstName: 'Jane', lastName: 'Doe' })
+    } as any);
+    mockDesign.findOneAndUpdate.mockReturnValue({
+      populate: jest.fn().mockReturnValue({
+        populate: jest.fn().mockResolvedValue({ _id: 'design123', comments: [] })
+      })
+    } as any);
 
-      mockDesign.findById.mockResolvedValue(mockDesign as any);
-
-      const { req, res } = createMocks({
-        method: 'GET',
-        query: { designId: 'design123' }
-      });
-
-      await handler(req, res);
-
-      expect(res._getStatusCode()).toBe(200);
-      const data = JSON.parse(res._getData());
-      expect(data.comments).toEqual(mockDesign.comments);
+    const { req, res } = createMocks({
+      method: 'POST',
+      query: { designId: 'design123' },
+      body: { text: 'Looks good' }
     });
 
-    it('should return 404 if design not found', async () => {
-      mockDesign.findById.mockResolvedValue(null);
+    await handler(req, res);
 
-      const { req, res } = createMocks({
-        method: 'GET',
-        query: { designId: 'nonexistent' }
-      });
-
-      await handler(req, res);
-
-      expect(res._getStatusCode()).toBe(404);
-    });
+    expect(res._getStatusCode()).toBe(201);
   });
 
-  describe('POST /api/designs/[designId]/comments', () => {
-    it('should add a comment to a design', async () => {
-      const existingDesign = {
-        _id: 'design123',
-        comments: [],
-        save: jest.fn().mockResolvedValue({})
-      };
-
-      mockDesign.findById.mockResolvedValue(existingDesign as any);
-
-      const commentData = {
-        text: 'This looks great!',
-        author: 'John Doe',
-        x: 100,
-        y: 200
-      };
-
-      const { req, res } = createMocks({
-        method: 'POST',
-        query: { designId: 'design123' },
-        body: commentData
-      });
-
-      await handler(req, res);
-
-      expect(res._getStatusCode()).toBe(201);
-      expect(existingDesign.save).toHaveBeenCalled();
-      
-      // Check that comment was added
-      expect(existingDesign.comments).toHaveLength(1);
-      expect(existingDesign.comments[0]).toMatchObject({
-        text: commentData.text,
-        author: commentData.author,
-        x: commentData.x,
-        y: commentData.y
-      });
+  it('returns 400 when text is missing', async () => {
+    const { req, res } = createMocks({
+      method: 'POST',
+      query: { designId: 'design123' },
+      body: {}
     });
 
-    it('should return 400 for invalid comment data', async () => {
-      const existingDesign = {
-        _id: 'design123',
-        save: jest.fn()
-      };
+    await handler(req, res);
 
-      mockDesign.findById.mockResolvedValue(existingDesign as any);
+    expect(res._getStatusCode()).toBe(400);
+  });
 
-      const { req, res } = createMocks({
-        method: 'POST',
-        query: { designId: 'design123' },
-        body: { invalid: 'data' }
-      });
-
-      await handler(req, res);
-
-      expect(res._getStatusCode()).toBe(400);
+  it('returns 405 for unsupported method', async () => {
+    const { req, res } = createMocks({
+      method: 'GET',
+      query: { designId: 'design123' }
     });
 
-    it('should return 404 if design not found', async () => {
-      mockDesign.findById.mockResolvedValue(null);
+    await handler(req, res);
 
-      const { req, res } = createMocks({
-        method: 'POST',
-        query: { designId: 'nonexistent' },
-        body: {
-          text: 'Test comment',
-          author: 'John Doe'
-        }
-      });
-
-      await handler(req, res);
-
-      expect(res._getStatusCode()).toBe(404);
-    });
-
-    it('should require text field', async () => {
-      const existingDesign = {
-        _id: 'design123',
-        save: jest.fn()
-      };
-
-      mockDesign.findById.mockResolvedValue(existingDesign as any);
-
-      const { req, res } = createMocks({
-        method: 'POST',
-        query: { designId: 'design123' },
-        body: {
-          author: 'John Doe'
-          // Missing text field
-        }
-      });
-
-      await handler(req, res);
-
-      expect(res._getStatusCode()).toBe(400);
-    });
+    expect(res._getStatusCode()).toBe(405);
   });
 
   describe('Error handling', () => {
     it('should return 500 on database error', async () => {
-      mockDesign.findById.mockRejectedValue(new Error('Database error'));
+      mockUser.findById.mockReturnValue({
+        select: jest.fn().mockResolvedValue({ firstName: 'Jane', lastName: 'Doe' })
+      } as any);
+      mockDesign.findOneAndUpdate.mockImplementation(() => {
+        throw new Error('Database error');
+      });
 
       const { req, res } = createMocks({
-        method: 'GET',
-        query: { designId: 'design123' }
+        method: 'POST',
+        query: { designId: 'design123' },
+        body: { text: 'Looks good' }
       });
 
       await handler(req, res);
@@ -170,3 +86,8 @@ describe('/api/designs/[designId]/comments', () => {
     });
   });
 });
+
+// Prevent Next route validator errors when test files are under `pages`.
+export default function __testFileRoutePlaceholder() {
+  return null;
+}

@@ -17,6 +17,7 @@ export interface Design {
   createdBy: string;
   createdAt: Date;
   updatedAt: Date;
+  placement?: DesignPlacement;
 }
 
 export interface DesignVersion {
@@ -83,6 +84,15 @@ export interface AddCommentRequest {
 export interface UploadVersionRequest {
   versionNumber: string;
   notes?: string;
+}
+
+export interface DesignPlacement {
+  apparelImageUrl: string;
+  areaId: 'front' | 'back' | 'left_sleeve' | 'right_sleeve';
+  logoVersionId: string;
+  position: { x: number; y: number }; // normalized 0..1
+  widthInches: number;
+  rotation: number; // degrees
 }
 
 export interface DesignFilter {

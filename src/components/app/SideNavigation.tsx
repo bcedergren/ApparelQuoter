@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { Nav } from 'react-bootstrap'
-import { FiChevronsLeft, FiChevronsRight, FiMenu } from 'react-icons/fi'
+import { FiChevronsLeft, FiChevronsRight } from 'react-icons/fi'
 import {
   SlBag,
   SlPeople,
@@ -58,12 +58,7 @@ const SideNavigation: React.FC<SideNavigationProps> = ({
             />
           </Link>
           <div>
-            {isMobile ? (
-              <FiMenu
-                onClick={() => setShowSidebar(false)}
-                className={styles.toggleIcon}
-              />
-            ) : collapsed ? (
+            {!isMobile && (collapsed ? (
               <FiChevronsRight
                 onClick={toggleCollapse}
                 className={styles.toggleIcon}
@@ -73,7 +68,7 @@ const SideNavigation: React.FC<SideNavigationProps> = ({
                 onClick={toggleCollapse}
                 className={styles.toggleIcon}
               />
-            )}
+            ))}
           </div>
         </div>
       </div>
@@ -82,6 +77,7 @@ const SideNavigation: React.FC<SideNavigationProps> = ({
         href="/app/orders-board"
         passHref
         className={styles.navLink}
+        onClick={() => isMobile && setShowSidebar(false)}
       >
         <div style={iconStyle}>
           <SlNotebook /> {!collapsed && 'Orders Board'}
@@ -92,12 +88,13 @@ const SideNavigation: React.FC<SideNavigationProps> = ({
         href="/app/customers"
         passHref
         className={styles.navLink}
+        onClick={() => isMobile && setShowSidebar(false)}
       >
         <div style={iconStyle}>
           <SlPeople /> {!collapsed && 'Customers'}
         </div>
       </Nav.Link>
-      <Nav.Link as={Link} href="/app/quote" passHref className={styles.navLink}>
+      <Nav.Link as={Link} href="/app/quote" passHref className={styles.navLink} onClick={() => isMobile && setShowSidebar(false)}>
         <div style={iconStyle}>
           <SlCalculator /> {!collapsed && 'New Quote'}
         </div>
@@ -107,6 +104,7 @@ const SideNavigation: React.FC<SideNavigationProps> = ({
         href="/app/saved-quotes"
         passHref
         className={styles.navLink}
+        onClick={() => isMobile && setShowSidebar(false)}
       >
         <div style={iconStyle}>
           <SlNote /> {!collapsed && 'Saved Quotes'}
@@ -117,6 +115,7 @@ const SideNavigation: React.FC<SideNavigationProps> = ({
         href="/app/open-orders"
         passHref
         className={styles.navLink}
+        onClick={() => isMobile && setShowSidebar(false)}
       >
         <div style={iconStyle}>
           <SlDocs /> {!collapsed && 'Open Orders'}
@@ -127,6 +126,7 @@ const SideNavigation: React.FC<SideNavigationProps> = ({
         href="/app/saved-orders"
         passHref
         className={styles.navLink}
+        onClick={() => isMobile && setShowSidebar(false)}
       >
         <div style={iconStyle}>
           <SlBag /> {!collapsed && 'Saved Orders'}
@@ -137,6 +137,7 @@ const SideNavigation: React.FC<SideNavigationProps> = ({
         href="/app/completed-orders"
         passHref
         className={styles.navLink}
+        onClick={() => isMobile && setShowSidebar(false)}
       >
         <div style={iconStyle}>
           <SlDrawer /> {!collapsed && 'Completed Orders'}
@@ -147,6 +148,7 @@ const SideNavigation: React.FC<SideNavigationProps> = ({
         href="/app/inventory"
         passHref
         className={styles.navLink}
+        onClick={() => isMobile && setShowSidebar(false)}
       >
         <div style={iconStyle}>
           <SlBag /> {!collapsed && 'Inventory'}
@@ -157,6 +159,7 @@ const SideNavigation: React.FC<SideNavigationProps> = ({
         href="/app/invoice"
         passHref
         className={styles.navLink}
+        onClick={() => isMobile && setShowSidebar(false)}
       >
         <div style={iconStyle}>
           <SlDocs /> {!collapsed && 'Invoices'}
@@ -167,6 +170,7 @@ const SideNavigation: React.FC<SideNavigationProps> = ({
         href="/app/designs"
         passHref
         className={styles.navLink}
+        onClick={() => isMobile && setShowSidebar(false)}
       >
         <div style={iconStyle}>
           <SlDrawer /> {!collapsed && 'Designs'}
@@ -177,6 +181,7 @@ const SideNavigation: React.FC<SideNavigationProps> = ({
         href="/app/reports"
         passHref
         className={styles.navLink}
+        onClick={() => isMobile && setShowSidebar(false)}
       >
         <div style={iconStyle}>
           <SlNote /> {!collapsed && 'Reports'}

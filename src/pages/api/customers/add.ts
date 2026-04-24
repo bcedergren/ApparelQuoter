@@ -2,7 +2,8 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import dbConnect from '@/utils/dbConnect';
 import Customer from '@/models/Customer';
 import CustomerNote from '@/models/CustomerNote';
-import { getSession } from 'next-auth/react';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/pages/api/auth/[...nextauth]';
 import mongoose from 'mongoose';
 
 export default async function handler(
@@ -16,7 +17,7 @@ export default async function handler(
 	await dbConnect();
 
 	try {
-		const session = await getSession({ req });
+		const session = await getServerSession(req, res, authOptions);
 
 		if (!session || !session.user) {
 			return res.status(401).json({ message: 'Unauthorized' });

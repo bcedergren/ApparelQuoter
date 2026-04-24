@@ -3,7 +3,7 @@ import {
 	Droppable,
 	Draggable,
 	DropResult,
-} from 'react-beautiful-dnd';
+} from '@hello-pangea/dnd';
 import { Quote } from '@/types/Quote';
 import { OrdersState } from '@/utils/ordersUtils';
 import { formatColumnHeader } from '@/utils/formatQuoteType';

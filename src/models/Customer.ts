@@ -19,6 +19,14 @@ interface ICustomer extends Document {
 	phone: string;
 	email: string;
 	followUpNotes: IFollowUpNote[];
+	logoFiles?: Array<{
+		fileId: mongoose.Types.ObjectId;
+		filename: string;
+		displayName?: string;
+		contentType?: string;
+		length?: number;
+		uploadDate?: Date;
+	}>;
 	createdBy: mongoose.Types.ObjectId;
 	createdDate: Date;
 }
@@ -34,6 +42,18 @@ const FollowUpNoteSchema = new mongoose.Schema({
 	addedDate: { type: Date, required: true },
 });
 
+const FileRefSchema = new mongoose.Schema(
+{
+	fileId: { type: mongoose.Schema.Types.ObjectId, required: true },
+	filename: { type: String, required: true },
+	displayName: { type: String },
+	contentType: { type: String },
+	length: { type: Number },
+	uploadDate: { type: Date },
+},
+{ _id: false }
+);
+
 const CustomerSchema = new mongoose.Schema({
 	companyId: { type: mongoose.Types.ObjectId, ref: 'Company', required: true },
 	companyName: { type: String, required: true },
@@ -46,6 +66,7 @@ const CustomerSchema = new mongoose.Schema({
 	phone: { type: String, required: true },
 	email: { type: String, required: true },
 	followUpNotes: { type: [FollowUpNoteSchema], default: [] },
+	logoFiles: { type: [FileRefSchema], default: [] },
 	createdBy: {
 		type: mongoose.Schema.Types.ObjectId,
 		required: true,

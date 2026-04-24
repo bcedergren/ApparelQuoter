@@ -49,3 +49,14 @@
 	border-bottom: 1px solid #ddd;
 	padding-bottom: 5px;
 }
+
+@media (max-width: 768px) {
+	.dashboardContainer {
+		padding-top: 4px !important;
+	}
+
+	/* Reduce large top margins between rows on small screens */
+	.dashboardContainer :global(.mt-4) {
+		margin-top: 4px !important;
+	}
+}

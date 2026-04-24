@@ -1,5 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Muli:wght@400;500;600;700&display=swap');
 
+/* Global Styles */
+* {
+	box-sizing: border-box;
+}
+
+html, body {
+	overflow-x: hidden;
+	max-width: 100vw;
+}
+
 /* General Public Page Styles */
 body.public-styles {
 	font-family: 'Muli', sans-serif;
@@ -204,5 +214,8 @@ body.public-styles .mb-60 {
 	}
 	body.public-styles .mt-60 {
 		margin-top: 60px;
+	}
+	body.public-styles .mt-4 {
+		margin-top: 4px !important;
 	}
 }

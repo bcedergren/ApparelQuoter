@@ -36,6 +36,13 @@ const AddEditCustomerModal: FC<AddEditCustomerModalProps> = ({
 
   const [customerData, setCustomerData] =
     useState<Customer>(initialCustomerState)
+  const [selectedLogoFiles, setSelectedLogoFiles] = useState<FileList | null>(
+    null
+  )
+  const [isUploading, setIsUploading] = useState(false)
+  const [showRenameModal, setShowRenameModal] = useState(false)
+  const [currentLogo, setCurrentLogo] = useState<any>(null)
+  const [newDisplayName, setNewDisplayName] = useState('')
 
   useEffect(() => {
     setCustomerData(customer ?? initialCustomerState)
@@ -54,6 +61,75 @@ const AddEditCustomerModal: FC<AddEditCustomerModalProps> = ({
   const handleSubmit = () => {
     onSave(customerData)
     onHide()
+  }
+
+  const handleLogoFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setSelectedLogoFiles(e.target.files)
+  }
+
+  const uploadSelectedLogos = async () => {
+    if (!customerData._id || !selectedLogoFiles || selectedLogoFiles.length === 0)
+      return
+    setIsUploading(true)
+    try {
+      for (let i = 0; i < selectedLogoFiles.length; i++) {
+        const formData = new FormData()
+        formData.append('file', selectedLogoFiles[i])
+        const resp = await fetch(`/api/customers/${customerData._id}/logos`, {
+          method: 'POST',
+          body: formData,
+        })
+        if (!resp.ok) throw new Error('Upload failed')
+        const data = await resp.json()
+        setCustomerData((prev) => ({ ...prev, logoFiles: data.logoFiles }))
+      }
+      setSelectedLogoFiles(null)
+    } catch (err) {
+      // no-op minimal handling
+    } finally {
+      setIsUploading(false)
+    }
+  }
+
+  const handleDeleteLogo = async (fileId: string) => {
+    if (!customerData._id) return
+    try {
+      const resp = await fetch(`/api/customers/${customerData._id}/logos`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fileId }),
+      })
+      if (!resp.ok) throw new Error('Delete failed')
+      const data = await resp.json()
+      setCustomerData((prev) => ({ ...prev, logoFiles: data.logoFiles }))
+    } catch (err) {
+      // no-op minimal handling
+    }
+  }
+
+  const openRenameModal = (logo: any) => {
+    setCurrentLogo(logo)
+    setNewDisplayName(logo.displayName || logo.filename || '')
+    setShowRenameModal(true)
+  }
+
+  const renameLogo = async () => {
+    if (!customerData._id || !currentLogo || !newDisplayName.trim()) return
+    try {
+      const resp = await fetch(`/api/customers/${customerData._id}/logos`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fileId: currentLogo.fileId, displayName: newDisplayName.trim() })
+      })
+      if (!resp.ok) throw new Error('Rename failed')
+      const data = await resp.json()
+      setCustomerData((prev) => ({ ...prev, logoFiles: data.logoFiles }))
+      setShowRenameModal(false)
+      setCurrentLogo(null)
+      setNewDisplayName('')
+    } catch (err) {
+      // no-op minimal handling
+    }
   }
 
   return (
@@ -189,6 +265,43 @@ const AddEditCustomerModal: FC<AddEditCustomerModalProps> = ({
         </Form>
       </Modal.Body>
       <Modal.Footer>
+        {customerData._id && (
+          <div style={{ width: '100%' }}>
+            <div className="mb-3">
+              <strong>Logos</strong>
+            </div>
+            <div className="mb-3" style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+              {customerData.logoFiles?.map((f) => (
+                <div key={f.fileId} style={{ position: 'relative', textAlign: 'center' }}>
+                  <img
+                    src={`/api/customers/${customerData._id}/logos/${f.fileId}`}
+                    alt={f.displayName || f.filename}
+                    style={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 4, border: '1px solid #ddd', cursor: 'pointer' }}
+                    onClick={() => openRenameModal(f)}
+                  />
+                  <Button
+                    size="sm"
+                    variant="outline-danger"
+                    onClick={() => handleDeleteLogo(String(f.fileId))}
+                    style={{ position: 'absolute', top: -8, right: -8, padding: '0 6px' }}
+                  >
+                    ×
+                  </Button>
+                  <div style={{ fontSize: '10px', marginTop: '2px', maxWidth: '72px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {f.displayName || f.filename}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="d-flex align-items-center gap-2" style={{ gap: 8 }}>
+              <Form.Control type="file" multiple accept="image/*" onChange={handleLogoFileChange} />
+              <Button onClick={uploadSelectedLogos} disabled={isUploading || !selectedLogoFiles || selectedLogoFiles.length === 0}>
+                {isUploading ? 'Uploading...' : 'Upload'}
+              </Button>
+            </div>
+            <hr className="my-3" />
+          </div>
+        )}
         <Button variant="secondary" onClick={onHide}>
           Close
         </Button>
@@ -196,6 +309,28 @@ const AddEditCustomerModal: FC<AddEditCustomerModalProps> = ({
           {customer ? 'Save Changes' : 'Add Customer'}
         </Button>
       </Modal.Footer>
+
+      {/* Rename Modal */}
+      <Modal show={showRenameModal} onHide={() => setShowRenameModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Rename Logo</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form.Group className='mb-3'>
+            <Form.Label>Display Name</Form.Label>
+            <Form.Control
+              type='text'
+              value={newDisplayName}
+              onChange={(e) => setNewDisplayName(e.target.value)}
+              placeholder='Enter logo name'
+            />
+          </Form.Group>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant='secondary' onClick={() => setShowRenameModal(false)}>Cancel</Button>
+          <Button variant='primary' onClick={renameLogo}>Save</Button>
+        </Modal.Footer>
+      </Modal>
     </Modal>
   )
 }

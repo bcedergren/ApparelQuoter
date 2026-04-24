@@ -35,7 +35,7 @@ const Customers: NextPage = () => {
     setIsLoading(true)
 
     try {
-      const response = await fetch(`/api/customers/${session.user.companyId}`)
+      const response = await fetch(`/api/customers/by-company/${session.user.companyId}`)
       if (!response.ok) throw new Error('Failed to fetch customers.')
       const data = await response.json()
 

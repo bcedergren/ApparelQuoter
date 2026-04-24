@@ -13,6 +13,51 @@ jest.mock('next-auth/react', () => ({
   signOut: jest.fn(),
 }))
 
+// Mock server-side next-auth helpers to avoid ESM-only transitive deps in Jest
+jest.mock('next-auth/next', () => ({
+  getServerSession: jest.fn(async () => ({
+    user: {
+      id: 'test-user-id',
+      email: 'test@example.com',
+      companyId: 'test-company-id',
+    },
+  })),
+}))
+
+jest.mock('@/pages/api/auth/[...nextauth]', () => ({
+  __esModule: true,
+  authOptions: {},
+  default: {},
+}))
+
+jest.mock('@/utils/dbConnect', () => jest.fn(async () => undefined))
+
+jest.mock('mongoose', () => {
+  class MockObjectId {
+    static isValid() {
+      return true
+    }
+  }
+  class MockSchema {
+    static Types = { ObjectId: MockObjectId }
+    pre() {}
+    post() {}
+    index() {}
+  }
+  const mongooseMock = {
+    __esModule: true,
+    default: undefined,
+    connect: jest.fn(),
+    connection: { readyState: 1 },
+    Schema: MockSchema,
+    Types: { ObjectId: MockObjectId },
+    model: jest.fn(() => ({})),
+    models: {},
+  }
+  mongooseMock.default = mongooseMock
+  return mongooseMock
+})
+
 // Mock next/router
 jest.mock('next/router', () => ({
   useRouter: () => ({
@@ -32,6 +77,12 @@ jest.mock('next/image', () => ({
   },
 }))
 
+// Mock app layout to avoid SidebarProvider dependency in page tests
+jest.mock('@/components/app/Layout', () => ({
+  __esModule: true,
+  default: ({ children }) => <>{children}</>,
+}))
+
 // Mock jsPDF
 jest.mock('jspdf', () => {
   return jest.fn().mockImplementation(() => ({
@@ -47,7 +98,9 @@ jest.mock('jspdf', () => {
     internal: {
       pageSize: {
         width: 595.28,
-        height: 841.89
+        height: 841.89,
+        getWidth: jest.fn(() => 595.28),
+        getHeight: jest.fn(() => 841.89),
       }
     }
   }))

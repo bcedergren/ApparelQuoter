@@ -14,4 +14,12 @@ export interface Company {
 	creditCardCharge: string;
 	offerings: string[];
 	quoteIdFormat: string;
+	apparelImages?: Array<{
+		fileId: string;
+		filename: string;
+		displayName?: string;
+		contentType?: string;
+		length?: number;
+		uploadDate?: string | Date;
+	}>;
 }

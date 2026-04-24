@@ -33,6 +33,10 @@ const DesignsPage: React.FC = () => {
     pages: 0
   });
 
+  // Delete confirmation modal state
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+
   const fetchDesigns = useCallback(async () => {
     try {
       setLoading(true);
@@ -61,7 +65,7 @@ const DesignsPage: React.FC = () => {
 
   const fetchCustomers = useCallback(async () => {
     try {
-      const response = await fetch(`/api/customers/${session?.user?.companyId}`);
+      const response = await fetch(`/api/customers/by-company/${session?.user?.companyId}`);
       const data = await response.json();
       if (response.ok) {
         setCustomers(data.customers || []);
@@ -73,11 +77,13 @@ const DesignsPage: React.FC = () => {
 
   const fetchUsers = useCallback(async () => {
     try {
-      const response = await fetch(`/api/users/${session?.user?.companyId}`);
-      const data = await response.json();
-      if (response.ok) {
-        setUsers(data.users || []);
+      const response = await fetch(`/api/company-users/${session?.user?.companyId}`);
+      if (!response.ok) {
+        const message = await response.text();
+        throw new Error(message || `Request failed: ${response.status}`);
       }
+      const data = await response.json();
+      setUsers((data?.users ?? data) || []);
     } catch (error) {
       console.error('Error fetching users:', error);
     }
@@ -94,7 +100,7 @@ const DesignsPage: React.FC = () => {
   }, [status, session, filters, pagination.page, fetchDesigns, fetchCustomers, fetchUsers, router]);
 
   const handleCreateDesign = () => {
-    router.push('/app/designs/create');
+    router.push('/app/designs/place');
   };
 
   const handleViewDesign = (design: Design) => {
@@ -102,18 +108,21 @@ const DesignsPage: React.FC = () => {
   };
 
   const handleEditDesign = (design: Design) => {
-    router.push(`/app/designs/${design._id}/edit`);
+    router.push(`/app/designs/${design._id}/place`);
   };
 
-  const handleDeleteDesign = async (designId: string) => {
-    if (!confirm('Are you sure you want to delete this design?')) return;
+  const confirmDeleteDesign = (designId: string) => {
+    setPendingDeleteId(designId);
+    setShowDeleteModal(true);
+  };
 
+  const handleDeleteDesign = async () => {
+    if (!pendingDeleteId) return;
     try {
-      const response = await fetch(`/api/designs/${designId}`, {
-        method: 'DELETE'
-      });
-
+      const response = await fetch(`/api/designs/${pendingDeleteId}`, { method: 'DELETE' });
       if (response.ok) {
+        setShowDeleteModal(false);
+        setPendingDeleteId(null);
         fetchDesigns();
       } else {
         const data = await response.json();
@@ -122,6 +131,9 @@ const DesignsPage: React.FC = () => {
     } catch (error) {
       console.error('Error deleting design:', error);
       setError('Failed to delete design');
+    } finally {
+      setShowDeleteModal(false);
+      setPendingDeleteId(null);
     }
   };
 
@@ -393,9 +405,16 @@ const DesignsPage: React.FC = () => {
                           <FaEdit />
                         </Button>
                         <Button
+                          variant="outline-success"
+                          size="sm"
+                          onClick={() => router.push(`/app/designs/${design._id}/place`)}
+                        >
+                          Place
+                        </Button>
+                        <Button
                           variant="outline-danger"
                           size="sm"
-                          onClick={() => handleDeleteDesign(design._id)}
+                          onClick={() => confirmDeleteDesign(design._id)}
                         >
                           <FaTrash />
                         </Button>
@@ -457,6 +476,23 @@ const DesignsPage: React.FC = () => {
           </Row>
         )}
       </Container>
+      {/* Delete Confirmation Modal */}
+      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Delete Design</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to delete this design? This action cannot be undone.
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={handleDeleteDesign}>
+            Delete
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Layout>
   );
 };

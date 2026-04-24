@@ -26,7 +26,15 @@ export default async function handler(
 			const company = await Company.findById(companyId);
 
 			if (company) {
-				res.status(200).json({ success: true, company });
+				// Stringify fileIds in apparelImages for frontend compatibility
+				const companyData = company.toObject();
+				if (companyData.apparelImages) {
+					companyData.apparelImages = companyData.apparelImages.map((img: any) => ({
+						...img,
+						fileId: img.fileId.toString(),
+					}));
+				}
+				res.status(200).json({ success: true, company: companyData });
 			} else {
 				res.status(404).json({ success: false, message: 'Company not found' });
 			}

@@ -5,14 +5,20 @@ import { useRouter } from 'next/router';
 import SideNavigation from './SideNavigation';
 import styles from '@/styles/Layout.module.css';
 import Footer from './Footer';
+import { useSidebar } from '@/context/SidebarContext';
+import SidebarToggle from '@/components/app/SidebarToggle';
+
 
 type LayoutProps = {
 	children: ReactNode;
 };
 
+const MOBILE_DRAWER_WIDTH = 280;
+const MOBILE_TOGGLE_WIDTH = 36;
+
 const Layout = ({ children }: LayoutProps) => {
 	const { data: session, status } = useSession();
-	const [collapsed, setCollapsed] = useState(false);
+	const { collapsed, toggleCollapse } = useSidebar();
 	const [isMobile, setIsMobile] = useState(false);
 	const [showSidebar, setShowSidebar] = useState(false);
 
@@ -47,11 +53,23 @@ const Layout = ({ children }: LayoutProps) => {
 					>
 						<SideNavigation
 							collapsed={collapsed}
-							setCollapsed={setCollapsed}
+							setCollapsed={(value: boolean) => {
+								if (value !== collapsed) {
+									toggleCollapse();
+								}
+							}}
 							isMobile={isMobile}
 							setShowSidebar={setShowSidebar}
 						/>
 					</aside>
+					{isMobile && (
+						<SidebarToggle
+							open={showSidebar}
+							onToggle={setShowSidebar}
+							mobileDrawerWidth={MOBILE_DRAWER_WIDTH}
+							ariaLabel={showSidebar ? 'Close sidebar navigation' : 'Open sidebar navigation'}
+						/>
+					)}
 					{isMobile && showSidebar && (
 						<div
 							className={styles.overlay}
@@ -64,6 +82,7 @@ const Layout = ({ children }: LayoutProps) => {
 				className={`${styles.mainContent} ${collapsed ? styles.expanded : ''} ${
 					isMobile ? styles.mobileContent : ''
 				}`}
+				style={isMobile && !showSidebar ? { marginLeft: `${MOBILE_TOGGLE_WIDTH}px` } : undefined}
 			>
 				{session && <Header />}
 				<div className={styles.content}>{children}</div>

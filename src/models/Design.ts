@@ -30,6 +30,18 @@ export interface IDesignVersion {
   notes?: string;
 }
 
+export interface IDesignPlacement {
+  apparelImageUrl: string;
+  areaId: 'front' | 'back' | 'left_sleeve' | 'right_sleeve';
+  logoVersionId: mongoose.Schema.Types.ObjectId;
+  position: {
+    x: number; // normalized 0..1
+    y: number; // normalized 0..1
+  };
+  widthInches: number;
+  rotation: number; // degrees
+}
+
 export interface IDesign extends Document {
   companyId: mongoose.Schema.Types.ObjectId;
   customerId: mongoose.Schema.Types.ObjectId;
@@ -48,6 +60,7 @@ export interface IDesign extends Document {
   createdBy: mongoose.Schema.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
+  placement?: IDesignPlacement;
 }
 
 const DesignCommentSchema = new Schema<IDesignComment>({
@@ -76,6 +89,22 @@ const DesignVersionSchema = new Schema<IDesignVersion>({
   approvedBy: { type: Schema.Types.ObjectId, ref: 'User' },
   approvedAt: { type: Date },
   notes: { type: String }
+});
+
+const DesignPlacementSchema = new Schema<IDesignPlacement>({
+  apparelImageUrl: { type: String, required: true },
+  areaId: {
+    type: String,
+    enum: ['front', 'back', 'left_sleeve', 'right_sleeve'],
+    required: true
+  },
+  logoVersionId: { type: Schema.Types.ObjectId, required: true },
+  position: {
+    x: { type: Number, required: true, min: 0, max: 1 },
+    y: { type: Number, required: true, min: 0, max: 1 }
+  },
+  widthInches: { type: Number, required: true, min: 0 },
+  rotation: { type: Number, required: true }
 });
 
 const DesignSchema = new Schema<IDesign>({
@@ -107,7 +136,8 @@ const DesignSchema = new Schema<IDesign>({
   completedAt: { type: Date },
   createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now }
+  updatedAt: { type: Date, default: Date.now },
+  placement: { type: DesignPlacementSchema, required: false }
 });
 
 // Pre-save middleware

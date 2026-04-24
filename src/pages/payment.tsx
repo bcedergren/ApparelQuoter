@@ -16,7 +16,7 @@ const PaymentPage = () => {
 			},
 		});
 
-		const checkoutSession = await res.json();
+		const { session: checkoutSession } = await res.json();
 		const stripe = await getStripe();
 		const { error } = await stripe!.redirectToCheckout({
 			sessionId: checkoutSession.id,

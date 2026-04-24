@@ -61,7 +61,7 @@ const InvoicesPage: React.FC = () => {
 
   const fetchCustomers = useCallback(async () => {
     try {
-      const response = await fetch(`/api/customers/${session?.user?.companyId}`);
+      const response = await fetch(`/api/customers/by-company/${session?.user?.companyId}`);
       const data = await response.json();
       if (response.ok) {
         setCustomers(data.customers || []);

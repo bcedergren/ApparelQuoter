@@ -15,7 +15,26 @@ export interface ICompany extends Document {
 	creditCardCharge?: string;
 	offerings?: string[];
 	quoteIdFormat: string;
+	apparelImages?: Array<{
+		fileId: mongoose.Types.ObjectId;
+		filename: string;
+		contentType?: string;
+		length?: number;
+		uploadDate?: Date;
+	}>;
 }
+
+const FileRefSchema: Schema = new Schema(
+{
+	fileId: { type: Schema.Types.ObjectId, required: true },
+	filename: { type: String, required: true },
+	displayName: { type: String },
+	contentType: { type: String },
+	length: { type: Number },
+	uploadDate: { type: Date },
+},
+{ _id: false }
+);
 
 const CompanySchema: Schema = new Schema({
 	name: { type: String, required: true },
@@ -32,6 +51,7 @@ const CompanySchema: Schema = new Schema({
 	creditCardCharge: { type: String },
 	offerings: { type: [String] },
 	quoteIdFormat: { type: String },
+	apparelImages: { type: [FileRefSchema], default: [] },
 });
 
 export default mongoose.models.Company ||

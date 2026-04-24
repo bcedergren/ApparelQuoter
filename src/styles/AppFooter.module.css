@@ -33,3 +33,22 @@
 .footer p {
 	margin: 0;
 }
+
+@media (max-width: 768px) {
+	.footer,
+	.footerCollapsed {
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		width: 100%;
+		background-color: #f8f9fa;
+		padding: 10px 20px;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		border-top: 1px solid #e7e7e7;
+		font-size: 14px;
+		color: #6c757d;
+		z-index: 1000;
+	}
+}

@@ -1,6 +1,6 @@
 /* This code snippet is setting up authentication using NextAuth in a TypeScript environment. It is
 configuring authentication providers like Google, Facebook, and custom credentials provider. */
-import NextAuth from 'next-auth';
+import NextAuth, { type NextAuthOptions } from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import FacebookProvider from 'next-auth/providers/facebook';
 import CredentialsProvider from 'next-auth/providers/credentials';
@@ -9,7 +9,14 @@ import User from '@/models/User';
 import { verifyPassword } from '@/lib/password';
 import { CustomUser, CustomJWT, CustomSession } from '@/types/CustomUser';
 
-export default NextAuth({
+export const authOptions: NextAuthOptions = {
+	secret: process.env.NEXTAUTH_SECRET,
+	session: {
+		strategy: 'jwt',
+		maxAge: 30 * 24 * 60 * 60,
+		updateAge: 24 * 60 * 60,
+	},
+	useSecureCookies: process.env.NODE_ENV === 'production',
 	providers: [
 		GoogleProvider({
 			clientId: process.env.GOOGLE_CLIENT_ID as string,
@@ -144,4 +151,6 @@ export default NextAuth({
 			console.log('User signed out:', message);
 		},
 	},
-});
+};
+
+export default NextAuth(authOptions);

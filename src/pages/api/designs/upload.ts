@@ -1,9 +1,30 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getSession } from 'next-auth/react';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/pages/api/auth/[...nextauth]';
 import formidable from 'formidable';
 import fs from 'fs';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
+
+const allowedExtensionsByMime: Record<string, string[]> = {
+  'image/jpeg': ['.jpg', '.jpeg'],
+  'image/png': ['.png'],
+  'image/gif': ['.gif'],
+  'image/svg+xml': ['.svg'],
+  'image/webp': ['.webp'],
+  'application/pdf': ['.pdf'],
+  'application/postscript': ['.ps', '.eps'],
+  'image/x-eps': ['.eps'],
+  'application/eps': ['.eps'],
+  'application/x-eps': ['.eps'],
+  'image/eps': ['.eps'],
+  'application/illustrator': ['.ai'],
+  'application/x-illustrator': ['.ai'],
+  'image/vnd.adobe.illustrator': ['.ai'],
+  'application/photoshop': ['.psd'],
+  'application/x-photoshop': ['.psd'],
+  'image/vnd.adobe.photoshop': ['.psd']
+};
 
 export const config = {
   api: {
@@ -15,7 +36,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const session = await getSession({ req });
+  const session = await getServerSession(req, res, authOptions);
 
   if (!session || !session.user) {
     return res.status(401).json({ message: 'Unauthorized' });
@@ -39,27 +60,7 @@ export default async function handler(
       maxFileSize: 50 * 1024 * 1024, // 50MB limit
       filter: ({ mimetype }) => {
         // Allow common image and design file types
-        const allowedTypes = [
-          'image/jpeg',
-          'image/png',
-          'image/gif',
-          'image/svg+xml',
-          'image/webp',
-          'application/pdf',
-          'application/illustrator',
-          'application/photoshop',
-          'application/x-photoshop',
-          'image/vnd.adobe.photoshop',
-          'application/postscript',
-          'image/x-eps',
-          'application/eps',
-          'application/x-eps',
-          'image/eps',
-          'application/illustrator',
-          'application/x-illustrator',
-          'image/vnd.adobe.illustrator'
-        ];
-        return allowedTypes.includes(mimetype || '');
+        return Boolean(mimetype && allowedExtensionsByMime[mimetype]);
       }
     });
 
@@ -72,7 +73,16 @@ export default async function handler(
     }
 
     // Generate unique filename
-    const fileExtension = path.extname(file.originalFilename || '');
+    const mimeType = file.mimetype || '';
+    const sourceExtension = path.extname(file.originalFilename || '').toLowerCase();
+    const allowedExtensions = allowedExtensionsByMime[mimeType] || [];
+    const fileExtension = allowedExtensions.includes(sourceExtension)
+      ? sourceExtension
+      : allowedExtensions[0];
+
+    if (!fileExtension) {
+      return res.status(400).json({ message: 'Unsupported or unsafe file type' });
+    }
     const uniqueFilename = `${uuidv4()}${fileExtension}`;
     const newPath = path.join(uploadDir, uniqueFilename);
 

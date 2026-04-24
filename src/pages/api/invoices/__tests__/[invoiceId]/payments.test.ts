@@ -203,3 +203,8 @@ describe('/api/invoices/[invoiceId]/payments', () => {
     });
   });
 });
+
+// Prevent Next route validator errors when test files are under `pages`.
+export default function __testFileRoutePlaceholder() {
+  return null;
+}

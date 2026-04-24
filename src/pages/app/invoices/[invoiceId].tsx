@@ -29,7 +29,7 @@ const InvoiceDetailPage: React.FC = () => {
 
   const fetchCustomer = useCallback(async (customerId: string) => {
     try {
-      const response = await fetch(`/api/customers/${session?.user?.companyId}`);
+      const response = await fetch(`/api/customers/by-company/${session?.user?.companyId}`);
       const data = await response.json();
       if (response.ok) {
         const customer = data.customers?.find((c: Customer) => c._id === customerId);

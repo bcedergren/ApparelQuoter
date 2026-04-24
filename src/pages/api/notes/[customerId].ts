@@ -2,7 +2,8 @@ import mongoose from 'mongoose';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import Customer from '@/models/Customer';
 import dbConnect from '@/utils/dbConnect';
-import { getSession } from 'next-auth/react';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/pages/api/auth/[...nextauth]';
 
 async function handlePost(
 	req: NextApiRequest,
@@ -42,7 +43,7 @@ export default async function handler(
 	req: NextApiRequest,
 	res: NextApiResponse
 ) {
-	const session = await getSession({ req });
+	const session = await getServerSession(req, res, authOptions);
 
 	if (!session || !session.user) {
 		return res.status(401).json({ message: 'Unauthorized' });

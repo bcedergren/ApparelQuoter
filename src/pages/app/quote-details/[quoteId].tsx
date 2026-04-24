@@ -111,7 +111,7 @@ const QuoteDetailsPage = () => {
     const fetchCustomerDetails = async () => {
       if (quote && quote.companyId) {
         try {
-          const response = await fetch(`/api/customers/${quote.companyId}`)
+          const response = await fetch(`/api/customers/by-company/${quote.companyId}`)
           const data = await response.json()
 
           if (data.customers && data.customers.length > 0) {
