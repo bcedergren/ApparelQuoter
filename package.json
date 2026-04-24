@@ -78,7 +78,7 @@
     "sharp": "^0.33.2",
     "stripe": "^18.5.0",
     "text-mask-addons": "^3.8.0",
-    "uuid": "^9.0.1",
+    "uuid": "^14.0.0",
     "winston": "^3.13.1"
   },
   "devDependencies": {
